@@ -178,7 +178,7 @@
 				
 				<div class="w-full md:w-1/3 m-4">
 					<h5 class="text-3xl my-4">Centro de distribución</h5>
-					<address>Av. La Paz 1181 Col. Centro CP: 45100, Guadalajara, Jalisco.</address>
+					<address>Av. La Paz 1181 Col. Centro CP: 44100, Guadalajara, Jalisco.</address>
 					<p class="mt-2"><i>HerramientasAltaCalidad@hotmail.com</i></p>
 
 					<h5 class="text-3xl my-4">Contáctanos</h5>

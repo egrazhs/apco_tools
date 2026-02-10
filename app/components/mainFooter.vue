@@ -30,7 +30,7 @@
 			<hr/>
 
 			<div class="flex">
-				<h6 class="p-4">APCO Tools 2026</h6>
+				<h6 class="p-4">APCO Tools {{current_year}}</h6>
 				<article>
 					
 				</article>
@@ -40,5 +40,5 @@
 </template>
 
 <script setup>
-	
+	const current_year = ref(new Date().getFullYear());
 </script>

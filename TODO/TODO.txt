@@ -1,0 +1,6 @@
+
+-Agregar imagenes a proyecto
+
+-Diseñar BD
+
+-PostgreSQL
