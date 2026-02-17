@@ -12,7 +12,8 @@
 
           <p class="text-2xl font-bold text-primary mb-6">${{ producto.precio_venta }}</p>
 
-          <UButton size="lg" disabled>Contactar / Comprar</UButton>
+          <UButton size="lg" class="cursor-pointer" :disabled="producto.stock === 0" @click="addToCart" >{{ producto.stock === 0 ? 'Sin stock' : 'Agregar al carrito' }}</UButton>
+
         </div>
 
       </div>
@@ -21,10 +22,27 @@
 </template>
 
 <script setup>
-const route = useRoute()
+  import { useCartStore } from '~/stores/cart'
+  
+  const route = useRoute()
+  const { $supabase } = useNuxtApp()
+  const { data: producto, error } = await $supabase.from('productos').select(`*, marcas ( nombre )`).eq('slug', route.params.slug).single()
+  const cart = useCartStore()
 
-const { $supabase } = useNuxtApp()
+  function addToCart() {
+    if (!producto) return
 
-const { data: producto, error } = await $supabase.from('productos').select(`*, marcas ( nombre )`).eq('slug', route.params.slug).single()
+    console.log(producto);
+
+    cart.addItem({
+      id: producto.id,
+      nombre: producto.nombre,
+      slug: producto.slug,
+      precio_venta: producto.precio_venta,
+      imagen_principal: producto.imagen_principal,
+      marca: producto.marcas?.nombre || '',
+    })
+  }
+
 
 </script>
