@@ -17,9 +17,7 @@ const { $supabase } = useNuxtApp()
 
 const marcas = ref([])
 
-const { data, error } = await $supabase
-  .from('marcas')
-  .select('*')
+const { data, error } = await $supabase.from('marcas').select('*');
 
 if (error) {
   console.error(error)
