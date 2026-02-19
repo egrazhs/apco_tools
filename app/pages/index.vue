@@ -201,4 +201,11 @@
 	</main>
 
 	<MainFooter></MainFooter>
+
+	<NuxtLink to="/cart">Ir al carrito de compra</NuxtLink>
+
+	<NuxtLink to="/productos" >Ver Productos</NuxtLink>
 </template>
+
+<script setup>
+</script>

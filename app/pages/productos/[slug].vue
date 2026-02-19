@@ -32,8 +32,6 @@
   function addToCart() {
     if (!producto) return
 
-    console.log(producto);
-
     cart.addItem({
       id: producto.id,
       nombre: producto.nombre,
@@ -41,6 +39,7 @@
       precio_venta: producto.precio_venta,
       imagen_principal: producto.imagen_principal,
       marca: producto.marcas?.nombre || '',
+      stock: producto.stock
     })
   }
 

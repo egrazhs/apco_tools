@@ -7,7 +7,7 @@
     </div>
 
     <!-- Estado vacío -->
-    <div v-if="cart.isLoaded && cart.items.length === 0" class="text-center py-20">
+    <div v-if="cart.items.length === 0" class="text-center py-20">
       <div class="mb-6 text-gray-400 text-6xl">🛒</div>
       <h2 class="text-xl font-semibold mb-2">Tu carrito está vacío</h2>
       <p class="text-gray-500 mb-6">Explora nuestros productos y encuentra lo que necesitas</p>
@@ -17,7 +17,7 @@
 
 
     <!-- Contenido carrito -->
-    <div v-else-if="cart.isLoaded" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
       <!-- Lista de productos -->
       <div class="lg:col-span-2 space-y-6">
@@ -36,37 +36,19 @@
 
             <!-- Cantidad -->
             <div class="flex items-center gap-4">
-              <UInput
-                type="number"
-                :model-value="item.cantidad"
-                @update:model-value="val => cart.updateQuantity(item.id, Number(val))"
-                min="1"
-                :max="item.stock"
-                class="w-24"
-              />
+              <UInput type="number" :model-value="item.cantidad" @update:model-value="val => cart.updateQuantity(item.id, Number(val))" min="1" 
+              	:max="item.stock" class="w-24"/>
 
-              <UButton
-                color="red"
-                variant="ghost"
-                @click="cart.removeItem(item.id)"
-              >
-                Eliminar
-              </UButton>
+              <UButton color="red" variant="ghost" @click="cart.removeItem(item.id)">Eliminar</UButton>
             </div>
           </div>
 
           <!-- Subtotal -->
           <div class="text-right">
-            <p class="text-gray-500 text-sm">
-              Subtotal
-            </p>
-            <p class="text-xl font-bold">
-              ${{ (item.precio_venta * item.cantidad).toFixed(2) }}
-            </p>
+            <p class="text-gray-500 text-sm">Subtotal</p>
+            <p class="text-xl font-bold">${{ (item.precio_venta * item.cantidad).toFixed(2) }}</p>
           </div>
-
         </div>
-
       </div>
 
       <!-- Resumen -->
@@ -94,20 +76,11 @@
         <UButton to="/productos" variant="ghost" block>Seguir comprando</UButton>
       </div>
     </div>
-
-    <!--Cargando Carrito-->
-    <div v-else class="py-20 text-center">Cargando carrito...</div>
-
   </div>
 </template>
 
 <script setup lang="ts">
 	import { useCartStore } from '~/stores/cart'
 
-	const cart = useCartStore()
-
-	onMounted(() => {
-  		cart.loadFromLocalStorage()
-	})
-
+	const cart = useCartStore();
 </script>
