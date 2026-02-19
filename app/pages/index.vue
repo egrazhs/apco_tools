@@ -12,6 +12,12 @@
 </template>
 
 <script setup>
+	onMounted(() => {
+  const toast = useToast()
+  toast.add({
+    title: 'TEST'
+  })
+})
 	definePageMeta({
 		layout: 'landing'
 	})

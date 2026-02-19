@@ -32,7 +32,7 @@
 
             <p class="text-gray-500 text-sm">Marca: {{ item.marca }}</p>
 
-            <p class="text-xl font-bold">${{ item.precio_venta.toFixed(2) }}</p>
+            <p class="text-xl font-bold">{{ formatCurrency(item.precio_venta) }}</p>
 
             <!-- Cantidad -->
             <div class="flex items-center gap-4">
@@ -46,7 +46,7 @@
           <!-- Subtotal -->
           <div class="text-right">
             <p class="text-gray-500 text-sm">Subtotal</p>
-            <p class="text-xl font-bold">${{ (item.precio_venta * item.cantidad).toFixed(2) }}</p>
+            <p class="text-xl font-bold">{{ formatCurrency((item.precio_venta * item.cantidad)) }}</p>
           </div>
         </div>
       </div>
@@ -58,17 +58,17 @@
 
         <div class="flex justify-between">
           <span>Subtotal</span>
-          <span>${{ cart.subtotal.toFixed(2) }}</span>
+          <span>{{ formatCurrency(cart.subtotal) }}</span>
         </div>
 
         <div class="flex justify-between">
           <span>Impuestos (16%)</span>
-          <span>${{ cart.tax.toFixed(2) }}</span>
+          <span>{{ formatCurrency(cart.tax) }}</span>
         </div>
 
         <div class="border-t pt-4 flex justify-between text-lg font-bold">
           <span>Total</span>
-          <span>${{ cart.total.toFixed(2) }}</span>
+          <span>{{ formatCurrency(cart.total) }}</span>
         </div>
 
         <UButton block size="lg" class="mt-4">Proceder al pago</UButton>
@@ -83,4 +83,6 @@
 	import { useCartStore } from '~/stores/cart'
 
 	const cart = useCartStore();
+
+  const { formatCurrency } = useCurrency();
 </script>

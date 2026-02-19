@@ -27,7 +27,9 @@
   const route = useRoute()
   const { $supabase } = useNuxtApp()
   const { data: producto, error } = await $supabase.from('productos').select(`*, marcas ( nombre )`).eq('slug', route.params.slug).single()
-  const cart = useCartStore()
+  const cart = useCartStore();
+  const toast = useToast();
+
 
   function addToCart() {
     if (!producto) return
@@ -41,7 +43,22 @@
       marca: producto.marcas?.nombre || '',
       stock: producto.stock
     })
+
+    toast.add({
+      title: 'Producto agregado',
+      description: `fue agregado al carrito.`,
+      color: 'green',
+      icon: 'i-heroicons-check-circle'
+    })
   }
+
+  onMounted(() => {
+    console.log(toast);
+    
+    toast.add({
+      title: 'Toast de prueba'
+    })
+  })
 
 
 </script>
