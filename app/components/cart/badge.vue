@@ -15,9 +15,9 @@
 	const isBouncing = ref(false)
 
 	watch( () => cart.totalItems, (newVal, oldVal) => {
-	if (newVal > oldVal) {
-	  triggerBounce()
-	}
+		if (newVal > oldVal) {
+		  triggerBounce()
+		}
 	})
 
 	function triggerBounce() {
