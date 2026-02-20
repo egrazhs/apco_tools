@@ -1,9 +1,5 @@
 <script setup lang="ts">
-const toast = useToast()
-
-definePageMeta({
-  layout: false
-})
+const toast = useToast();
 
 function addToCalendar() {
   const eventDate = new Date(Date.now() + Math.random() * 31536000000)
