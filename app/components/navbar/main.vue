@@ -13,13 +13,12 @@
           <NuxtLink to="/cart" class="hover:text-primary">Carrito</NuxtLink>
         </nav>
 
-        <!-- Cart Icon -->
-        <CartBadge />
+        <CartMiniSlide />
       </div>
     </div>
   </header>
 </template>
 
 
-<script setup lang="ts">
+<script setup>
 </script>

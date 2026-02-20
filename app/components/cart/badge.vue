@@ -1,12 +1,12 @@
 <template>
-	<NuxtLink to="/cart" class="relative">
-     <UIcon name="i-heroicons-shopping-cart" class="w-6 h-6 transition-transform duration-300" :class="{ 'animate-bounce-cart': isBouncing }"/>
+	<div class="relative cursor-pointer hover:scale-105">
+      <UIcon name="i-heroicons-shopping-cart" class="w-6 h-6 transition-transform duration-300" :class="{ 'animate-bounce-cart': isBouncing }"/>
 
       <!-- Badge -->
       <Transition name="badge">
         <span v-if="cart.totalItems > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">{{ cart.totalItems > 9 ? '9+' : cart.totalItems }}</span>
       </Transition>
-    </NuxtLink>
+    </div>
 </template>
 
 <script setup>

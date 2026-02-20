@@ -21,8 +21,8 @@
 					<p class="w-1/6 p-2 mx-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a href="#marcas">Precios</a></p>
 					<p class="w-1/6 p-2 mx-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a href="#contacto">Contacto</a></p>
 
-					<article class="relative w-12 h-10">
-						<CartBadge />
+					<article class="relative">
+						<CartMiniSlide />
 					</article>
 				</div>
 			</nav>
@@ -32,7 +32,7 @@
 		<nav id="nav_moviles" class="hidden lg:hidden">
 			<div class="flex flex-wrap items-center">
 				<article class="relative w-12 h-10">
-					<CartBadge />
+					<CartMiniSlide />
 				</article>
 			</div>
 
