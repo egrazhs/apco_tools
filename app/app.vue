@@ -6,6 +6,8 @@
   </UApp>
 </template>
 
-
 <script setup>
+  const { init } = useAuth();
+
+  await init();
 </script>

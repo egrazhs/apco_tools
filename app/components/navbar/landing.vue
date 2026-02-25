@@ -1,5 +1,5 @@
 <template>
-	<header class="sticky top-0 bg-white z-50">
+	<header class="sticky top-0 bg-white z-10">
 		<div class="container mx-auto flex justify-between items-center content-center py-4">
 			<article>
 				<img src="/img/APCO_PNG.webp" draggable="false" />

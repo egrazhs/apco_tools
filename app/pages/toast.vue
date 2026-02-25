@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const toast = useToast();
+const toast = useToast()
 
 function addToCalendar() {
   const eventDate = new Date(Date.now() + Math.random() * 31536000000)
@@ -8,8 +8,6 @@ function addToCalendar() {
     day: 'numeric',
     year: 'numeric'
   })
-
-  console.log("Aqui deberia mostrar el toast", toast);
 
   toast.add({
     title: 'Event added to calendar',
@@ -26,6 +24,5 @@ function addToCalendar() {
     variant="outline"
     icon="i-lucide-plus"
     @click="addToCalendar"
-    class="cursor-pointer"
   />
 </template>

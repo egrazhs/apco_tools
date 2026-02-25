@@ -4,7 +4,9 @@
 
       <!-- Badge -->
       <Transition name="badge">
+        <ClientOnly>
         <span v-if="cart.totalItems > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">{{ cart.totalItems > 9 ? '9+' : cart.totalItems }}</span>
+         </ClientOnly>
       </Transition>
     </div>
 </template>
