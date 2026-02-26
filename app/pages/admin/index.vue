@@ -1,14 +1,19 @@
 <template>
 	<h1>Admin Index</h1>
 
-	<button @click="logout" class="cursor-pointer">Cerrar sesión</button>
+	<div>
+		<NuxtLink to="/admin/categorias" >ver categorias</NuxtLink>
+	</div>
+
+	<button @click="handleLogout" class="cursor-pointer">Cerrar sesión</button>
 </template>
 
-<script setup>
-	const { $supabase } = useNuxtApp()
+<script setup lang="ts">
+	const { logout } = useAuth()
+	const user = useSupabaseUser()
 
-	const logout = async () => {
-	  await $supabase.auth.signOut()
-	  await navigateTo('/login')
+	const handleLogout = async () => {
+		await logout()
+		await navigateTo('/login')
 	}
 </script>

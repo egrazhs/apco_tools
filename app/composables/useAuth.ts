@@ -1,71 +1,49 @@
 export const useAuth = () => {
-  const { $supabase } = useNuxtApp()
+	const supabase = useSupabaseClient()
+	const user = useSupabaseUser()
 
-  const user = useState('auth_user', () => null)
-  const perfil = useState('auth_perfil', () => null)
-  const loading = useState('auth_loading', () => true)
+	const perfil = useState('auth_perfil', () => null)
+	const loading = useState('auth_loading', () => false)
 
-  const fetchPerfil = async () => {
-  if (!user.value) return
+	const fetchPerfil = async () => {
+		if (!user.value?.id) {
+			perfil.value = null
+			return
+		}
 
-  const { data, error } = await $supabase.from('perfiles').select('*').eq('id', user.value.id).single()
+		loading.value = true
 
-  if (error) {
-    console.warn('Error cargando perfil:', error.message)
-    perfil.value = null
-    return
-  }
+		const { data, error } = await supabase.from('perfiles').select('*').eq('id', user.value.id).single()
 
-  perfil.value = data
-}
+		if (error) {
+			console.warn('Error cargando perfil:', error.message)
+			perfil.value = null
+		} else {
+			perfil.value = data
+		}
 
-  let authListener: any = null
+		loading.value = false
+	}
 
-  const init = async () => {
-    loading.value = true
+	const login = async (email: string, password: string) => {
+		const { error } = await supabase.auth.signInWithPassword({email, password})
 
-    const { data } = await $supabase.auth.getUser()
-    user.value = data.user
+		if (error) throw error
+	}
 
-    if (user.value) {
-      await fetchPerfil()
-    }
+	const logout = async () => {
+		await supabase.auth.signOut()
+		perfil.value = null
+	}
 
-    loading.value = false
+	// Cada vez que cambia el usuario, cargamos perfil
+	watch(user, async (newUser) => {
+		if (newUser?.id) {
+			await fetchPerfil()
+		} else {
+			perfil.value = null
+		}
+	}, { immediate: true })
 
-    if (!authListener) {
-      const { data: listener } = $supabase.auth.onAuthStateChange(
-        async (_, session) => {
-          user.value = session?.user ?? null
-
-          if (user.value) {
-            await fetchPerfil()
-          } else {
-            perfil.value = null
-          }
-        }
-      )
-
-      authListener = listener
-    }
-  }
-
-  const login = async (email: string, password: string) => {
-    const { error } = await $supabase.auth.signInWithPassword({email, password})
-
-    if (error) throw error
-  }
-
-  const logout = async () => {
-    await $supabase.auth.signOut()
-  }
-
-  return {
-    user,
-    perfil,
-    loading,
-    login,
-    logout,
-    init
-  }
+	return {user, perfil, loading, login, logout, fetchPerfil}
 }
