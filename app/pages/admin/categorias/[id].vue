@@ -12,17 +12,13 @@
 	const route = useRoute()
 	const { getCategoryById, updateCategory: update } = useCategories()
 
-	const category = ref(null)
-
-	const fetchCategory = async () => {
+	const { data: category } = await useAsyncData('category', async () => {
 		const { data } = await getCategoryById(route.params.id as string)
-		if (data) category.value = data
-	}
+		return data ?? null
+	})
 
 	const updateCategory = async (form: any) => {
 		await update(route.params.id as string, form)
 		navigateTo('/admin/categorias')
 	}
-
-	onMounted(fetchCategory)
 </script>

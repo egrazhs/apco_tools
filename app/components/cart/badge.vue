@@ -1,29 +1,38 @@
 <template>
-	<div class="relative cursor-pointer hover:scale-105">
-		<UIcon name="i-heroicons-shopping-cart" class="w-6 h-6 transition-transform duration-300" :class="{ 'animate-bounce-cart': isBouncing }"/>
-
-		<!-- Badge -->
-		<Transition name="badge">
-			<span v-if="cart.totalItems > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">{{ cart.totalItems > 9 ? '9+' : cart.totalItems }}</span>
-		</Transition>
-	</div>
+  <div class="relative cursor-pointer hover:scale-105">
+    <UIcon name="i-heroicons-shopping-cart" class="w-6 h-6 transition-transform duration-300" :class="{ 'animate-bounce-cart': isBouncing }"/>
+    <!-- Badge -->
+    <Transition name="badge">
+      <span 
+        v-if="isHydrated && cart.totalItems > 0" 
+        class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"
+      >
+        {{ cart.totalItems > 9 ? '9+' : cart.totalItems }}
+      </span>
+    </Transition>
+  </div>
 </template>
 
 <script setup>
-	const cart = useCartStore()
+	
+  const cart = useCartStore()
+  const isBouncing = ref(false)
+  const isHydrated = ref(false)
 
-	const isBouncing = ref(false)
+  onMounted(() => {
+    isHydrated.value = true
+  })
 
-	watch( () => cart.totalItems, (newVal, oldVal) => {
-		if (newVal > oldVal) {
-			triggerBounce()
-		}
-	})
+  watch(() => cart.totalItems, (newVal, oldVal) => {
+    if (newVal > oldVal) {
+      triggerBounce()
+    }
+  })
 
-	function triggerBounce() {
-		isBouncing.value = true
-		setTimeout(() => { isBouncing.value = false}, 300)
-	}
+  function triggerBounce() {
+    isBouncing.value = true
+    setTimeout(() => { isBouncing.value = false }, 300)
+  }
 </script>
 
 <style scoped>

@@ -1,7 +1,9 @@
 <template>
-	<placeGallery/>
-	<ragsGallery/>
-	<brandsSection/>
+	<div>
+		<placeGallery/>
+		<ragsGallery/>
+		<brandsSection/>
+	</div>
 </template>
 
 <script setup></script>

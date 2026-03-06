@@ -1,14 +1,16 @@
 <template>
-	<main id="inicio">
-		<LandingHeader />
-		<LandingProductos />
-		<LandingNosotros />
-		<LandingDistribuidores />
-		<LandingMarcas />
-		<LandingContacto />
-	</main>
+	<div>
+		<main id="inicio">
+			<LandingHeader />
+			<LandingProductos />
+			<LandingNosotros />
+			<LandingDistribuidores />
+			<LandingMarcas />
+			<LandingContacto />
+		</main>
 
-	<MainFooter></MainFooter>
+		<MainFooter></MainFooter>
+	</div>
 </template>
 
 <script setup>
