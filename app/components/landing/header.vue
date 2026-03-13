@@ -21,7 +21,7 @@
 
 			<!-- Subtítulo -->
 			<p class="text-stone-300 text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
-				25 años equipando a profesionales con las marcas líderes del mercado industrial.
+				+25 años equipando a profesionales con las marcas líderes del mercado industrial.
 			</p>
 
 			<!-- CTAs -->

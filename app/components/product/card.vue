@@ -1,7 +1,7 @@
 <template>
     <div
-        class="group relative bg-white rounded-2xl overflow-hidden border border-stone-100
-               shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+        class="group bg-white overflow-hidden border border-stone-200
+               hover:border-red-600 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col"
     >
         <!-- Imagen -->
         <div class="relative overflow-hidden bg-stone-100 aspect-square">
@@ -18,9 +18,9 @@
             <!-- Badge sin stock -->
             <div
                 v-if="product.stock === 0"
-                class="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center"
+                class="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center"
             >
-                <span class="text-xs font-semibold tracking-[0.15em] uppercase text-stone-500 bg-white px-3 py-1.5 rounded-full border border-stone-200">
+                <span class="text-xs font-bold tracking-[0.2em] uppercase text-stone-500 bg-white px-3 py-1.5 border border-stone-200">
                     Sin stock
                 </span>
             </div>
@@ -28,17 +28,26 @@
             <!-- Badge marca -->
             <div
                 v-if="product.marcas?.nombre"
-                class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-stone-600
-                       text-[10px] font-semibold tracking-wider uppercase px-2.5 py-1 rounded-full border border-stone-100"
+                class="absolute top-3 left-3 bg-white text-stone-700
+                       text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 border border-stone-200"
             >
                 {{ product.marcas.nombre }}
+            </div>
+
+            <!-- Badge oferta -->
+            <div
+                v-if="product.precioOferta"
+                class="absolute top-3 right-3 bg-red-600 text-white
+                       text-[10px] font-bold tracking-widest uppercase px-2.5 py-1"
+            >
+                Oferta
             </div>
         </div>
 
         <!-- Info -->
         <div class="flex flex-col flex-1 p-4 gap-3">
             <div class="flex-1 space-y-1">
-                <h3 class="font-semibold text-stone-900 leading-snug line-clamp-2">
+                <h3 class="font-bold text-stone-900 leading-snug line-clamp-2 group-hover:text-red-600 transition-colors duration-200">
                     {{ product.nombre }}
                 </h3>
                 <p class="text-xs text-stone-400 line-clamp-2 leading-relaxed">
@@ -49,23 +58,14 @@
             <!-- Precio -->
             <div class="flex items-baseline gap-2">
                 <span class="text-xl font-black text-stone-900">
-                    ${{ product.precioOferta || product.precio_venta }}
+                    {{ formatCurrency(product.precioOferta || product.precio_venta) }}
                 </span>
                 <span
                     v-if="product.precioOferta"
                     class="text-xs text-stone-400 line-through"
                 >
-                    ${{ product.precio }}
+                    {{ formatCurrency(product.precio_venta) }}
                 </span>
-                <UBadge
-                    v-if="product.precioOferta"
-                    color="amber"
-                    variant="soft"
-                    size="xs"
-                    class="ml-auto"
-                >
-                    Oferta
-                </UBadge>
             </div>
 
             <!-- Acciones -->
@@ -75,27 +75,29 @@
                     variant="outline"
                     block
                     size="sm"
-                    color="gray"
-                    :ui="{ rounded: 'rounded-xl' }"
+                    class="rounded-none border-stone-300 text-stone-700 hover:border-stone-900 hover:text-stone-900 hover:bg-transparent transition-colors"
                 >
                     Ver detalles
                 </UButton>
+                <!--
                 <UButton
                     block
                     size="sm"
                     :disabled="product.stock === 0"
-                    color="amber"
-                    :ui="{ rounded: 'rounded-xl', font: 'font-semibold' }"
+                    class="rounded-none font-bold uppercase tracking-widest text-xs bg-red-600 hover:bg-stone-900 text-white transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
                     icon="i-heroicons-shopping-cart"
                 >
                     Agregar al carrito
                 </UButton>
+                -->
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
+    const { formatCurrency } = useCurrency()
+
     defineProps({
         product: {
             type: Object,

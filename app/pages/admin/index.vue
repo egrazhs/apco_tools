@@ -69,6 +69,9 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: false
+})
 const { logout } = useAuth()
 const user = useSupabaseUser()
 

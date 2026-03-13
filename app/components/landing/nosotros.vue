@@ -14,7 +14,7 @@
                     <div class="w-16 h-1 bg-red-600 mb-8 mx-auto lg:mx-0" />
 
                     <p class="text-stone-600 leading-relaxed mb-5 text-center lg:text-left">
-                        Somos una empresa con <strong class="text-stone-900">25 años de experiencia</strong> en el mercado,
+                        Somos una empresa con <strong class="text-stone-900">mas 25 años de experiencia</strong> en el mercado,
                         fundada con la misión de ofrecer soluciones herramentales a profesionales e industrias.
                         Trabajamos con las mejores marcas para cubrir necesidades de herramienta industrial,
                         protección personal y equipos de seguridad.
@@ -58,7 +58,7 @@
                     </div>
 
                     <div class="absolute -bottom-4 -left-4 bg-red-600 text-white p-5 shadow-xl hidden lg:block">
-                        <p class="text-4xl font-black leading-none">25</p>
+                        <p class="text-4xl font-black leading-none">+25</p>
                         <p class="text-xs uppercase tracking-widest mt-1 text-red-100">Años</p>
                     </div>
                 </div>

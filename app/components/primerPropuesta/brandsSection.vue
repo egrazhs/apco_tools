@@ -1,5 +1,5 @@
 <template>
-    <section class="py-16 md:py-24 bg-white">
+    <section id="marcas" class="py-16 md:py-24 bg-white">
         <UContainer>
 
             <!-- Header -->

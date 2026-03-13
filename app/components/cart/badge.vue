@@ -1,6 +1,6 @@
 <template>
   <div class="relative cursor-pointer hover:scale-105">
-    <UIcon name="i-heroicons-shopping-cart" class="w-6 h-6 transition-transform duration-300" :class="{ 'animate-bounce-cart': isBouncing }"/>
+    <UIcon name="i-heroicons-shopping-cart" class="w-6 h-6 text-stone-700 transition-transform duration-300" :class="{ 'animate-bounce-cart': isBouncing }"/>
     <!-- Badge -->
     <Transition name="badge">
       <span 

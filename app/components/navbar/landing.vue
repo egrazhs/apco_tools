@@ -1,51 +1,101 @@
 <template>
-	<header class="sticky top-0 bg-white z-50">
-		<div class="container mx-auto flex justify-between items-center content-center py-4">
-			<article>
-				<img src="/img/APCO_PNG.webp" draggable="false" />
-			</article>
+    <header class="sticky top-0 bg-white z-50 border-b border-stone-200 shadow-sm">
+        <UContainer>
+            <div class="flex justify-between items-center py-3">
 
-			<article id="iconos_nav" class="lg:hidden">
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mt-4 mr-4 cursor-pointer">
-					<path id="path_hamburger" class="bg-red-600" stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-					<path id="path_x" class="hidden" stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-	  			</svg>
-			</article>
+                <!-- Logo -->
+                <NuxtLink to="/" class="flex items-center">
+                    <img
+                        src="/img/APCO_PNG.webp"
+                        alt="APCO Tools"
+                        class="h-10 object-contain"
+                        draggable="false"
+                    />
+                </NuxtLink>
 
-			<nav class="sticky top-0 bg-white uppercase hidden lg:block xl:w-[60%]">
-				<div class="flex items-center">
-					<p class="w-1/6 p-2 mx-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a href="#inicio">Inicio</a></p>
-					<p class="w-1/6 p-2 mx-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a href="#productos">Productos</a></p>
-					<p class="w-1/6 p-2 mx-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a href="#nosotros">Nosotros</a></p>
-					<p class="w-1/6 p-2 mx-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a href="#distribuidores">Marcas</a></p>
-					<p class="w-1/6 p-2 mx-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a href="#marcas">Precios</a></p>
-					<p class="w-1/6 p-2 mx-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a href="#contacto">Contacto</a></p>
+                <!-- Nav desktop -->
+                <nav class="hidden lg:flex items-center gap-1">
+                    <a
+                        v-for="link in navLinks"
+                        :key="link.label"
+                        :href="link.href"
+                        class="px-4 py-2 text-xs font-bold uppercase tracking-widest text-stone-600 hover:text-red-600 hover:bg-stone-50 transition-colors duration-150"
+                    >
+                        {{ link.label }}
+                    </a>
 
-					<article class="relative">
-						<CartMiniSlide />
-					</article>
-				</div>
-			</nav>
-		</div>
+                    <!-- CTA cotización -->
+                    <a
+                        href="#contacto"
+                        class="ml-4 px-5 py-2 text-xs font-black uppercase tracking-widest bg-red-600 text-white hover:bg-stone-900 transition-colors duration-150"
+                    >
+                        Cotizar
+                    </a>
 
+                    <!-- Carrito -->
+                    <div class="ml-2 relative">
+                        <CartMiniSlide />
+                    </div>
+                </nav>
 
-		<nav id="nav_moviles" class="hidden lg:hidden">
-			<div class="flex flex-wrap items-center">
-				<article class="relative w-12 h-10">
-					<CartMiniSlide />
-				</article>
-			</div>
+                <!-- Mobile: carrito + hamburger -->
+                <div class="flex items-center gap-3 lg:hidden">
+                    <CartMiniSlide />
+                    <button
+                        @click="menuAbierto = !menuAbierto"
+                        class="p-2 text-stone-700 hover:text-red-600 transition-colors"
+                        aria-label="Menú"
+                    >
+                        <UIcon
+                            :name="menuAbierto ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
+                            class="text-2xl"
+                        />
+                    </button>
+                </div>
 
-			<p class="elemento_nav_moviles w-full p-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a class="w-full block" href="#inicio">Inicio</a></p>
-			<p class="elemento_nav_moviles w-full p-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a class="w-full block" href="#productos">Productos</a></p>
-			<p class="elemento_nav_moviles w-full p-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a class="w-full block" href="#nosotros">Nosotros</a></p>
-			<p class="elemento_nav_moviles w-full p-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a class="w-full block" href="#distribuidores">Marcas</a></p>
-			<p class="elemento_nav_moviles w-full p-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a class="w-full block" href="#marcas">Precios</a></p>
-			<p class="elemento_nav_moviles w-full p-2 text-center bg-red-600 text-white cursor-pointer hover:bg-slate-800 duration-100"><a class="w-full block" href="#contacto">Contacto</a></p>
-		</nav>
-	</header>
+            </div>
+        </UContainer>
+
+        <!-- Nav mobile -->
+        <Transition
+            enter-active-class="transition-all duration-200 ease-out"
+            enter-from-class="opacity-0 -translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition-all duration-150 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-2"
+        >
+            <nav v-if="menuAbierto" class="lg:hidden bg-white border-t border-stone-100">
+                <a
+                    v-for="link in navLinks"
+                    :key="link.label"
+                    :href="link.href"
+                    class="block w-full px-6 py-3 text-sm font-bold uppercase tracking-widest text-stone-600 hover:text-red-600 hover:bg-stone-50 border-b border-stone-100 transition-colors"
+                    @click="menuAbierto = false"
+                >
+                    {{ link.label }}
+                </a>
+                <a
+                
+                    href="#contacto"
+                    class="block w-full px-6 py-3 text-sm font-black uppercase tracking-widest bg-red-600 text-white hover:bg-stone-900 transition-colors text-center"
+                    @click="menuAbierto = false"
+                >
+                    Cotizar Ahora
+                </a>
+            </nav>
+        </Transition>
+    </header>
 </template>
 
 <script setup>
-	
+    const menuAbierto = ref(false)
+
+    const navLinks = [
+        { label: 'Inicio',    href: '#inicio' },
+        { label: 'Nosotros',  href: '#nosotros' },
+        { label: 'Productos', href: '#productos' },
+        { label: 'Marcas',    href: '#marcas' },
+        { label: 'Contacto',  href: '#contacto' },
+    ]
 </script>

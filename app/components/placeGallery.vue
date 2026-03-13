@@ -6,7 +6,6 @@
 			loop
 			arrows
 			indicators
-			autoplay="true"
 			dots
 			:autoplay-delay="5000"
 			class="h-[70vh] overflow-hidden rounded-none"
