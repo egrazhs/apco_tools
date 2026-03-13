@@ -2,12 +2,15 @@
 	<div>
 		<main id="inicio">
 			<LandingHeader />
-			<LandingProductos />
+			<PrimerPropuestaStats />
+			<!--<PrimerPropuestaPlaceGallery />-->
+			<PrimerPropuestaProductos />
+			<PlaceGallery/>
 			<LandingNosotros />
-			<LandingDistribuidores />
-			<LandingMarcas />
+			<PrimerPropuestaRagsGallery />
+			<PrimerPropuestaBrandsSection />
 			<LandingContacto />
-		</main>
+		</main> 
 
 		<MainFooter></MainFooter>
 	</div>

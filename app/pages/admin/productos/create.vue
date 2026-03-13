@@ -1,7 +1,7 @@
 <template>
-  <div class="p-6">
-    <AdminProductosForm :marcas="marca_options || []" @submit="saveProduct" />
-  </div>
+	<div class="p-6">
+		<AdminProductosForm :marcas="marca_options || []" @submit="saveProduct" />
+	</div>
 </template>
 
 <script setup lang="ts">
