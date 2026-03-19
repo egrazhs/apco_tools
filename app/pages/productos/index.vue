@@ -5,7 +5,7 @@
             <div class="max-w-7xl mx-auto px-6 py-12">
                 <p class="text-xs font-semibold tracking-[0.25em] uppercase text-stone-400 mb-2">Catálogo</p>
                 <h1 class="text-5xl font-black tracking-tight text-stone-900 mb-8" style="font-family: 'Georgia', serif;">
-                    Nuestros <em class="italic font-normal text-amber-600">productos</em>
+                    Nuestros productos
                 </h1>
                 <div class="max-w-md">
                     <UInput
