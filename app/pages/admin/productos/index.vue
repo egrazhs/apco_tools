@@ -97,7 +97,7 @@
 			</template>
 
 			<template #body>
-				<p class="text-sm text-gray-600 dark:text-gray-300 py-2">¿Estás seguro que deseas eliminar<span class="font-semibold text-gray-900 dark:text-white">{{ deleteModal.producto?.nombre }}</span>?</p>
+				<p class="text-sm text-gray-600 dark:text-gray-300 py-2">¿Estás seguro que deseas eliminar <span class="font-semibold text-gray-900 dark:text-white">{{ deleteModal.producto?.nombre }}</span>?</p>
 			</template>
 
 			<template #footer>

@@ -90,6 +90,14 @@ const sections = [
     iconColor: 'text-blue-600 dark:text-blue-400',
   },
   {
+    to: '/admin/subcategorias',
+    label: 'Subategorías',
+    description: 'Crea, edita y elimina las subcategorías de productos.',
+    icon: 'i-lucide-folder',
+    bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+    iconColor: 'text-blue-800 dark:text-blue-600',
+  },
+  {
     to: '/admin/marcas',
     label: 'Marcas',
     description: 'Administra las marcas disponibles en el catálogo.',

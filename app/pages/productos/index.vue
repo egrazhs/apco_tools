@@ -57,10 +57,26 @@
     const supabase = useSupabaseClient()
     const search = ref('')
 
-    const { data: products, pending, error } = await useAsyncData('productos', async () => {
-        const { data, error } = await supabase.from('productos').select('*, marcas(nombre)')
+    const { data: products, pending, error, refresh } = await useAsyncData('productos', async () => {
+        const { data, error } = await supabase
+            .from('productos')
+            .select('*, marcas(nombre)')
         if (error) throw error
         return data
+    })
+
+    // Suscripción a cambios en tiempo real
+    const channel = supabase
+        .channel('productos-realtime')
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'productos' },
+            () => refresh()
+        )
+        .subscribe()
+
+    onUnmounted(() => {
+        supabase.removeChannel(channel)
     })
 
     const productos_filtrados = computed(() => {
