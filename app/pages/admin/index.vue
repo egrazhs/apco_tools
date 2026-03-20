@@ -91,7 +91,7 @@ const sections = [
   },
   {
     to: '/admin/subcategorias',
-    label: 'Subategorías',
+    label: 'Subcategorías',
     description: 'Crea, edita y elimina las subcategorías de productos.',
     icon: 'i-lucide-folder',
     bgColor: 'bg-blue-100 dark:bg-blue-900/30',
