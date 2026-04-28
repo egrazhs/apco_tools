@@ -1,0 +1,380 @@
+------Tabla Adresses
+
+CREATE TABLE addresses (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    alias           TEXT NOT NULL DEFAULT 'Casa',          -- "Casa", "Oficina", etc.
+    recipient_name  TEXT NOT NULL,
+    street          TEXT NOT NULL,
+    ext_number      TEXT NOT NULL,
+    int_number      TEXT,
+    neighborhood    TEXT NOT NULL,
+    city            TEXT NOT NULL DEFAULT 'Guadalajara',
+    state           TEXT NOT NULL DEFAULT 'Jalisco',
+    zip_code        TEXT NOT NULL,
+    country         TEXT NOT NULL DEFAULT 'MX',
+    phone           TEXT,
+    is_default      BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+user_id: 			usuario al que pertenece la direccion
+alias: 				nombre para referirse a la direccion, por ejemplo casa u oficina
+recipient_name:		Nombre de la persona que hace el pedido
+street:				Calle de la direccion
+ext_number:			Numero exterior de la dirección
+int_number:			numero interior de la direccion
+neighborhood:		Colonia de la dirección
+city:				Ciudad (por default Guadalajara)
+state:				Estado (por default Jalisco)
+zip_code:			Codigo postal de la dirección
+country:			Pais (por default 'MX')
+phone:				Telefono
+is_default:			bool para ver si es la direccion predefinida (por default FALSE)
+created_at			Tiempo en que se creo el registro de la dirección
+updated_at			Fecha del ultimo cambio a la dirección
+
+
+
+
+
+
+
+------Tabla Orders
+
+CREATE TABLE orders (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id             UUID NOT NULL REFERENCES auth.users(id) ON DELETE RESTRICT,
+    address_id          UUID REFERENCES addresses(id) ON DELETE SET NULL,
+
+    -- Totales (snapshot al momento de compra)
+    subtotal            NUMERIC(12, 2) NOT NULL DEFAULT 0,
+    shipping_cost       NUMERIC(12, 2) NOT NULL DEFAULT 0,
+    tax                 NUMERIC(12, 2) NOT NULL DEFAULT 0,
+    total               NUMERIC(12, 2) NOT NULL DEFAULT 0,
+
+    -- Estado del pedido
+    status              TEXT NOT NULL DEFAULT 'pending'
+                            CHECK (status IN (
+                                'pending',       -- creada, sin pagar
+                                'paid',          -- pago confirmado
+                                'processing',    -- en preparación
+                                'shipped',       -- enviada
+                                'delivered',     -- entregada
+                                'cancelled',     -- cancelada
+                                'refunded'       -- reembolsada
+                            )),
+
+    -- Pago
+    payment_status      TEXT NOT NULL DEFAULT 'unpaid'
+                            CHECK (payment_status IN (
+                                'unpaid',
+                                'pending',       -- en proceso (ej. OXXO pendiente)
+                                'paid',
+                                'failed',
+                                'refunded'
+                            )),
+    payment_provider    TEXT CHECK (payment_provider IN ('mercadopago', 'stripe', 'manual')),
+    external_payment_id TEXT,                    -- ID de la transacción en el proveedor
+
+    notes               TEXT,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+
+-user_id:				Id del usuario
+-adresses_id:			Id con la direccion de la orden
+-subtotal:				costo del pago por los productos (SNAPSHOT al momento de la compra)
+-shipping_cost:			Costo del envío (SNAPSHOT al momento de la compra)
+-tax:					Cantidad agregada por los impuestos (SNAPSHOT al momento de la compra)
+-total:					Suma total de los gastos (SNAPSHOT al momento de la compra)
+-status:				Estado de la orden (pending, paid, processing, shipped, delivered, cancelled, refunded)
+-payment_status:		Estado del pago de la orden (unpaid, pending, paid, failed, refunded)
+-payment_provider:		Establece si el pago se hace por mercadopago, stripe o de manera manual
+-external_payment_id:	Id del pago que da la respectiva plataforma de pago
+-notes:					Anotaciones sobre la orden
+-created_at:			Hora a la que se creo la orden
+-updated_at:			Hora del ultimo cambio a la info de la orden
+
+
+
+
+
+----- Tabla order_items
+
+CREATE TABLE order_items (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id    UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_id  bigint NOT NULL REFERENCES productos(id) ON DELETE RESTRICT,
+
+    quantity    INT NOT NULL CHECK (quantity > 0),
+    unit_price  NUMERIC(12, 2) NOT NULL,         -- snapshot del precio al comprar
+    discount    NUMERIC(12, 2) NOT NULL DEFAULT 0,
+    subtotal    NUMERIC(12, 2) GENERATED ALWAYS AS
+                    ((unit_price - discount) * quantity) STORED,
+
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+
+-order_id: 			Id de la orden al que pertenece este/os productos
+-product_id:		id del producto al que se hace referencia
+-quantity:			Cantidad de veces que se pidio el producto en la orden (por default que no sea 0)
+-unit_price:		Precio unitario (SNAPSHOT del precio al momento de comprar)
+-discount:			Cantidad a descontar por alguna promoción
+-subtotal:			Cantidad resultado del precio por la cantidad del producto - el descuento
+-created_at:		Fecha en la que se creo el registro
+
+
+
+
+----- Tabla Cart
+
+CREATE TABLE cart (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id     UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-user_id:			Usuario al que se hace referencia los productos del cart
+-created_at:		Fecha en la que se creo el cart
+-updated_at:		Fecha del ultimo cambio que se implemento en el registro del cart
+
+
+
+----- Tabla cart_items
+
+CREATE TABLE cart_items (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cart_id     UUID NOT NULL REFERENCES cart(id) ON DELETE CASCADE,
+    product_id  bigint NOT NULL REFERENCES productos(id) ON DELETE CASCADE,
+    quantity    INT NOT NULL DEFAULT 1 CHECK (quantity > 0),
+    added_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    UNIQUE (cart_id, product_id)               -- evita duplicados; solo se actualiza quantity
+);
+
+
+-cart_id:			Id del cart al que pertenece este registro
+-product_id:		Id del producto que se trata en este registro
+-quantity:			Cantidad de veces que es solicitado el producto en el cart
+-added_at:			Fecha en la que se agrego el producto al cart
+
+UNIQUE (cart_id. product_id) -Esto evita duplicados y solo se actualiza la cantidad del producto en el cart
+
+
+
+
+
+
+
+----INDEXES
+
+-- Búsquedas frecuentes por usuario
+CREATE INDEX idx_orders_user_id       ON orders(user_id);
+CREATE INDEX idx_addresses_user_id    ON addresses(user_id);
+CREATE INDEX idx_cart_items_cart_id   ON cart_items(cart_id);
+
+-- Filtrar órdenes por estado de pago (para el panel admin)
+CREATE INDEX idx_orders_payment_status ON orders(payment_status);
+CREATE INDEX idx_orders_status         ON orders(status);
+
+-- Para el webhook: buscar orden por ID externo del proveedor
+CREATE INDEX idx_orders_external_payment_id ON orders(external_payment_id)
+    WHERE external_payment_id IS NOT NULL;
+
+
+
+CREATE INDEX idx_orders_user_id       ON orders(user_id);
+	Cada vez que un usuario abre "Mis pedidos", la app hace WHERE user_id = auth.uid(). Sin este índice, escanea toda la tabla de órdenes. Con él, salta directo a las órdenes de ese usuario.
+
+
+CREATE INDEX idx_addresses_user_id    ON addresses(user_id);
+	Mismo caso — cuando el usuario va al checkout y carga sus direcciones guardadas, la query filtra por user_id. Esencial si tienes miles de usuarios con múltiples direcciones.
+
+CREATE INDEX idx_cart_items_cart_id   ON cart_items(cart_id);
+	Para mostrar el carrito se hace WHERE cart_id = ? constantemente. Esta es probablemente la query más ejecutada de toda la app (cada vez que alguien abre el carrito o lo sincroniza).
+
+
+CREATE INDEX idx_orders_payment_status ON orders(payment_status);
+CREATE INDEX idx_orders_status         ON orders(status);
+	En el panel admin vas a querer cosas como:
+	-- "Muéstrame todas las órdenes sin pagar"
+	SELECT * FROM orders WHERE payment_status = 'unpaid';
+	-- "Órdenes listas para enviar"
+	SELECT * FROM orders WHERE status = 'processing';
+	Sin índices, cada consulta escanea toda la tabla. Con ellos, PostgreSQL agrupa internamente los valores repetidos y llega directo.
+
+
+CREATE INDEX idx_orders_external_payment_id ON orders(external_payment_id) WHERE external_payment_id IS NOT NULL;
+	¿Para qué sirve? Cuando Stripe o Mercado Pago confirman un pago, mandan un webhook a tu servidor con su propio ID de transacción (ej. "pi_3Ov2xK..." de Stripe). Tu backend necesita encontrar la orden correspondiente:
+
+
+
+
+
+------TRIGGERS
+-- Función reutilizable
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Aplicar a cada tabla que tenga updated_at
+CREATE TRIGGER trg_addresses_updated_at
+    BEFORE UPDATE ON addresses
+    FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_orders_updated_at
+    BEFORE UPDATE ON orders
+    FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER trg_cart_updated_at
+    BEFORE UPDATE ON cart
+    FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+
+
+-Estos triggers hacen que cada que se genere un cambio en una fila de adresses, orders o cart, se actualize la propiedad updated_at en la BD
+
+
+
+
+
+-----RLS policies
+
+-- ── Habilitar RLS ──────────────────────────────
+ALTER TABLE addresses    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cart         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cart_items   ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════════════════════════════════
+-- ADDRESSES
+-- ═══════════════════════════════════════════════
+CREATE POLICY "addresses: usuario ve las suyas"
+    ON addresses FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "addresses: usuario crea las suyas"
+    ON addresses FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "addresses: usuario edita las suyas"
+    ON addresses FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "addresses: usuario borra las suyas"
+    ON addresses FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- ═══════════════════════════════════════════════
+-- ORDERS
+-- ═══════════════════════════════════════════════
+CREATE POLICY "orders: usuario ve las suyas"
+    ON orders FOR SELECT
+    USING (auth.uid() = user_id);
+
+-- El usuario sólo puede crear órdenes a su nombre.
+-- La inserción real la hará una Server Action / Edge Function
+-- con service_role para evitar manipulación del total.
+-- Si prefieres inserción desde cliente, usa esta policy:
+CREATE POLICY "orders: usuario crea las suyas"
+    ON orders FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+-- El usuario NO puede modificar una orden directamente.
+-- Las actualizaciones de status/payment_status las hace el backend.
+-- (No se crea policy UPDATE para el rol anon/authenticated)
+
+-- ═══════════════════════════════════════════════
+-- ORDER ITEMS
+-- ═══════════════════════════════════════════════
+CREATE POLICY "order_items: usuario ve los de sus órdenes"
+    ON order_items FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM orders
+            WHERE orders.id = order_items.order_id
+              AND orders.user_id = auth.uid()
+        )
+    );
+
+-- Inserción también vía backend (service_role), no se expone al cliente.
+
+-- ═══════════════════════════════════════════════
+-- CART
+-- ═══════════════════════════════════════════════
+CREATE POLICY "cart: usuario ve el suyo"
+    ON cart FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "cart: usuario crea el suyo"
+    ON cart FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "cart: usuario actualiza el suyo"
+    ON cart FOR UPDATE
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "cart: usuario borra el suyo"
+    ON cart FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- ═══════════════════════════════════════════════
+-- CART ITEMS
+-- ═══════════════════════════════════════════════
+CREATE POLICY "cart_items: usuario ve los suyos"
+    ON cart_items FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM cart
+            WHERE cart.id = cart_items.cart_id
+              AND cart.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "cart_items: usuario agrega a su carrito"
+    ON cart_items FOR INSERT
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM cart
+            WHERE cart.id = cart_items.cart_id
+              AND cart.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "cart_items: usuario edita su carrito"
+    ON cart_items FOR UPDATE
+    USING (
+        EXISTS (
+            SELECT 1 FROM cart
+            WHERE cart.id = cart_items.cart_id
+              AND cart.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "cart_items: usuario elimina de su carrito"
+    ON cart_items FOR DELETE
+    USING (
+        EXISTS (
+            SELECT 1 FROM cart
+            WHERE cart.id = cart_items.cart_id
+              AND cart.user_id = auth.uid()
+        )
+    );
+
+
+
+

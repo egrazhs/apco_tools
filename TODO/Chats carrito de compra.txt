@@ -1,0 +1,143 @@
+-----------------------Chat 1 BD
+
+Estoy construyendo una tienda e-commerce en Nuxt 3 + Vue 3 + NuxtUI v3 + 
+Tailwind CSS + Supabase (auth + database) + Pinia para un cliente llamado 
+APCO Tools (Herramientas y Suministros SA de CV), distribuidor de herramientas 
+en Guadalajara, Jalisco.
+
+El proyecto vive en C:/xampp/htdocs/apco_tools/app/
+El project ref de Supabase es: gqgdzvkoydpuefloilmr
+
+Lo único que tengo en BD hasta ahora es la tabla `products` que entre otros datos, incluye los campos 
+stock, price y active.
+
+Necesito implementar desde cero todo lo necesario en Supabase para soportar 
+venta en línea con Mercado Pago y Stripe (ambos en sandbox por ahora):
+
+- Tablas: orders, order_items, addresses, cart, cart_items
+- Columnas extra en orders: payment_status, payment_provider, external_payment_id
+- RLS policies para orders y addresses
+
+Dame el SQL completo para crear todo esto, las RLS policies adecuadas, y al 
+final indícame cómo regenerar los tipos TypeScript con Supabase CLI.
+
+Usa tabulaciones de 4 espacios en cualquier código que generes.
+
+
+----------------------Chat 2 Carrito
+
+Estoy construyendo una tienda e-commerce en Nuxt 3 + Vue 3 + NuxtUI v3 + 
+Tailwind CSS + Supabase + Pinia para APCO Tools, distribuidor de herramientas 
+en Guadalajara, Jalisco.
+
+El proyecto vive en C:/xampp/htdocs/apco_tools/app/
+Stack: Nuxt 3, Vue 3, NuxtUI v3, Tailwind CSS, Supabase, Pinia.
+Paleta: stone base + red accent + amber secundario. Esquinas sharp (no rounded-2xl).
+Usa tabulaciones de 4 espacios.
+
+Ya tengo:
+- useCartStore con Pinia (solo en memoria)
+- Tablas en Supabase: products, orders, order_items, addresses, cart, cart_items 
+  (con RLS policies activas)
+- Tipos TypeScript generados con Supabase CLI
+
+Necesito implementar:
+1. Persistir el carrito en Supabase (tabla cart/cart_items)
+2. Sincronización carrito local → Supabase al hacer login
+3. Validación de stock al agregar al carrito
+
+Dame el composable/store actualizado y lo que haga falta en Nuxt para que 
+funcione correctamente con SSR (useAsyncData donde aplique).
+
+
+--------------------Chat 3  Checkout
+
+Estoy construyendo una tienda e-commerce en Nuxt 3 + Vue 3 + NuxtUI v3 + 
+Tailwind CSS + Supabase + Pinia para APCO Tools, distribuidor de herramientas 
+en Guadalajara, Jalisco.
+
+El proyecto vive en C:/xampp/htdocs/apco_tools/app/
+Stack: Nuxt 3, Vue 3, NuxtUI v3, Tailwind CSS, Supabase, Pinia.
+Paleta: stone base + red accent + amber secundario. Esquinas sharp (no rounded-2xl).
+Usa tabulaciones de 4 espacios.
+El composable useCurrency() expone formatCurrency() para formatear precios.
+
+Ya tengo:
+- useCartStore con Pinia persistido en Supabase
+- Tablas listas: products, orders, order_items, addresses, cart, cart_items
+- Tipos TypeScript generados con Supabase CLI
+- Auth funcional con Supabase
+
+Necesito implementar desde cero:
+1. Página /checkout con resumen de orden (productos, subtotal, total)
+2. Formulario/selección de dirección de envío
+3. Creación de la orden en Supabase (status: pending) antes de ir al procesador
+4. Middleware auth.ts para proteger /checkout y /mi-cuenta
+5. Páginas /checkout/success y /checkout/failed
+
+El checkout debe soportar tanto Mercado Pago como Stripe como procesadores 
+(se elige vía variable de entorno PAYMENT_PROVIDER).
+
+
+
+-----------------Chat 4 Pagos
+
+Estoy construyendo una tienda e-commerce en Nuxt 3 + Vue 3 + NuxtUI v3 + 
+Tailwind CSS + Supabase + Pinia para APCO Tools, distribuidor de herramientas 
+en Guadalajara, Jalisco.
+
+El proyecto vive en C:/xampp/htdocs/apco_tools/app/
+Stack: Nuxt 3, Vue 3, NuxtUI v3, Tailwind CSS, Supabase, Pinia.
+Usa tabulaciones de 4 espacios.
+
+Ya tengo:
+- Carrito persistido en Supabase
+- Página /checkout funcional que crea la orden en Supabase con status: pending
+- Páginas /checkout/success y /checkout/failed
+- Tablas: orders (con payment_status, payment_provider, external_payment_id), 
+  order_items, addresses, cart, cart_items
+- Tipos TypeScript generados con Supabase CLI
+
+Necesito implementar ambos procesadores en modo sandbox para que el cliente 
+pueda elegir con ambos funcionando:
+
+MERCADO PAGO (prioridad):
+- Credenciales sandbox y usuarios de prueba
+- Server route para crear preferencia de pago (Checkout Pro)
+- Webhook/IPN para actualizar orden en Supabase al confirmar pago
+
+STRIPE:
+- Credenciales test
+- Server route para crear PaymentIntent
+- Stripe Elements en el checkout
+- Webhook para actualizar orden en Supabase
+
+Ambos deben enrutarse mediante una variable de entorno PAYMENT_PROVIDER, 
+usando un composable usePayment() como abstracción.
+
+---------------Chat 5 Mi Cuenta
+
+Estoy construyendo una tienda e-commerce en Nuxt 3 + Vue 3 + NuxtUI v3 + 
+Tailwind CSS + Supabase + Pinia para APCO Tools, distribuidor de herramientas 
+en Guadalajara, Jalisco.
+
+El proyecto vive en C:/xampp/htdocs/apco_tools/app/
+Stack: Nuxt 3, Vue 3, NuxtUI v3, Tailwind CSS, Supabase, Pinia.
+Paleta: stone base + red accent + amber secundario. Esquinas sharp (no rounded-2xl).
+Usa tabulaciones de 4 espacios.
+El composable useCurrency() expone formatCurrency() para formatear precios.
+
+Ya tengo:
+- Auth funcional con Supabase
+- Middleware auth.ts protegiendo rutas privadas
+- Flujo completo de carrito → checkout → pago funcional (MP y Stripe sandbox)
+- Tablas: orders, order_items, addresses, products
+- Tipos TypeScript generados con Supabase CLI
+
+Necesito implementar desde cero la sección /mi-cuenta con:
+1. Historial de órdenes (fecha, total, status, detalle de productos)
+2. Gestión de direcciones guardadas (agregar, editar, eliminar)
+3. Datos del perfil (nombre, email)
+
+Usa NuxtUI para tabs, tablas y formularios. Diseño consistente con el resto 
+del proyecto (stone + red).
