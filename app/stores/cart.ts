@@ -1,68 +1,102 @@
+// stores/cart.ts
 import { defineStore } from 'pinia'
 
 export interface CartItem {
-  id: string
-  nombre: string  
-  slug: string
-  precio_venta: number
-  imagen_principal: string
-  marca: string
-  cantidad: number
-  stock: number
+    product_id: number
+    quantity: number
+    // Snapshot del producto al momento de agregar
+    name: string
+    price: number
+    slug: string
+    image_url: string | null
+    stock: number
 }
 
-export const useCartStore = defineStore('cart', {
-  state: () => ({
-    items: [] as CartItem[]
-  }),
+export const useCartStore = defineStore('cart', () => {
+    const items = ref<CartItem[]>([])
+    const loading = ref(false)
+    const error = ref<string | null>(null)
 
-  getters: {
-    totalItems: (state) => state.items.reduce((acc, item) => acc + item.cantidad, 0),
+    // ─── Computadas ──────────────────────────────────────────────────────────
 
-    subtotal: (state) => state.items.reduce((acc, item) => acc + item.precio_venta * item.cantidad, 0),
+    const totalItems = computed(() =>
+        items.value.reduce((sum, i) => sum + i.quantity, 0)
+    )
 
-    tax(): number {return this.subtotal * 0.16},
+    const subtotal = computed(() =>
+        items.value.reduce((sum, i) => sum + i.price * i.quantity, 0)
+    )
 
-    total(): number {return this.subtotal + this.tax}
-  },
+    const isEmpty = computed(() => items.value.length === 0)
 
-  actions: {
-    addItem(product: Omit<CartItem, 'cantidad'>) {
-      const existing = this.items.find(item => String(item.id) === String(product.id))
+    // ─── Helpers internos ─────────────────────────────────────────────────────
 
-      if (existing) {
-        // No permitir superar stock
-        existing.cantidad = Math.min(existing.cantidad + 1, existing.stock)
-      } else {
-        this.items.push({
-          ...product,
-          cantidad: 1
-        })
-      }
-    },
-
-    removeItem(id: string) {
-      this.items = this.items.filter(item => item.id !== id)
-    },
-
-    updateQuantity(id: string, cantidad: number) {
-      const item = this.items.find(item => item.id === id)
-      if (!item) return
-
-      if (cantidad <= 0) {
-        this.removeItem(id)
-        return
-      }
-
-      item.cantidad = Math.min(cantidad, item.stock)
-    },
-
-    clearCart() {
-      this.items = []
+    function _findIndex(product_id: number) {
+        return items.value.findIndex(i => i.product_id === product_id)
     }
-  },
 
-  persist: {
-    storage: piniaPluginPersistedstate.localStorage(),
-  },
+    // ─── Mutaciones (solo estado local, sin efectos secundarios) ─────────────
+
+    function setItems(newItems: CartItem[]) {
+        items.value = newItems
+    }
+
+    /**
+     * Agrega o incrementa un ítem. Respeta el stock máximo.
+     * No llama a Supabase: eso lo hace useSupabaseCart.
+     */
+    function _addItem(
+        product: Omit<CartItem, 'quantity'>,
+        quantity: number
+    ) {
+        const idx = _findIndex(product.product_id)
+        if (idx >= 0) {
+            const newQty = items.value[idx].quantity + quantity
+            items.value[idx].quantity = Math.min(newQty, product.stock)
+        } else {
+            items.value.push({
+                ...product,
+                quantity: Math.min(quantity, product.stock),
+            })
+        }
+    }
+
+    function _removeItem(product_id: number) {
+        const idx = _findIndex(product_id)
+        if (idx >= 0) items.value.splice(idx, 1)
+    }
+
+    function _updateQuantity(product_id: number, quantity: number) {
+        const idx = _findIndex(product_id)
+        if (idx < 0) return
+        if (quantity <= 0) {
+            items.value.splice(idx, 1)
+        } else {
+            items.value[idx].quantity = Math.min(
+                quantity,
+                items.value[idx].stock
+            )
+        }
+    }
+
+    function clearCart() {
+        items.value = []
+    }
+
+    return {
+        // state
+        items,
+        loading,
+        error,
+        // computed
+        totalItems,
+        subtotal,
+        isEmpty,
+        // mutations
+        setItems,
+        _addItem,
+        _removeItem,
+        _updateQuantity,
+        clearCart,
+    }
 })

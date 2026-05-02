@@ -137,15 +137,15 @@
 
           <template #activo-cell="{ row }">
             <UBadge
-              :color="row.original.activo ? 'green' : 'red'"
+              :color="row.original.is_active ? 'green' : 'red'"
               variant="subtle"
               class="gap-1.5"
             >
               <span
                 class="w-1.5 h-1.5 rounded-full inline-block"
-                :class="row.original.activo ? 'bg-green-500' : 'bg-red-500'"
+                :class="row.original.is_active ? 'bg-green-500' : 'bg-red-500'"
               />
-              {{ row.original.activo ? 'Activa' : 'Inactiva' }}
+              {{ row.original.is_active ? 'Activa' : 'Inactiva' }}
             </UBadge>
           </template>
 

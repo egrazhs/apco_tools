@@ -1,4 +1,4 @@
-<template>
+ <template>
     <div
         class="group bg-white overflow-hidden border border-stone-200
                hover:border-red-600 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col"
@@ -6,9 +6,9 @@
         <!-- Imagen -->
         <div class="relative overflow-hidden bg-stone-100 aspect-square">
             <img
-                v-if="product.imagen_principal"
-                :src="product.imagen_principal"
-                :alt="product.nombre"
+                v-if="product.image_url"
+                :src="product.image_url"
+                :alt="product.name"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
             <div v-else class="w-full h-full flex items-center justify-center text-stone-300">
@@ -27,11 +27,11 @@
 
             <!-- Badge marca -->
             <div
-                v-if="product.marcas?.nombre"
+                v-if="product.brands?.name"
                 class="absolute top-3 left-3 bg-white text-stone-700
                        text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 border border-stone-200"
             >
-                {{ product.marcas.nombre }}
+                {{ product.brands.name }}
             </div>
 
             <!-- Badge oferta -->
@@ -48,23 +48,23 @@
         <div class="flex flex-col flex-1 p-4 gap-3">
             <div class="flex-1 space-y-1">
                 <h3 class="font-bold text-stone-900 leading-snug line-clamp-2 group-hover:text-red-600 transition-colors duration-200">
-                    {{ product.nombre }}
+                    {{ product.name }}
                 </h3>
                 <p class="text-xs text-stone-400 line-clamp-2 leading-relaxed">
-                    {{ product.descripcion_corta }}
+                    {{ product.short_description }}
                 </p>
             </div>
 
             <!-- Precio -->
             <div class="flex items-baseline gap-2">
                 <span class="text-xl font-black text-stone-900">
-                    {{ formatCurrency(product.precioOferta || product.precio_venta) }}
+                    {{ formatCurrency(product.precioOferta || product.price) }}
                 </span>
                 <span
                     v-if="product.precioOferta"
                     class="text-xs text-stone-400 line-through"
                 >
-                    {{ formatCurrency(product.precio_venta) }}
+                    {{ formatCurrency(product.price) }}
                 </span>
             </div>
 

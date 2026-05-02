@@ -29,7 +29,7 @@
                     <div class="grid grid-cols-2 gap-x-5 gap-y-4">
                         <UFormField label="Nombre del producto" required class="col-span-2">
                             <UInput
-                                v-model="form.nombre"
+                                v-model="form.name"
                                 placeholder="Ej: Taladro Percutor 800W"
                                 size="lg"
                                 icon="i-heroicons-tag"
@@ -38,7 +38,7 @@
 
                         <UFormField label="Código" class="col-span-1">
                             <UInput
-                                v-model="form.codigo"
+                                v-model="form.code"
                                 placeholder="Ej: DW-801"
                                 size="lg"
                                 icon="i-heroicons-hashtag"
@@ -59,20 +59,20 @@
 
                         <UFormField label="Descripción corta" class="col-span-2">
                             <UInput
-                                v-model="form.descripcion_corta"
+                                v-model="form.short_description"
                                 placeholder="Resumen breve del producto (máx. 120 caracteres)"
                                 size="lg"
                                 icon="i-heroicons-bars-2"
                                 :maxlength="120"
                             />
                             <template #hint>
-                                <span class="text-xs text-gray-500">{{ form.descripcion_corta?.length || 0 }}/120 caracteres</span>
+                                <span class="text-xs text-gray-500">{{ form.short_description?.length || 0 }}/120 caracteres</span>
                             </template>
                         </UFormField>
 
                         <UFormField label="Descripción detallada" class="col-span-2">
                             <UTextarea
-                                v-model="form.descripcion_larga"
+                                v-model="form.long_description"
                                 placeholder="Describe características, especificaciones técnicas, usos recomendados..."
                                 :rows="4"
                                 resize
@@ -92,7 +92,7 @@
                     <div class="grid grid-cols-2 gap-x-5 gap-y-4">
                         <UFormField label="Precio de venta" required class="col-span-1">
                             <UInput
-                                v-model.number="form.precio_venta"
+                                v-model.number="form.price"
                                 type="number"
                                 min="0"
                                 step="0.01"
@@ -133,7 +133,7 @@
 
                         <UFormField label="Marca" class="col-span-1">
                             <USelect
-                                v-model="form.marca_id"
+                                v-model="form.brand_id"
                                 :items="marcas"
                                 placeholder="Selecciona una marca"
                                 size="lg"
@@ -179,8 +179,8 @@
                     <div class="flex gap-5 items-start">
                         <div class="w-[120px] h-[90px] shrink-0 rounded-lg overflow-hidden border border-gray-700 bg-gray-800">
                             <img
-                                v-if="form.imagen_principal"
-                                :src="form.imagen_principal"
+                                v-if="form.image_url"
+                                :src="form.image_url"
                                 alt="Vista previa"
                                 class="w-full h-full object-cover"
                             />
@@ -193,7 +193,7 @@
                         <div class="flex-1 min-w-0">
                             <UFormField label="URL de imagen principal">
                                 <UInput
-                                    v-model="form.imagen_principal"
+                                    v-model="form.image_url"
                                     placeholder="https://ejemplo.com/imagen.jpg"
                                     size="lg"
                                     icon="i-heroicons-link"

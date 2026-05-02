@@ -125,7 +125,7 @@
               <div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
                 <UIcon name="i-heroicons-tag" class="w-4 h-4 text-primary-500" />
               </div>
-              <span class="font-medium text-gray-900 dark:text-white">{{ row.original.nombre }}</span>
+              <span class="font-medium text-gray-900 dark:text-white">{{ row.original.name }}</span>
             </div>
           </template>
 
@@ -137,15 +137,15 @@
 
           <template #activo-cell="{ row }">
             <UBadge
-              :color="row.original.activo ? 'green' : 'red'"
+              :color="row.original.is_active ? 'green' : 'red'"
               variant="subtle"
               class="gap-1.5"
             >
               <span
                 class="w-1.5 h-1.5 rounded-full inline-block"
-                :class="row.original.activo ? 'bg-green-500' : 'bg-red-500'"
+                :class="row.original.is_active ? 'bg-green-500' : 'bg-red-500'"
               />
-              {{ row.original.activo ? 'Activa' : 'Inactiva' }}
+              {{ row.original.is_active ? 'Activa' : 'Inactiva' }}
             </UBadge>
           </template>
 

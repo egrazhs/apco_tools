@@ -378,3 +378,34 @@ CREATE POLICY "cart_items: usuario elimina de su carrito"
 
 
 
+-----FUNCION get_or_create_cart()
+
+CREATE OR REPLACE FUNCTION get_or_create_cart(p_user_id UUID)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER                               -- corre como superuser, evita RLS en la función
+AS $$
+DECLARE
+    v_cart_id UUID;
+BEGIN
+    SELECT id INTO v_cart_id
+    FROM cart
+    WHERE user_id = p_user_id;
+
+    IF v_cart_id IS NULL THEN
+        INSERT INTO cart (user_id)
+        VALUES (p_user_id)
+        RETURNING id INTO v_cart_id;
+    END IF;
+
+    RETURN v_cart_id;
+END;
+$$;
+
+
+¿Qué problema resuelve?
+Cada usuario debe tener exactamente un carrito. El problema es que cuando un usuario recién registrado abre el carrito por primera vez, ese carrito no existe todavía. Necesitas una operación que diga:
+
+"Dame el carrito de este usuario. Si no existe, créalo. En ambos casos, devuélveme el ID."
+
+Sin esta función tendrías que hacer esa lógica en tu código Nuxt: primero un SELECT, revisar si vino vacío, y si sí hacer un INSERT. Eso son dos round-trips a la base de datos y lógica duplicada en cada lugar que la necesites. La función lo resuelve en una sola llamada.

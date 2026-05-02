@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   css: ['~/assets/css/main.css'],
   devtools: { enabled: true },
-  modules: ['@nuxt/ui', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@nuxtjs/supabase'],
+  modules: ['@nuxt/ui', '@pinia/nuxt', '@nuxtjs/supabase'],
   runtimeConfig: {
     public: {
       supabase: {

@@ -35,8 +35,8 @@
                 <div class="space-y-4">
                     <div class="relative overflow-hidden rounded-2xl bg-gray-800/60 border border-white/5 aspect-[4/3] flex items-center justify-center">
                         <img
-                            :src="producto.imagen_principal"
-                            :alt="producto.nombre"
+                            :src="producto.image_url"
+                            :alt="producto.name"
                             class="w-full h-full object-contain"
                         />
                         <div class="absolute top-4 left-4">
@@ -55,11 +55,11 @@
 
                     <!-- Marca + nombre -->
                     <div>
-                        <p v-if="producto.marcas?.nombre" class="text-green-400 text-sm font-semibold tracking-widest uppercase mb-1">
-                            {{ producto.marcas.nombre }}
+                        <p v-if="producto.brands?.name" class="text-green-400 text-sm font-semibold tracking-widest uppercase mb-1">
+                            {{ producto.brands.name }}
                         </p>
                         <h1 class="text-3xl xl:text-4xl font-bold text-white leading-tight">
-                            {{ producto.nombre }}
+                            {{ producto.name }}
                         </h1>
                         <p v-if="producto.slug" class="text-gray-500 text-xs mt-1">
                             SKU: {{ producto.slug }}
@@ -69,10 +69,10 @@
                     <!-- Precio -->
                     <div class="flex items-end gap-3">
                         <span class="text-4xl font-extrabold text-green-400 tracking-tight">
-                            ${{ producto.precio_venta?.toLocaleString('es-MX') }}
+                            ${{ producto.price?.toLocaleString('es-MX') }}
                         </span>
                         <span
-                            v-if="producto.precio_comparacion && producto.precio_comparacion > producto.precio_venta"
+                            v-if="producto.precio_comparacion && producto.precio_comparacion > producto.price"
                             class="text-xl text-gray-500 line-through mb-1"
                         >
                             ${{ producto.precio_comparacion.toLocaleString('es-MX') }}
@@ -91,7 +91,7 @@
 
                     <!-- Descripción corta -->
                     <p class="text-gray-300 leading-relaxed line-clamp-4">
-                        {{ producto.descripcion_larga }}
+                        {{ producto.long_description }}
                     </p>
 
                     <!-- Cantidad + CTA -->
@@ -118,11 +118,12 @@
 
                             <!-- Botón agregar -->
                             <UButton
-                                @click="addToCart"
+                                @click="handleAddToCart"
                                 color="green"
                                 size="lg"
                                 class="flex-1 justify-center font-bold tracking-wide cursor-pointer"
-                                :disabled="producto.stock === 0"
+                                :disabled="producto.stock === 0 || addingToCart"
+                                :loading="addingToCart"
                                 icon="i-heroicons-shopping-cart"
                             >
                                 {{ producto.stock === 0 ? 'Sin stock' : 'Agregar al carrito' }}
@@ -212,17 +213,17 @@
                     >
                         <div class="aspect-square overflow-hidden bg-gray-700/50">
                             <img
-                                :src="rel.imagen_principal"
-                                :alt="rel.nombre"
+                                :src="rel.image_url"
+                                :alt="rel.name"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                         </div>
                         <div class="p-4 space-y-1">
-                            <p class="text-xs text-gray-500">{{ rel.marcas?.nombre }}</p>
+                            <p class="text-xs text-gray-500">{{ rel.brands?.name }}</p>
                             <p class="text-white text-sm font-medium line-clamp-2 group-hover:text-green-400 transition-colors">
-                                {{ rel.nombre }}
+                                {{ rel.name }}
                             </p>
-                            <p class="text-green-400 font-bold">${{ rel.precio_venta?.toLocaleString('es-MX') }}</p>
+                            <p class="text-green-400 font-bold">${{ rel.price?.toLocaleString('es-MX') }}</p>
                         </div>
                     </NuxtLink>
                 </div>
@@ -234,19 +235,20 @@
 
 <script setup lang="ts">
     import { useCartStore } from '~/stores/cart'
-
+    
     const route = useRoute()
     const supabase = useSupabaseClient()
     const cart = useCartStore()
+    const { addItem, removeItem, updateQuantity } = useSupabaseCart()
     const toast = useToast()
 
     // ── Fetch producto principal ──────────────────────────────────────
     const { data: producto, pending, error } = await useAsyncData(
-        `producto-${route.params.slug}`,
+        `product-${route.params.slug}`,
         async () => {
             const { data, error } = await supabase
-                .from('productos')
-                .select('*, marcas(nombre)')
+                .from('products')
+                .select('*, brands(name)')
                 .eq('slug', route.params.slug)
                 .single()
             if (error) throw createError({ statusCode: 404, statusMessage: 'Producto no encontrado' })
@@ -261,9 +263,9 @@
             const idMarca = producto.value?.id_marca
             if (!idMarca) return []
             const { data } = await supabase
-                .from('productos')
-                .select('id, nombre, slug, precio_venta, imagen_principal, marcas(nombre)')
-                .eq('id_marca', idMarca)
+                .from('products')
+                .select('id, name, slug, price, image_url, brands(name)')
+                .eq('id_brand', idMarca)
                 .neq('slug', route.params.slug)
                 .limit(4)
             return data ?? []
@@ -274,6 +276,8 @@
     const cantidad = ref(1)
     const incrementar = () => { if (cantidad.value < (producto.value?.stock ?? 1)) cantidad.value++ }
     const decrementar = () => { if (cantidad.value > 1) cantidad.value-- }
+
+    const addingToCart = ref(false)
 
     // ── Descuento calculado ───────────────────────────────────────────
     const descuentoPorcentaje = computed(() => {
@@ -290,27 +294,25 @@
     ])
 
     // ── Agregar al carrito ────────────────────────────────────────────
-    function addToCart() {
-        if (!producto.value) return
-        cart.addItem({
-            id: producto.value.id,
-            nombre: producto.value.nombre,
-            slug: producto.value.slug,
-            precio_venta: producto.value.precio_venta,
-            imagen_principal: producto.value.imagen_principal,
-            marca: producto.value.marcas?.nombre || '',
-            stock: producto.value.stock,
-        })
-        toast.add({
-            title: 'Agregado al carrito 🛒',
-            description: `${producto.value.nombre} — $${producto.value.precio_venta}`,
-            icon: 'i-heroicons-shopping-cart',
-            color: 'green',
-            action: {
-                label: 'Ver carrito',
-                onClick: () => navigateTo('/cart'),
+
+    async function handleAddToCart() {
+        const added = await addItem(
+            {
+                product_id:  producto.value.id,
+                name:        producto.value.name,
+                price:       producto.value.price,
+                slug:        producto.value.slug,
+                image_url:   producto.value.image_url ?? null,
+                stock:       producto.value.stock,
             },
-        })
+            cantidad.value   // ← .value porque es un ref
+        )
+
+        if (!added) {
+            toast.add({ title: cart.error ?? 'Sin stock', color: 'red' })
+        } else {
+            toast.add({ title: 'Agregado al carrito', color: 'green' })
+        }
     }
 
     // ── Estáticos ─────────────────────────────────────────────────────

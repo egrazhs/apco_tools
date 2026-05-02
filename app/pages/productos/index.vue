@@ -59,8 +59,8 @@
 
     const { data: products, pending, error, refresh } = await useAsyncData('productos', async () => {
         const { data, error } = await supabase
-            .from('productos')
-            .select('*, marcas(nombre)')
+            .from('products')
+            .select('*, brands(name)')
         if (error) throw error
         return data
     })
@@ -70,7 +70,7 @@
         .channel('productos-realtime')
         .on(
             'postgres_changes',
-            { event: '*', schema: 'public', table: 'productos' },
+            { event: '*', schema: 'public', table: 'products' },
             () => refresh()
         )
         .subscribe()

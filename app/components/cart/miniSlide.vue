@@ -41,11 +41,11 @@
                     </div>
 
                     <!-- Lista de productos -->
-                    <div v-for="item in cart.items" :key="item.id"
+                    <div v-for="item in cart.items" :key="item.product_id"
                         class="flex gap-3 py-3 border-b border-stone-100 last:border-0">
                         <!-- Imagen placeholder o real -->
                         <div class="size-14 bg-stone-100 shrink-0 overflow-hidden">
-                            <img v-if="item.imagen" :src="item.imagen" :alt="item.nombre"
+                            <img v-if="item.image_url" :src="item.image_url" :alt="item.name"
                                 class="w-full h-full object-contain p-1" />
                             <UIcon v-else name="i-heroicons-wrench-screwdriver"
                                 class="w-full h-full p-3 text-stone-300" />
@@ -54,17 +54,17 @@
                         <!-- Info -->
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-semibold text-stone-900 leading-tight line-clamp-2">
-                                {{ item.nombre }}
+                                {{ item.name }}
                             </p>
                             <p class="text-xs text-stone-400 mt-1">
-                                {{ item.cantidad }} × {{ formatCurrency(item.precio_venta) }}
+                                {{ item.quantity }} × {{ formatCurrency(item.price) }}
                             </p>
                         </div>
 
                         <!-- Subtotal -->
                         <div class="text-right shrink-0">
                             <p class="text-sm font-bold text-stone-900">
-                                {{ formatCurrency(item.precio_venta * item.cantidad) }}
+                                {{ formatCurrency(item.price * item.quantity) }}
                             </p>
                         </div>
                     </div>

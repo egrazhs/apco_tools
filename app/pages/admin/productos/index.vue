@@ -60,7 +60,7 @@
 							<div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
 								<UIcon name="i-heroicons-cube" class="w-4 h-4 text-primary-500" />
 							</div>
-							<span class="font-medium text-gray-900 dark:text-white">{{ row.original.nombre }}</span>
+							<span class="font-medium text-gray-900 dark:text-white">{{ row.original.name }}</span>
 						</div>
 					</template>
 
