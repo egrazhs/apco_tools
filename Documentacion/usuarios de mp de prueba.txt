@@ -1,0 +1,15 @@
+usuarios de mp de prueba
+
+Comprador:
+UserID 			3379091180
+usuarios		TESTUSER5941474116686502679
+Contraseña		ARxZxo7GgS
+Cod Verif		091180
+Correo			test_user_5941474116686502679@testuser.com
+
+
+Vendedor
+UserID			3380861130
+usuarios		TESTUSER7488956427346989383
+Contraseña		gpQvQXtG8c
+Cod Verif		861130

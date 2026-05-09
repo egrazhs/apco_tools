@@ -115,29 +115,96 @@ STRIPE:
 Ambos deben enrutarse mediante una variable de entorno PAYMENT_PROVIDER, 
 usando un composable usePayment() como abstracción.
 
----------------Chat 5 Mi Cuenta
 
-Estoy construyendo una tienda e-commerce en Nuxt 3 + Vue 3 + NuxtUI v3 + 
-Tailwind CSS + Supabase + Pinia para APCO Tools, distribuidor de herramientas 
+
+
+
+-----------------Chat 5 — Mi Cuenta
+
+Estoy construyendo una tienda e-commerce en Nuxt 3 + Vue 3 + NuxtUI v3 +
+Tailwind CSS + Supabase + Pinia para APCO Tools, distribuidor de herramientas
 en Guadalajara, Jalisco.
 
-El proyecto vive en C:/xampp/htdocs/apco_tools/app/
+El proyecto vive en C:/xampp/htdocs/apco_tools/
+El código Nuxt está en la subcarpeta app/ (pages, components, composables, etc.)
+Los server routes están en app/server/api/
 Stack: Nuxt 3, Vue 3, NuxtUI v3, Tailwind CSS, Supabase, Pinia.
-Paleta: stone base + red accent + amber secundario. Esquinas sharp (no rounded-2xl).
 Usa tabulaciones de 4 espacios.
+
+— Design system —
+Paleta: stone base + red accent + amber secundario.
+Esquinas sharp (no rounded-2xl).
+Tipografía: serif en headings, editorial.
 El composable useCurrency() expone formatCurrency() para formatear precios.
+bg-white explícito en todas las secciones claras (dark mode override).
+UInput/UTextarea: bg-white + text-stone-900 en la key base del prop :ui.
+UButton: color customization via class directo, no via :ui color.
+USeparator en lugar de UDivider (deprecado).
 
-Ya tengo:
-- Auth funcional con Supabase
+— Estado actual —
+- Auth funcional con Supabase (@nuxtjs/supabase)
 - Middleware auth.ts protegiendo rutas privadas
-- Flujo completo de carrito → checkout → pago funcional (MP y Stripe sandbox)
-- Tablas: orders, order_items, addresses, products
-- Tipos TypeScript generados con Supabase CLI
+- Flujo completo carrito → checkout → pago funcional (Stripe y MP sandbox)
+- Composable usePayment() abstrae ambos proveedores vía PAYMENT_PROVIDER en .env
+- Tipos TypeScript generados con Supabase CLI (proyecto: gqgdzvkoydpuefloilmr)
 
-Necesito implementar desde cero la sección /mi-cuenta con:
-1. Historial de órdenes (fecha, total, status, detalle de productos)
-2. Gestión de direcciones guardadas (agregar, editar, eliminar)
-3. Datos del perfil (nombre, email)
+— Esquema Supabase relevante —
+orders:         id (uuid), user_id, address_id, subtotal, shipping_cost,
+                tax, total, status, payment_status, payment_provider,
+                external_payment_id, notes, created_at, updated_at
+order_items:    id (uuid), order_id, product_id, quantity, unit_price,
+                discount, subtotal, created_at
+addresses:      id (uuid), user_id, alias, recipient_name, street,
+                ext_number, int_number, neighborhood, city, state,
+                zip_code, country, phone, is_default, created_at, updated_at
+products:       id, nombre, precio, precio_descuento, imagen_url, stock
 
-Usa NuxtUI para tabs, tablas y formularios. Diseño consistente con el resto 
-del proyecto (stone + red).
+— Qué necesito implementar —
+Página /mi-cuenta con 3 secciones:
+
+1. Historial de órdenes
+   - Listado con: fecha, número de orden, total, payment_status
+   - Vista de detalle por orden: productos, cantidades, precios, dirección de envío
+   - Estados visuales: pending, paid, failed con colores distintivos
+
+2. Gestión de direcciones guardadas
+   - Listar direcciones del usuario
+   - Agregar nueva dirección
+   - Editar dirección existente
+   - Eliminar dirección
+   - Marcar como predeterminada (is_default)
+
+3. Datos del perfil
+   - Mostrar nombre y email del usuario autenticado
+   - Opción para cerrar sesión
+
+Usa NuxtUI (UTabs, UTable, UModal, UForm) para estructura.
+Diseño consistente con el resto del proyecto (stone + red).
+Supabase queries envueltas en useAsyncData para SSR safety.
+
+
+
+--------Prueba como usuario nuevo--------
+Estoy construyendo una tienda e-commerce en Nuxt 3 + Vue 3 + NuxtUI v3 + Tailwind CSS + Supabase + Pinia para APCO Tools, distribuidor de herramientas en Guadalajara, Jalisco. El proyecto vive en C:/xampp/htdocs/apco_tools/app/.
+Design system: paleta stone + red accent + amber secundario. Esquinas sharp, tipografía serif editorial. formatCurrency() via useCurrency(). bg-white explícito en secciones claras. UButton color via class directo. USeparator en lugar de UDivider.
+Stack y estado actual:
+
+Auth funcional con @nuxtjs/supabase
+Middleware auth.ts con redirect ?redirect=/ruta al login
+Flujo carrito (Pinia useCartStore) → checkout → pago implementado con Stripe (funcional) y Mercado Pago (pendiente pruebas completas)
+Composable usePayment() abstrae ambos proveedores via PAYMENT_PROVIDER en .env
+Página /mi-cuenta con 3 tabs: historial de órdenes, gestión de direcciones, perfil
+Composables useOrders() y useAddresses() con { server: false } para SSR safety
+RLS policies correctas en tabla addresses (SELECT, INSERT, UPDATE, DELETE por auth.uid() = user_id)
+Webhook de Stripe funcional, órdenes se marcan paid correctamente
+Dark mode deshabilitado via colorMode: { preference: 'light', fallback: 'light', forced: true } en nuxt.config.ts
+
+Esquema Supabase relevante:
+
+orders: id, user_id, address_id, subtotal, shipping_cost, tax, total, status, payment_status, payment_provider, external_payment_id, notes, created_at, updated_at
+order_items: id, order_id, product_id, quantity, unit_price, discount, subtotal
+addresses: id, user_id, alias, recipient_name, street, ext_number, int_number, neighborhood, city, state, zip_code, country, phone, is_default
+products: id, nombre, precio, precio_descuento, imagen_url, stock
+
+Lo que necesito en este chat:
+Quiero hacer una prueba de fuego de UX/UI del flujo de compra para un usuario nuevo no registrado. Necesito que me enlistes paso a paso el recorrido completo que debería hacer ese usuario — desde llegar a la landing hasta completar una compra — tal como está implementado actualmente, para identificar fricciones, pasos confusos o cosas que podrían mejorarse antes de abrir a clientes reales.

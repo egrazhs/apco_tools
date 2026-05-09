@@ -116,6 +116,7 @@
                         block
                         size="lg"
                         class="bg-red-600 hover:bg-red-700 text-white font-bold justify-center mt-2"
+                        to="/checkout"
                     >
                         Proceder al pago
                     </UButton>

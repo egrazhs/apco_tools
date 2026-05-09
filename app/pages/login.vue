@@ -111,55 +111,60 @@
 </template>
 
 <script setup lang="ts">
-const { login } = useAuth()
-const user = useSupabaseUser()
+    const route = useRoute()
 
-const email = ref('')
-const password = ref('')
-const errorMsg = ref('')
-const loading = ref(false)
-const showPassword = ref(false)
+    const { login } = useAuth()
+    const user = useSupabaseUser()
 
-const handleLogin = async () => {
-    errorMsg.value = ''
-    loading.value = true
-    try {
-        await login(email.value, password.value)
-    } catch (err: any) {
-        errorMsg.value = err.message
-    } finally {
-        loading.value = false
+    const email = ref('')
+    const password = ref('')
+    const errorMsg = ref('')
+    const loading = ref(false)
+    const showPassword = ref(false)
+
+    const handleLogin = async () => {
+        errorMsg.value = ''
+        loading.value = true
+        try {
+            await login(email.value, password.value)
+        } catch (err: any) {
+            errorMsg.value = err.message
+        } finally {
+            loading.value = false
+        }
     }
-}
 
-watch(user, (val) => {
-    if (val) navigateTo('/admin')
-}, { immediate: true })
+    watch(user, (val) => {
+        if (val) {
+            const redirect = route.query.redirect as string | undefined
+            navigateTo(redirect ?? '/admin')
+        }
+    }, { immediate: true })
 </script>
 
 <style scoped>
-@keyframes rise {
-    from {
+    @keyframes rise {
+        from {
+            opacity: 0;
+            transform: translateY(16px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-rise {
+        animation: rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .slide-error-enter-active,
+    .slide-error-leave-active {
+        transition: all 0.2s ease;
+    }
+    .slide-error-enter-from,
+    .slide-error-leave-to {
         opacity: 0;
-        transform: translateY(16px);
+        transform: translateY(-4px);
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-rise {
-    animation: rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.slide-error-enter-active,
-.slide-error-leave-active {
-    transition: all 0.2s ease;
-}
-.slide-error-enter-from,
-.slide-error-leave-to {
-    opacity: 0;
-    transform: translateY(-4px);
-}
 </style>
