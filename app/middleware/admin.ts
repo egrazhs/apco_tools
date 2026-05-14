@@ -1,7 +1,19 @@
-export default defineNuxtRouteMiddleware(() => {
-  const { perfil } = useAuth()
+export default defineNuxtRouteMiddleware(async () => {
+    const supabase = useSupabaseClient()
 
-  if (perfil.value?.rol !== 'admin') {
-    return navigateTo('/')
-  }
+    const { data: { session } } = await supabase.auth.getSession()
+
+    if (!session) {
+        return navigateTo('/login')
+    }
+
+    const { data: perfil } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single()
+
+    if (perfil?.role !== 'admin') {
+        return navigateTo('/')
+    }
 })

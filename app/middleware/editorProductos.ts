@@ -1,9 +1,9 @@
 export default defineNuxtRouteMiddleware(() => {
-  const { perfil } = useAuth()
+  const { profile } = useAuth()
 
   const permitido =
-    perfil.value?.rol === 'admin' ||
-    perfil.value?.puede_editar_productos
+    profile.value?.role === 'admin' ||
+    profile.value?.can_edit_products
 
   if (!permitido) {
     return navigateTo('/')

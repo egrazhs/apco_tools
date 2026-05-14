@@ -1,8 +1,8 @@
 export interface Subcategory {
 	id?: string
-	nombre: string
+	name: string
 	slug: string
-	activo: boolean
+	is_active: boolean
 	created_at?: string
 }
 

@@ -1,0 +1,5 @@
+-Enviar correos desde formularios y al hacer compras.
+
+-Subir catalogo de RIDGID
+
+-Pantalla de restringido (redirigir desde los middlewares)

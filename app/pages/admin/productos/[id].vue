@@ -1,6 +1,6 @@
 <template>
 	<div class="p-6">
-		<AdminProductosForm :initialData="product" :marcas="marcasOptions || []" @submit="updateProduct"/>
+		<AdminProductosForm :initialData="product" :marcas="marcasOptions || []" :categories="category_options" :subcategories="subcategory_options" @submit="updateProduct"/>
 	</div>
 </template>
 
@@ -13,21 +13,35 @@
 	const route = useRoute()
 	const { getProductById, updateProduct: update } = useProducts()
 	const { getBrands } = useBrands()
+	const { getCategories } = useCategories()
+	const { getSubcategories } = useSubcategories()
 	
-	const [{ data: brandsData }, { data: productData }] = await Promise.all([
-	  getBrands(),
-	  getProductById(route.params.id as string)
+	const [{ data: brandsData }, { data: productData }, { data: categoriesData}, { data: SubcategoriesData}] = await Promise.all([
+		getBrands(),
+		getProductById(route.params.id as string),
+		getCategories(),
+		getSubcategories(),
 	])
 
 	const marcas = ref(brandsData || [])
 	const product = ref(productData)
+	const categories = ref(categoriesData)
+	const subcategories = ref(SubcategoriesData)
 
-	const marcasOptions = computed(() =>
-	  (marcas.value || []).map(m => ({
-	    label: m.nombre,
-	    value: Number(m.id)
-	  }))
-	)
+	const marcasOptions = computed(() => (marcas.value || []).map(m => ({
+		label: m.name,
+		value: Number(m.id)
+	})))
+
+	const category_options = computed(() => (categories.value || []).map(c => ({
+		label: c.name,
+		value: Number(c.id)
+	})))
+
+	const subcategory_options = computed(() => (subcategories.value || []).map(s => ({
+		label: s.name,
+		value: Number(s.id)
+	})))
 
 	const fetchProduct = async () => {
 		const { data } = await getProductById(route.params.id as string)
@@ -40,11 +54,15 @@
 	}	
 
 	const updateProduct = async (form: any) => {
-	  const { id, created_at, ...cleanForm } = form
-	  await update(route.params.id as string, {
-	    ...cleanForm,
-	    marca_id: Number(cleanForm.marca_id)
-	  })
-	  navigateTo('/admin/productos')
+		const { id, created_at, ...cleanForm } = form
+		
+		await update(route.params.id as string, {
+			...cleanForm,
+			brand_id: Number(cleanForm.brand_id),
+			category_id: Number(cleanForm.category_id),
+			subcategory_id: Number(cleanForm.subcategory_id),
+		})
+		
+		navigateTo('/admin/productos')
 	}
 </script>

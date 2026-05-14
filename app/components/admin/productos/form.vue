@@ -141,6 +141,26 @@
                             />
                         </UFormField>
 
+                        <UFormField label="Categoría" class="col-span-1">
+                            <USelect
+                                v-model="form.category_id"
+                                :items="categories"
+                                placeholder="Selecciona una Categoría"
+                                size="lg"
+                                icon="i-heroicons-building-storefront"
+                            />
+                        </UFormField>
+
+                        <UFormField label="Subcategoría" class="col-span-1">
+                            <USelect
+                                v-model="form.subcategory_id"
+                                :items="subcategories"
+                                placeholder="Selecciona una Subcategoría"
+                                size="lg"
+                                icon="i-heroicons-building-storefront"
+                            />
+                        </UFormField>
+
                         <UFormField label="Estado del producto" class="col-span-1">
                             <div
                                 class="flex items-center justify-between px-4 rounded-lg border h-[42px] transition-all duration-200"
@@ -232,20 +252,28 @@
 </template>
 
 <script setup lang="ts">
-    const props = defineProps<{ initialData?: any, marcas: Array<{ label: string; value: number }> }>()
+    const props = defineProps<{ 
+        initialData?: any, 
+        marcas: Array<{ label: string; value: number }>,
+        categories: Array<{ label: string; value: number }>,
+        subcategories: Array<{ label: string; value: number }>,
+    }>()
+    
     const emit = defineEmits(['submit'])
     const isEdit = computed(() => !!props.initialData)
 
     const form = reactive({
-        marca_id: props.initialData?.marca_id || null,
-        nombre: props.initialData?.nombre || '',
-        descripcion_larga: props.initialData?.descripcion_larga || '',
-        descripcion_corta: props.initialData?.descripcion_corta || '',
-        imagen_principal: props.initialData?.imagen_principal || 'https://placehold.co/300x200',
-        precio_venta: props.initialData?.precio_venta || 0,
+        brand_id: props.initialData?.brand_id || null,
+        category_id: props.initialData?.category_id || null,
+        subcategory_id: props.initialData?.subcategory_id || null,
+        name: props.initialData?.name || '',
+        long_description: props.initialData?.long_description || '',
+        short_description: props.initialData?.short_description || '',
+        image_url: props.initialData?.image_url || 'https://placehold.co/300x200',
+        price: props.initialData?.price || 0,
         slug: props.initialData?.slug || '',
-        codigo: props.initialData?.codigo || '',
-        stock: props.initialData?.stock || 0,
+        code: props.initialData?.code || '',
+        stock: props.initialData?.stock || 50,
         is_active: props.initialData?.is_active ?? true,
     })
 
@@ -261,5 +289,5 @@
         }
     })
 
-    const handleSubmit = () => { emit('submit', { ...form, marca_id: Number(form.marca_id) }) }
+    const handleSubmit = () => { emit('submit', { ...form, brand_id: Number(form.brand_id), category_id: Number(form.category_id), subcategory_id: Number(form.subcategory_id) }) }
 </script>

@@ -5,12 +5,8 @@
 			<!-- Header Section -->
 			<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 				<div>
-					<div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-1">
-						<UIcon name="i-heroicons-home" class="w-4 h-4" />
-						<span>Admin</span>
-						<UIcon name="i-heroicons-chevron-right" class="w-3 h-3" />
-						<span class="text-gray-900 dark:text-white font-medium">Productos</span>
-					</div>
+					<AdminBreadcrumb actual_page="Productos" />
+
 					<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Productos</h1>
 					<p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ products?.length ?? 0 }} producto{{ (products?.length ?? 0) !== 1 ? 's' : '' }} registrado{{ (products?.length ?? 0) !== 1 ? 's' : '' }}</p>
 				</div>
@@ -97,7 +93,7 @@
 			</template>
 
 			<template #body>
-				<p class="text-sm text-gray-600 dark:text-gray-300 py-2">¿Estás seguro que deseas eliminar <span class="font-semibold text-gray-900 dark:text-white">{{ deleteModal.producto?.nombre }}</span>?</p>
+				<p class="text-sm text-gray-600 dark:text-gray-300 py-2">¿Estás seguro que deseas eliminar <span class="font-semibold text-gray-900 dark:text-white">{{ deleteModal.product?.name }}</span>?</p>
 			</template>
 
 			<template #footer>
@@ -123,14 +119,15 @@
 	})
 
 	// Search
+	const search = ref('')
+
 	const filteredProducts = computed(() => {
 		if (!search.value) return products.value ?? []
 			const q = search.value.toLowerCase()			
 		return (products.value ?? []).filter((p: any) => p.nombre?.toLowerCase().includes(q))
 	})
 
-	const search = ref('')
-
+	
 	// Refresh
 	const refreshing = ref(false)
 	const handleRefresh = async () => {
@@ -143,17 +140,18 @@
 
 	const deleteModal = reactive({
 		loading: false,
-		producto: null as any
+		product: null as any
 	})
 
-	const confirmDelete = (producto: any) => {
-		deleteModal.producto = producto
+	const confirmDelete = (product: any) => {
+		deleteModal.product = product
 		deleteModalOpen.value = true  // ← ref separado
 	}
 
 	const handleDelete = async () => {
+		console.log(deleteModal.product)
 		deleteModal.loading = true
-		await deleteProduct(deleteModal.producto.id)
+		await deleteProduct(deleteModal.product.id)
 		await refresh()
 		deleteModal.loading = false
 		deleteModalOpen.value = false  // ← ref separado
@@ -166,7 +164,7 @@
 
 	// Columns
 	const columns = [
-		{ accessorKey: 'nombre', header: 'Nombre' },
+		{ accessorKey: 'name', header: 'Nombre' },
 		{ id: 'actions', header: 'Acciones' }
 	]
 </script>

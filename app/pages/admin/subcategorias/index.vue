@@ -5,12 +5,8 @@
       <!-- Header Section -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-1">
-            <UIcon name="i-heroicons-home" class="w-4 h-4" />
-            <span>Admin</span>
-            <UIcon name="i-heroicons-chevron-right" class="w-3 h-3" />
-            <span class="text-gray-900 dark:text-white font-medium">Subcategorías</span>
-          </div>
+          <AdminBreadcrumb actual_page="Subcategorías" />
+
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Subcategorías</h1>
           <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             {{ subcategories?.length ?? 0 }} Subcategoría{{ (subcategories?.length ?? 0) !== 1 ? 's' : '' }} registrada{{ (subcategories?.length ?? 0) !== 1 ? 's' : '' }}
@@ -135,20 +131,6 @@
             </span>
           </template>
 
-          <template #activo-cell="{ row }">
-            <UBadge
-              :color="row.original.is_active ? 'green' : 'red'"
-              variant="subtle"
-              class="gap-1.5"
-            >
-              <span
-                class="w-1.5 h-1.5 rounded-full inline-block"
-                :class="row.original.is_active ? 'bg-green-500' : 'bg-red-500'"
-              />
-              {{ row.original.is_active ? 'Activa' : 'Inactiva' }}
-            </UBadge>
-          </template>
-
           <template #actions-cell="{ row }">
             <div class="flex items-center gap-1">
               <UTooltip text="Editar">
@@ -157,6 +139,7 @@
                   color="gray"
                   variant="ghost"
                   icon="i-heroicons-pencil-square"
+                  class="cursor-pointer"
                   @click="editSubcategory(row.original.id)"
                 />
               </UTooltip>
@@ -166,6 +149,7 @@
                   color="red"
                   variant="ghost"
                   icon="i-heroicons-trash"
+                  class="cursor-pointer"
                   @click="confirmDelete(row.original)"
                 />
               </UTooltip>
@@ -174,7 +158,7 @@
         </UTable>
 
         <!-- Table Footer -->
-        <div
+        <footer
           v-if="filteredSubcategories.length > 0"
           class="px-4 py-3 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between"
         >
@@ -191,7 +175,7 @@
               {{ inactiveCount }} inactiva{{ inactiveCount !== 1 ? 's' : '' }}
             </span>
           </div>
-        </div>
+        </footer>
       </UCard>
     </div>
 
@@ -218,12 +202,8 @@
 
       <template #footer>
         <div class="flex justify-end gap-3">
-          <UButton color="gray" variant="ghost" @click="deleteModalOpen = false">
-            Cancelar
-          </UButton>
-          <UButton color="red" :loading="deleteModal.loading" @click="handleDelete">
-            Eliminar
-          </UButton>
+          <UButton color="gray" variant="ghost" @click="deleteModalOpen = false">Cancelar</UButton>
+          <UButton color="red" :loading="deleteModal.loading" @click="handleDelete">Eliminar</UButton>
         </div>
       </template>
     </UModal>
@@ -256,18 +236,18 @@ const filteredSubcategories = computed(() => {
   if (search.value) {
     const q = search.value.toLowerCase()
     result = result.filter((c: any) =>
-      c.nombre?.toLowerCase().includes(q) ||
+      c.name?.toLowerCase().includes(q) ||
       c.slug?.toLowerCase().includes(q)
     )
   }
   if (filterEstado.value !== null) {
-    result = result.filter((c: any) => c.activo === filterEstado.value)
+    result = result.filter((c: any) => c.is_active === filterEstado.value)
   }
   return result
 })
 
-const activeCount = computed(() => (subcategories.value ?? []).filter((c: any) => c.activo).length)
-const inactiveCount = computed(() => (subcategories.value ?? []).filter((c: any) => !c.activo).length)
+const activeCount = computed(() => (subcategories.value ?? []).filter((c: any) => c.is_active).length)
+const inactiveCount = computed(() => (subcategories.value ?? []).filter((c: any) => !c.is_active).length)
 
 const clearFilters = () => {
   search.value = ''
@@ -309,9 +289,9 @@ const editSubcategory = (id: string) => {
 
 // Columns
 const columns = [
-  { accessorKey: 'nombre', header: 'Nombre' },
+  { accessorKey: 'name', header: 'Nombre' },
   { accessorKey: 'slug', header: 'Slug' },
-  { accessorKey: 'activo', header: 'Estado' },
+  { accessorKey: 'is_active', header: 'Estado' },
   { id: 'actions', header: 'Acciones' }
 ]
 </script>

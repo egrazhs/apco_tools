@@ -1,6 +1,8 @@
 export interface Product {
 	id?: number
 	brand_id: number
+	category_id?: number
+    subcategory_id?: number
 	name: string
 	short_description: string
 	long_description: string
@@ -17,12 +19,16 @@ export const useProducts = () => {
 	const supabase = useSupabaseClient()
 
 	const getProducts = async () => {
-		return await supabase.from('products').select('*').select(`*, brand:brands(*)`).order('created_at', { ascending: false })
+	    return await supabase
+	        .from('products')
+	        .select(`*, brand:brands(*), category:categories(*), subcategory:subcategories(*))`)
+	        .eq('is_active', true)
+	        .order('created_at', { ascending: false })
 	}
 
 	const getProductById = async (id: string) => {
 		if (!id) throw new Error('ID requerido')
-		return await supabase.from('products').select(`*, brand:brands(*)`).eq('id', id).single()
+		return await supabase.from('products').select(`*, brand:brands(*), category:categories(*), subcategory:subcategories(*)`).eq('id', id).single()
 	}
 
 	const createProduct = async (data: Product) => {
@@ -34,9 +40,10 @@ export const useProducts = () => {
 		return await supabase.from('products').update(data).eq('id', id).select().single()
 	}
 
+	//Soft delete
 	const deleteProduct = async (id: string) => {
-		if (!id) throw new Error('ID requerido')
-		return await supabase.from('products').delete().eq('id', id)
+	    if (!id) throw new Error('ID requerido')
+	    return await supabase.from('products').update({ is_active: false }).eq('id', id)
 	}
 
 	return { getProducts, getProductById, createProduct, updateProduct, deleteProduct}

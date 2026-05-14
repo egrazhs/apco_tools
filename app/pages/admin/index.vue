@@ -70,8 +70,10 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: false
+    layout: false,
+    middleware: ['auth', 'admin'],
 })
+
 const { logout } = useAuth()
 const user = useSupabaseUser()
 
