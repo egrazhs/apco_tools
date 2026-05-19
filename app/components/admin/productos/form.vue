@@ -278,7 +278,7 @@
     })
 
     // Auto-genera slug desde nombre (solo al crear o si slug está vacío)
-    watch(() => form.nombre, (val) => {
+    watch(() => form.name, (val) => {
         if (!isEdit.value || !form.slug) {
             form.slug = val
                 .toLowerCase()
@@ -289,5 +289,11 @@
         }
     })
 
-    const handleSubmit = () => { emit('submit', { ...form, brand_id: Number(form.brand_id), category_id: Number(form.category_id), subcategory_id: Number(form.subcategory_id) }) }
+    const handleSubmit = () => { 
+        emit('submit', { 
+        ...form, 
+        brand_id: form.brand_id ? Number(form.brand_id) : null, 
+        category_id: form.category_id ? Number(form.category_id) : null, 
+        subcategory_id: form.subcategory_id ? Number(form.subcategory_id) : null 
+    }) }
 </script>

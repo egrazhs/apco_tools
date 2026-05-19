@@ -57,10 +57,7 @@
 		const { id, created_at, ...cleanForm } = form
 		
 		await update(route.params.id as string, {
-			...cleanForm,
-			brand_id: Number(cleanForm.brand_id),
-			category_id: Number(cleanForm.category_id),
-			subcategory_id: Number(cleanForm.subcategory_id),
+			...cleanForm
 		})
 		
 		navigateTo('/admin/productos')

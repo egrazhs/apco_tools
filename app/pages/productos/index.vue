@@ -83,7 +83,7 @@
         if (!products.value) return []
         if (!search.value) return products.value
         return products.value.filter((p: any) =>
-            p.nombre.toLowerCase().includes(search.value.toLowerCase())
+            p.name.toLowerCase().includes(search.value.toLowerCase())
         )
     })
 </script>
