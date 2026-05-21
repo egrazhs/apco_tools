@@ -33,13 +33,15 @@
                     </a>
 
                     <!-- Carrito -->
-                    <div class="ml-2 relative">
+                    <div class="ml-2 relative flex">
+                        <UserAuthMenu />
                         <CartMiniSlide />
                     </div>
                 </nav>
 
                 <!-- Mobile: carrito + hamburger -->
                 <div class="flex items-center gap-3 lg:hidden">
+                    <UserAuthMenu class="mr-2"/>
                     <CartMiniSlide />
                     <button
                         @click="menuAbierto = !menuAbierto"

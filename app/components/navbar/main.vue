@@ -28,6 +28,8 @@
 
                 <!-- Derecha: carrito + hamburger mobile -->
                 <div class="flex items-center gap-3">
+                    <UserAuthMenu />
+                    
                     <div class="text-stone-700">
                         <CartMiniSlide />
                     </div>
