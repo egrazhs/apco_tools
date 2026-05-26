@@ -4,6 +4,7 @@ export interface Subcategory {
 	slug: string
 	is_active: boolean
 	created_at?: string
+	category_id: number
 }
 
 export const useSubcategories = () => {
@@ -16,6 +17,11 @@ export const useSubcategories = () => {
 	const getSubcategoryById = async (id: string) => {
 		if (!id) throw new Error('ID requerido')
 		return await supabase.from('subcategories').select('*').eq('id', id).single()
+	}
+
+	const getSubcategoriesByCategory = async (category_id: string) => {
+		if (!category_id) throw new Error('ID requerido')
+		return await supabase.from('subcategories').select('*').eq('category_id', category_id) 
 	}
 
 	const createSubcategory = async (data: Category) => {
@@ -32,5 +38,5 @@ export const useSubcategories = () => {
 		return await supabase.from('subcategories').delete().eq('id', id)
 	}
 
-	return { getSubcategories, getSubcategoryById, createSubcategory, updateSubcategory, deleteSubcategory}
+	return { getSubcategories, getSubcategoryById, getSubcategoriesByCategory, createSubcategory, updateSubcategory, deleteSubcategory}
 }

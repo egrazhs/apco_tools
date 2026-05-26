@@ -1,10 +1,21 @@
 {
-  "hosting": {
-    "public": ".output/public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  }
+    "hosting": {
+        "public": ".output/public",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ],
+        "rewrites": [
+            {
+                "source": "**",
+                "function": "server",
+                "region": "us-central1"
+            }
+        ]
+    },
+    "functions": {
+        "source": ".output/server",
+        "runtime": "nodejs22"
+    }
 }

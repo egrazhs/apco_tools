@@ -32,6 +32,12 @@ export default defineNuxtConfig({
     ui: {
         colorMode: false
     },
+    nitro: {
+        preset: 'firebase',
+        firebase: {
+            gen: 2  // Cloud Functions 2ª generación (más moderna y recomendada)
+        },
+    },
     vite: {
         server: {
             allowedHosts: ['vitalize-steersman-conical.ngrok-free.dev']

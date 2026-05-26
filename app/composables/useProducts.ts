@@ -31,6 +31,10 @@ export const useProducts = () => {
 		return await supabase.from('products').select(`*, brand:brands(*), category:categories(*), subcategory:subcategories(*)`).eq('id', id).single()
 	}
 
+	const getProductsBySubcategory = async (subcategory_id: string) => {
+		return await supabase.from('products').select('*').eq('subcategory_id', subcategory_id).eq('is_active', true).order('created_at')
+	}
+
 	const createProduct = async (data: Product) => {
 		return await supabase.from('products').insert([data]).select().single()
 	}
@@ -46,5 +50,5 @@ export const useProducts = () => {
 	    return await supabase.from('products').update({ is_active: false }).eq('id', id)
 	}
 
-	return { getProducts, getProductById, createProduct, updateProduct, deleteProduct}
+	return { getProducts, getProductById, getProductsBySubcategory, createProduct, updateProduct, deleteProduct}
 }

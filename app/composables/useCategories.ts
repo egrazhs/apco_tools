@@ -18,6 +18,10 @@ export const useCategories = () => {
 		return await supabase.from('categories').select('*').eq('id', id).single()
 	}
 
+	const getCategoryBySlug = async (slug: string) => {
+	    return await supabase.from('categories').select('*').eq('slug', slug).single()
+	}
+
 	const createCategory = async (data: Category) => {
 		return await supabase.from('categories').insert(data).select().single()
 	}
@@ -32,5 +36,5 @@ export const useCategories = () => {
 		return await supabase.from('categories').delete().eq('id', id)
 	}
 
-	return { getCategories, getCategoryById, createCategory, updateCategory, deleteCategory}
+	return { getCategories, getCategoryById, getCategoryBySlug, createCategory, updateCategory, deleteCategory}
 }
