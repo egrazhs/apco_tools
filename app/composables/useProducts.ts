@@ -35,6 +35,11 @@ export const useProducts = () => {
 		return await supabase.from('products').select('*').eq('subcategory_id', subcategory_id).eq('is_active', true).order('created_at')
 	}
 
+	const getTotalProductsByBrand = async (brand_id: string) => {
+		if (!brand_id) throw new Error('ID requerido')
+    	return await supabase.from('products').select('*', { count: 'exact', head: true }).eq('brand_id', brand_id).eq('is_active', true)
+	}
+
 	const createProduct = async (data: Product) => {
 		return await supabase.from('products').insert([data]).select().single()
 	}
@@ -50,5 +55,13 @@ export const useProducts = () => {
 	    return await supabase.from('products').update({ is_active: false }).eq('id', id)
 	}
 
-	return { getProducts, getProductById, getProductsBySubcategory, createProduct, updateProduct, deleteProduct}
+	return { 
+		getProducts, 
+		getProductById, 
+		getProductsBySubcategory, 
+		getTotalProductsByBrand, 
+		createProduct, 
+		updateProduct, 
+		deleteProduct
+	}
 }

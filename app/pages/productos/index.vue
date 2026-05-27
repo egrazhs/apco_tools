@@ -19,20 +19,6 @@
             </p>
         </div>
 
-        <!-- Estado de carga -->
-        <!--
-        <div v-if="pending" class="flex justify-center py-16">
-            <div class="space-y-4 w-full max-w-4xl">
-                <USkeleton class="h-48 w-full" />
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <USkeleton class="h-56" />
-                    <USkeleton class="h-56" />
-                    <USkeleton class="h-56" />
-                </div>
-            </div>
-        </div>
-        -->
-
         <!-- Grid de marcas -->
         <div v-if="brands && brands.length > 0" class="mb-16">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -74,14 +60,21 @@
 </template>
 
 <script setup>
-const brands = [
-    {
-        id: 1,
-        name: 'RIDGID',
-        slug: 'ridgid',
-        logo: '/img/ridgid.webp',
-        description: 'Herramientas profesionales de drenaje, roscado y eléctricas',
-        product_count: 69
-    },
-];
+    const { getBrands } = useBrands()
+    const { getTotalProductsByBrand } = useProducts()
+
+    const { data: brands } = await useAsyncData('brands-with-counts', async () => {
+        const { data: raw_brands } = await getBrands()
+        if (!raw_brands) return []
+
+        const with_counts = await Promise.all(
+            raw_brands.map(async (brand) => {
+                const { count } = await getTotalProductsByBrand(brand.id)
+                return { ...brand, product_count: count ?? 0 }
+            })
+        )
+
+        // Solo muestra marcas que tienen al menos un producto activo
+        return with_counts.filter(brand => brand.product_count > 0)
+    })
 </script>
