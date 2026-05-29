@@ -98,9 +98,9 @@
                                                 class="flex items-center gap-3"
                                             >
                                                 <img
-                                                    v-if="item.products?.imagen_url"
-                                                    :src="item.products.imagen_url"
-                                                    :alt="item.products.nombre"
+                                                    v-if="item.products?.image_url"
+                                                    :src="item.products.image_url"
+                                                    :alt="item.products.name"
                                                     class="w-12 h-12 object-cover border border-stone-100 shrink-0"
                                                 />
                                                 <div v-else class="w-12 h-12 bg-stone-100 shrink-0 flex items-center justify-center">
@@ -108,7 +108,7 @@
                                                 </div>
                                                 <div class="flex-1 min-w-0">
                                                     <p class="text-sm font-medium text-stone-800 truncate">
-                                                        {{ item.products?.nombre ?? 'Producto' }}
+                                                        {{ item.products?.name ?? 'Producto' }}
                                                     </p>
                                                     <p class="text-xs text-stone-400">
                                                         {{ item.quantity }} × {{ formatCurrency(item.unit_price) }}
