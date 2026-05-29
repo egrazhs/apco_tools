@@ -35,7 +35,8 @@ export default defineNuxtConfig({
     nitro: {
         preset: 'firebase',
         firebase: {
-            gen: 2  // Cloud Functions 2ª generación (más moderna y recomendada)
+            gen: 2,  // Cloud Functions 2ª generación (más moderna y recomendada)
+            nodeVersion: '22'
         },
     },
     vite: {
@@ -43,6 +44,7 @@ export default defineNuxtConfig({
             include: [
                 '@vue/devtools-core',
                 '@vue/devtools-kit',
+                '@stripe/stripe-js',
             ]
         },
         server: {

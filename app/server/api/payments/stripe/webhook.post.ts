@@ -2,7 +2,12 @@ import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig()
+    
+    // 🔍 LOGS DE DEBUG TEMPORALES
+    console.log('[Webhook] Secret configurado:', !!process.env.STRIPE_WEBHOOK_SECRET)
+    console.log('[Webhook] Secret prefix:', process.env.STRIPE_WEBHOOK_SECRET?.substring(0, 12))
+    console.log('[Webhook] Signature header:', getHeader(event, 'stripe-signature')?.substring(0, 20))
+
 
     const rawBody = await readRawBody(event)
     const sig     = getHeader(event, 'stripe-signature') ?? ''
@@ -28,21 +33,32 @@ export default defineEventHandler(async (event) => {
     if (stripeEvent.type === 'payment_intent.succeeded') {
         const intent = stripeEvent.data.object as Stripe.PaymentIntent
 
-        //console.log('[Webhook] payment_intent.succeeded - intent.id:', intent.id)
+        console.log('[Stripe] Object: ', stripeEvent)
+        console.log('[Stripe] Event type:', stripeEvent.type)
+        console.log('[Stripe] Intent ID:', intent.id)
+        console.log('[Stripe] Intent status:', intent.status)   
 
-        const { data, error } = await supabase
+        const { data: order, error } = await supabase
             .from('orders')
             .update({ payment_status: 'paid' })
-            .eq('external_payment_id', intent.id).select()
+            .eq('external_payment_id', intent.id)
+            .select('id')
+            .single()
+
+        if (error || !order) {
+            console.error('[Webhook] Error actualizando orden:', error)
+            throw createError({ statusCode: 500, message: 'Error actualizando orden' })
+        }
 
         // Enviar confirmación de forma asíncrona (no bloqueante para Stripe)
+        /*
         $fetch('/api/mail/order-confirmation', {
             method: 'POST',
             body: { orderId: order.id },
         }).catch(err => console.error('[webhook] Error enviando email confirmación:', err))
+        */
 
-        return { received: true }   
-        //console.log('[Webhook] Supabase update result:', { data, error })
+        return { received: true }
     }
 
 

@@ -1,21 +1,32 @@
 {
-    "hosting": {
-        "public": ".output/public",
-        "ignore": [
-            "firebase.json",
-            "**/.*",
-            "**/node_modules/**"
-        ],
-        "rewrites": [
-            {
-                "source": "**",
-                "function": "server",
-                "region": "us-central1"
-            }
-        ]
-    },
-    "functions": {
-        "source": ".output/server",
-        "runtime": "nodejs22"
+  "functions": [
+    {
+      "codebase": "default",
+      "source": ".output/server",
+      "runtime": "nodejs22",
+      "predeploy": [],
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
     }
+  ],
+  "hosting": {
+    "public": ".output/public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "server",
+        "region": "us-central1"
+      }
+    ]
+  }
 }
