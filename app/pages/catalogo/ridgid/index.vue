@@ -44,23 +44,9 @@
                 :category="category"
             />
         </div>
+        
 
-        <!-- Sección adicional -->
-        <div class="py-12 border-t border-gray-200">
-            <h3 class="text-2xl font-serif text-stone-900 mb-4 uppercase tracking-widest">
-                ¿Necesitas ayuda?
-            </h3>
-            <p class="text-gray-600 mb-6 max-w-2xl">
-                Si no encuentras el producto que buscas o necesitas una cotización personalizada, 
-                nuestro equipo de asesores está disponible para ayudarte.
-            </p>
-            <NuxtLink 
-                to="/#contacto" 
-                class="inline-block bg-red-600 text-white px-8 py-3 uppercase tracking-widest font-semibold text-sm hover:bg-red-700 transition-colors duration-200"
-            >
-                Contactar
-            </NuxtLink>
-        </div>
+        <CatalogoInformacionAdicional />
     </section>
 </template>
 
