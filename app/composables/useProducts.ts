@@ -13,6 +13,7 @@ export interface Product {
 	code: string
 	stock: number
 	is_active: boolean
+	mercadopago_link: string
 }
 
 export const useProducts = () => {

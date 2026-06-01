@@ -186,6 +186,17 @@
                                 <USwitch v-model="form.is_active" size="lg" />
                             </div>
                         </UFormField>
+
+
+                        <UFormField label="Link de mercadopago (opcional)" class="col-span-1">
+                            <UInput
+                                v-model="form.mercadopago_link"
+                                type="text"
+                                placeholder="Link de mercadopago"
+                                size="lg"
+                                icon="i-heroicons-link"
+                            />
+                        </UFormField>
                     </div>
                 </div>
 
@@ -275,6 +286,7 @@
         code: props.initialData?.code || '',
         stock: props.initialData?.stock || 50,
         is_active: props.initialData?.is_active ?? true,
+        mercadopago_link: props.initialData?.mercadopago_link ?? '',
     })
 
     // Auto-genera slug desde nombre (solo al crear o si slug está vacío)
