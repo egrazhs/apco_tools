@@ -130,6 +130,10 @@
                             </UButton>
                         </div>
 
+                        <div>
+                            <ProductMercadopagoButton v-if="producto.mercadopago_link" :link="producto.mercadopago_link" />
+                        </div>
+
                         <!-- Cotización -->
                         <UButton
                             to="/cotizacion"
