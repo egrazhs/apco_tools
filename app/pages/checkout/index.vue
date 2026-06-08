@@ -398,11 +398,7 @@ async function handleCheckout() {
         orderId.value = orderResult.order_id
 
         // 3. Iniciar pago según proveedor activo
-        const result = await initPayment(
-            String(orderResult.order_id),
-            orderResult.total,
-            items,
-        )
+        const result = await initPayment(String(orderResult.order_id))
 
         if (result.type === 'redirect') {
             // Mercado Pago → salir del SPA

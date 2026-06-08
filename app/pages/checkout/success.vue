@@ -90,7 +90,6 @@ onMounted(async () => {
         if (paymentIntent) {
             isPending.value = route.query.redirect_status !== 'succeeded'
 
-            // El webhook puede tardar un momento — reintentamos hasta 3 veces
             for (let i = 0; i < 3; i++) {
                 const { data } = await supabase
                     .from('orders')
@@ -107,6 +106,18 @@ onMounted(async () => {
         const externalReference = route.query.external_reference as string
         if (externalReference) {
             isPending.value = route.query.collection_status === 'in_process'
+
+            // Verificar y actualizar el pago directamente con MP
+            const result = await $fetch<{ status: string }>(
+                '/api/payments/mp/verify-payment',
+                { method: 'POST', body: { order_id: externalReference } }
+            )
+
+            if (result.status === 'approved') {
+                isPending.value = false
+            } else if (result.status === 'pending' || result.status === 'in_process') {
+                isPending.value = true
+            }
 
             const { data } = await supabase
                 .from('orders')

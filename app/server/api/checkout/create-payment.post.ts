@@ -40,30 +40,48 @@ async function createMercadoPagoPreference(order: any, items: any[], baseUrl: st
         currency_id: 'MXN',
     }))
 
+    const mpBaseUrl = baseUrl.includes('localhost')
+        ? process.env.NGROK_URL ?? 'https://tu-dominio.ngrok-free.app'
+        : baseUrl
+
     const body = {
         items: mpItems,
         back_urls: {
-            success: `${baseUrl}/checkout/success?order_id=${order.id}`,
-            failure: `${baseUrl}/checkout/failed?order_id=${order.id}`,
-            pending: `${baseUrl}/checkout/success?order_id=${order.id}&pending=true`,
+            success: `${mpBaseUrl}/checkout/success?order_id=${order.id}`,
+            failure: `${mpBaseUrl}/checkout/failed?order_id=${order.id}`,
+            pending: `${mpBaseUrl}/checkout/success?order_id=${order.id}&pending=true`,
         },
         auto_return:        'approved',
         external_reference: String(order.id),
     }
 
-    const response = await $fetch<{ id: string; init_point: string }>(
-        'https://api.mercadopago.com/checkout/preferences',
+
+    console.log('[MP BODY]', JSON.stringify({
+        ...body,
+        notification_url: `${baseUrl}/api/payments/webhooks/mercadopago`,
+    }, null, 2))
+    console.log('[MP baseUrl]', baseUrl)
+    
+    const response = await $fetch<{ id: string; init_point: string; sandbox_init_point: string }>(
+    'https://api.mercadopago.com/checkout/preferences',
         {
             method:  'POST',
             headers: {
                 Authorization:  `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
             },
-            body,
+            body: {
+                ...body,
+                notification_url: `${baseUrl}/api/payments/webhooks/mercadopago`,
+            },
         }
-    )
+    ).catch(err => {
+        console.error('[MP ERROR]', JSON.stringify(err.data, null, 2))
+        throw err
+    })
 
-    return { redirect_url: response.init_point }
+    const isSandbox = accessToken.startsWith('TEST-')
+    return { redirect_url: isSandbox ? response.sandbox_init_point : response.init_point }
 }
 
 // ─── Handler principal ───────────────────────────────────────────────────────

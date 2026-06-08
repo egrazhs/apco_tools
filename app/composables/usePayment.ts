@@ -1,6 +1,4 @@
-export type PaymentResult =
-    | { type: 'redirect'; url: string }
-    | { type: 'elements'; clientSecret: string }
+export type PaymentResult = { type: 'redirect'; url: string }
 
 export interface PaymentItem {
     product_id: string
@@ -38,13 +36,12 @@ export const usePayment = () => {
     }
 
     // ─── Entrada pública ──────────────────────────────────────────────────────
-    const initPayment = async (
-        orderId: string,
-        amount:  number,
-        items:   PaymentItem[],
-    ): Promise<PaymentResult> => {
-        if (provider === 'mercadopago') return initMercadoPago(orderId, items)
-        return initStripe(orderId, amount)
+    const initPayment = async (orderId: string): Promise<PaymentResult> => {
+        const data = await $fetch<{ redirect_url: string }>(
+            '/api/checkout/create-payment',
+            { method: 'POST', body: { order_id: orderId } },
+        )
+        return { type: 'redirect', url: data.redirect_url }
     }
 
     return { provider, initPayment }

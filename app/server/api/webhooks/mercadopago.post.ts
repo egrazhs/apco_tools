@@ -14,6 +14,8 @@ export default defineEventHandler(async (event) => {
     const paymentApi = new Payment(client)
     const payment = await paymentApi.get({ id: body.data.id })
 
+    
+
     const orderId = payment.external_reference  // tu UUID de Supabase
     const status = payment.status               // 'approved' | 'pending' | 'rejected'
 
@@ -23,12 +25,18 @@ export default defineEventHandler(async (event) => {
         process.env.SUPABASE_SERVICE_ROLE_KEY! // service role en server-side
     )
 
+    const paymentStatusMap: Record<string, string> = {
+        approved: 'paid',
+        pending:  'pending',
+        rejected: 'failed',
+    }
+
     await supabase
         .from('orders')
         .update({
-            payment_status: status,
-            mp_payment_id: String(payment.id),
-            updated_at: new Date().toISOString(),
+            payment_status:      paymentStatusMap[status] ?? 'pending',
+            external_payment_id: String(payment.id),
+            updated_at:          new Date().toISOString(),
         })
         .eq('id', orderId)
 

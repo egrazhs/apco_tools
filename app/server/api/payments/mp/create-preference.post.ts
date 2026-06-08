@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
                 pending: `${config.public.siteUrl}/checkout/pending`,  // ← corregido
             },
             auto_return:          'approved',
-            notification_url:     `${config.public.siteUrl}/api/payments/mp/webhook`, // ← corregido
+            notification_url:     `${config.public.siteUrl}/api/webhooks/mercadopago`, // ← corregido
             statement_descriptor: 'APCO Tools',
         },
     })
