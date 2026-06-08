@@ -90,8 +90,7 @@
                     <USeparator />
 
                     <!-- Descripción corta -->
-                    <p class="text-gray-300 leading-relaxed line-clamp-4">
-                        {{ producto.long_description }}
+                    <p class="text-gray-300 leading-relaxed line-clamp-4 whitespace-pre-line" v-html="parseLinks(producto.long_description)">
                     </p>
 
                     <!-- Cantidad + CTA -->
@@ -165,8 +164,7 @@
             <UTabs :items="tabItems" class="w-full">
                 <template #descripcion>
                     <div class="py-6 max-w-3xl">
-                        <p class="text-gray-300 leading-relaxed text-base">
-                            {{ producto.descripcion_larga ?? 'Sin descripción detallada.' }}
+                        <p class="text-gray-300 leading-relaxed text-base whitespace-pre-line" v-html="parseLinks(producto.long_description ?? 'Sin descripción detallada.')">
                         </p>
                     </div>
                 </template>
@@ -245,6 +243,7 @@
     const cart = useCartStore()
     const { addItem, removeItem, updateQuantity } = useSupabaseCart()
     const toast = useToast()
+    const { parseLinks } = useTextParser()
 
     // ── Fetch producto principal ──────────────────────────────────────
     const { data: producto, pending, error } = await useAsyncData(
