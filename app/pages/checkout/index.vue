@@ -28,6 +28,53 @@
                 <!-- ══ COLUMNA IZQUIERDA: Dirección de envío ══════════════════ -->
                 <div class="lg:col-span-7 space-y-6">
 
+                    <!-- ══ DIRECCIONES GUARDADAS ════════════════════════════════ -->
+                    <div v-if="savedAddresses?.length" class="bg-white border border-stone-200 p-6">
+                        <h2 class="text-xl font-semibold text-stone-800 mb-4 flex items-center gap-2">
+                            <UIcon name="i-heroicons-bookmark" class="w-5 h-5 text-red-600" />
+                            Tus direcciones guardadas
+                        </h2>
+
+                        <div class="flex flex-wrap gap-3">
+                            <!-- Tarjeta por dirección -->
+                            <button
+                                v-for="addr in savedAddresses"
+                                :key="addr.id"
+                                type="button"
+                                class="text-left border p-3 w-40 transition-all duration-150 focus:outline-none"
+                                :class="selectedAddressId === addr.id
+                                    ? 'border-red-600 bg-red-50 ring-1 ring-red-600'
+                                    : 'border-stone-200 hover:border-stone-400 bg-white'"
+                                @click="selectAddress(addr)"
+                            >
+                                <p class="text-sm font-semibold text-stone-800 uppercase tracking-wide truncate">
+                                    {{ addr.alias }}
+                                </p>
+                                <p class="text-xs text-stone-400 mt-1 truncate">
+                                    {{ addr.street }} {{ addr.exterior_number }}
+                                </p>
+                                <p class="text-xs text-stone-400 truncate">
+                                    {{ addr.neighborhood }}
+                                </p>
+                            </button>
+
+                            <!-- Botón nueva dirección -->
+                            <button
+                                type="button"
+                                class="text-left border border-dashed p-3 w-40 transition-all duration-150 focus:outline-none flex flex-col items-center justify-center gap-1"
+                                :class="selectedAddressId === null
+                                    ? 'border-red-600 bg-red-50 ring-1 ring-red-600'
+                                    : 'border-stone-300 hover:border-stone-400 bg-white'"
+                                @click="clearAddress"
+                            >
+                                <UIcon name="i-heroicons-plus-circle" class="w-5 h-5 text-stone-400" />
+                                <p class="text-xs text-stone-500 font-medium text-center">Nueva dirección</p>
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!--Formulario-->
                     <div class="bg-white border border-stone-200 p-6">
                         <h2 class="text-xl font-semibold text-stone-800 mb-6 flex items-center gap-2">
                             <UIcon name="i-heroicons-map-pin" class="w-5 h-5 text-red-600" />
@@ -292,7 +339,34 @@ definePageMeta({
 const { formatCurrency } = useCurrency()
 const cartStore = useCartStore()
 
-// ─── Estado del formulario ───────────────────────────────────────────────────
+// ─── Direcciones guardadas ────────────────────────────────────────────────────
+
+const { addresses: savedAddresses, defaultAddress, pending: loadingAddresses } = useAddresses()
+const selectedAddressId = ref<string | null>(null)
+
+watch(defaultAddress, (addr) => {
+    if (addr && selectedAddressId.value === null) selectAddress(addr)
+}, { immediate: true })
+
+function selectAddress(addr: any) {
+    selectedAddressId.value = addr.id
+    address.nombre     = addr.recipient_name ?? ''
+    address.calle      = addr.street         ?? ''
+    address.numero_ext = addr.ext_number     ?? ''
+    address.numero_int = addr.int_number     ?? ''
+    address.colonia    = addr.neighborhood   ?? ''
+    address.ciudad     = addr.city           ?? ''
+    address.estado     = addr.state          ?? ''
+    address.cp         = addr.zip_code       ?? ''
+    address.telefono   = addr.phone          ?? ''
+}
+
+function clearAddress() {
+    selectedAddressId.value = null
+    Object.keys(address).forEach(k => (address as any)[k] = '')
+}
+
+// ─── Estado del formulario ────────────────────────────────────────────────────
 
 const address = reactive({
     nombre:     '',
@@ -314,13 +388,13 @@ const { initPayment } = usePayment()
 const stripeSecret = ref('')
 const orderId = ref<string | null>(null)
 
-// ─── UI compartido para inputs ───────────────────────────────────────────────
+// ─── UI compartido para inputs ────────────────────────────────────────────────
 
 const inputUI = {
     base: 'bg-white text-stone-900 border border-stone-300 focus:border-red-500 focus:ring-red-500',
 }
 
-// ─── Datos del carrito ───────────────────────────────────────────────────────
+// ─── Datos del carrito ────────────────────────────────────────────────────────
 
 const cartItems = computed(() => cartStore.items ?? [])
 
@@ -332,10 +406,9 @@ function itemUnitPrice(item: any): number {
     return item.precio_descuento ?? item.price ?? 0
 }
 
-// ─── Validación ──────────────────────────────────────────────────────────────
+// ─── Validación ───────────────────────────────────────────────────────────────
 
 function validate(): boolean {
-    // Limpiar errores anteriores
     Object.keys(errors).forEach(k => delete errors[k])
 
     const required: Array<[keyof typeof address, string]> = [
@@ -350,9 +423,7 @@ function validate(): boolean {
     ]
 
     for (const [field, message] of required) {
-        if (!address[field]?.trim()) {
-            errors[field] = message
-        }
+        if (!address[field]?.trim()) errors[field] = message
     }
 
     if (address.cp && !/^\d{5}$/.test(address.cp)) {
@@ -362,7 +433,7 @@ function validate(): boolean {
     return Object.keys(errors).length === 0
 }
 
-// ─── Flujo de checkout ───────────────────────────────────────────────────────
+// ─── Flujo de checkout ────────────────────────────────────────────────────────
 
 async function handleCheckout() {
     globalError.value = ''
@@ -377,7 +448,6 @@ async function handleCheckout() {
     loading.value = true
 
     try {
-        // 1. Preparar items
         const items = cartItems.value.map(item => ({
             product_id: item.product_id,
             name:       item.name ?? item.productos?.nombre ?? 'Producto',
@@ -385,7 +455,6 @@ async function handleCheckout() {
             unit_price: itemUnitPrice(item),
         }))
 
-        // 2. Crear orden en Supabase
         const orderResult = await $fetch<{ order_id: number; total: number }>(
             '/api/checkout/create-order',
             {
@@ -397,14 +466,11 @@ async function handleCheckout() {
 
         orderId.value = orderResult.order_id
 
-        // 3. Iniciar pago según proveedor activo
         const result = await initPayment(String(orderResult.order_id))
 
         if (result.type === 'redirect') {
-            // Mercado Pago → salir del SPA
             await navigateTo(result.url, { external: true })
         } else {
-            // Stripe → mostrar Payment Element en la misma página
             stripeSecret.value = result.clientSecret
             loading.value = false
         }
