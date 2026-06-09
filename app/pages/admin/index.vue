@@ -9,11 +9,9 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <UAvatar
-            :alt="user?.email ?? 'Admin'"
-            size="sm"
-          />
-          <span class="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">{{ user?.email }}</span>
+          
+          <UserAuthMenu />
+          
           <UButton
             color="neutral"
             variant="ghost"

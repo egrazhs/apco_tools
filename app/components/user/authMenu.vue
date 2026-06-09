@@ -1,7 +1,6 @@
 <template>
     <div class="flex items-center gap-2">
-
-        <!-- Estado: cargando (evita flash de contenido incorrecto) -->
+        <!-- Estado: cargando -->
         <template v-if="pending">
             <div class="w-8 h-8 rounded-full bg-stone-200 animate-pulse" />
         </template>
@@ -26,6 +25,7 @@
             </UDropdownMenu>
         </template>
 
+
         <!-- Estado: no autenticado -->
         <template v-else>
             <UButton
@@ -44,7 +44,6 @@
                 Registrarse
             </UButton>
         </template>
-
     </div>
 </template>
 
@@ -52,14 +51,25 @@
 const client = useSupabaseClient()
 const user = useSupabaseUser()
 
-// Pequeño estado de carga inicial para evitar el "flash" de botones de login
-// mientras Supabase resuelve la sesión
 const pending = ref(true)
-onMounted(() => {
+const isAdmin = ref(false)
+
+onMounted(async () => {
+    if (user.value) {
+        const userId = user.value.sub ?? user.value.id
+
+        const { data } = await client
+            .from('profiles')
+            .select('role')
+            .eq('id', userId)
+            .single()
+
+        isAdmin.value = data?.role === 'admin'
+    }
     pending.value = false
 })
 
-// Nombre a mostrar: prioriza display_name del metadata, luego email
+
 const displayName = computed(() => {
     return user.value?.user_metadata?.display_name
         ?? user.value?.email?.split('@')[0]
@@ -71,28 +81,37 @@ async function handleSignOut() {
     await navigateTo('/')
 }
 
-const menuItems = computed(() => [
-    [
-        {
-            label: displayName.value,
-            slot: 'account',
-            disabled: true,
-        }
-    ],
-    [
-        {
-            label: 'Mi cuenta',
-            icon: 'i-heroicons-user-circle',
-            to: '/mi_cuenta',
-        },
-    ],
-    [
-        {
-            label: 'Cerrar sesión',
-            icon: 'i-heroicons-arrow-right-on-rectangle',
-            class: 'text-red-600',
-            onSelect: handleSignOut,
-        }
+const menuItems = computed(() => {
+    const items = [
+        [
+            {
+                label: displayName.value,
+                slot: 'account',
+                disabled: true,
+            }
+        ],
+        [
+            {
+                label: 'Mi cuenta',
+                icon: 'i-heroicons-user-circle',
+                to: '/mi_cuenta',
+            },
+            ...(isAdmin.value ? [{
+                label: 'Panel de administración',
+                icon: 'i-heroicons-cog-6-tooth',
+                to: '/admin',
+            }] : []),
+        ],
+        [
+            {
+                label: 'Cerrar sesión',
+                icon: 'i-heroicons-arrow-right-on-rectangle',
+                class: 'text-red-600',
+                onSelect: handleSignOut,
+            }
+        ]
     ]
-])
+
+    return items
+})
 </script>
