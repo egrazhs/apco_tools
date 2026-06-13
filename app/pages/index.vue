@@ -4,7 +4,8 @@
 			<LandingHeader />
 			<PrimerPropuestaStats />
 			<!--<PrimerPropuestaPlaceGallery />-->
-			<PrimerPropuestaProductos />
+			<PrimerPropuestaProductosDestacados />
+			<!--<PrimerPropuestaProductos />-->
 			<PlaceGallery/>
 			<LandingNosotros />
 			<PrimerPropuestaRagsGallery />
