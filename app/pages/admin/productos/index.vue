@@ -121,7 +121,7 @@
 
     // Paginación
     const page = ref(1)
-    const pageSize = ref(25)
+    const pageSize = ref(10)
     const pageSizeOptions = [10, 25, 50, 100]
 
     // Búsqueda con debounce (espera 400ms tras la última tecla antes de consultar al servidor)
