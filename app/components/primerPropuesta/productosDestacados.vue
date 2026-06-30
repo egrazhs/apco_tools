@@ -1,7 +1,6 @@
 <template>
     <section id="productos" class="py-16 md:py-28 bg-stone-900">
         <UContainer>
- 
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
                 <div>
