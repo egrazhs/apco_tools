@@ -83,21 +83,21 @@
     const products = [
         {
             sku: 'No. Cat. 61748',
-            slug: '',
+            slug: 'aspiradora-12-galones-5-hp-mod-rt1200m',
             name: 'Máquina Sectorial de Limpieza 12 Gal K-60SP',
             img: 'https://http2.mlstatic.com/D_NQ_NP_2X_947032-MLA99464329204_112025-F.webp',
             desc: 'Compacta y portátil, pero con potencia para desazolves difíciles. Motor ½ HP, ideal para drenajes residenciales, comerciales e industriales de 1¼" a 4".',
         },
         {
             sku: 'No. Cat. 36475',
-            slug: '',
+            slug: 'tarraja-manual-12---2-npt-mod-12r',
             name: 'Set de Tarraja Manual 12-R (½" a 2")',
             img: 'https://www.toolferreterias.com/cdn/shop/products/179060116-1_1868633a-d28e-42d4-b2d0-08d9148a1ed4.jpg',
             desc: 'Set completo con 6 cabezales intercambiables de hierro dúctil para tubería ½" a 2" NPT. Compatibles con roscadoras eléctricas. Incluye maletín.',
         },
         {
             sku: 'No. Cat. 36345',
-            slug: '',
+            slug: 'tarraja-manual-12---1-npt-mod-00r',
             name: 'Set de Tarraja Manual 00-R (½" a 1")',
             img: 'https://www.toolferreterias.com/cdn/shop/products/179060110-3.jpg',
             desc: 'Diseñada para roscar tuberías y conduit de ½" a 1" NPT. Liviana y robusta, con 3 cabezales de precisión y operación manual por trinquete.',
