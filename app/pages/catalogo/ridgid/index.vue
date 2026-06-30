@@ -80,7 +80,7 @@ const categories = ref([
     {
         id: 4,
         name: 'Fabricación de roscado y tuberías',
-        slug: 'frabricacion-de-roscado-y-tuberias',
+        slug: 'fabricacion-de-roscado-y-tuberias',
         label: 'Fabricación de roscado y tuberías',
         image: 'https://cdn2.ridgid.com/resources/images/ea5b5b38-3626-40d6-8288-d0dbd0f1ee05',
         description: 'Herramientas de confianza para los trabajos de roscado y fabricación de tubos más exigentes.'
@@ -92,7 +92,7 @@ const categories = ref([
         label: 'Llaves y herramientas para tubos',
         image: 'https://cdn2.ridgid.com/resources/images/1731f14f-7929-438e-88fe-aec050b3884b',
         description: 'Llaves de alta resistencia para los trabajos más difíciles y herramientas para doblar, prensar y preparar tuberías.'
-    },
+    },/*
     {
         id: 6,
         name: 'Herramientas de servicios públicos y de electricistas',
@@ -100,7 +100,7 @@ const categories = ref([
         label: 'Herramientas de servicios públicos y de electricistas',
         image: 'https://cdn2.ridgid.com/resources/images/ebe18bdd-dce2-4e71-a963-dcc248f16d22',
         description: 'Las herramientas de servicios públicos y de electricistas RIDGID® mezclan innovación con eficiencia para realizar un trabajo rápido de corte de cables, engarzado de terminales y perforación de cajas/tableros.'
-    },
+    },*/
     {
         id: 7,
         name: 'Herramientas de uso general y manuales',
