@@ -62,6 +62,7 @@ export const useAdminProducts = () => {
                 stock,
                 is_active,
                 created_at,
+                image_url,
                 brand:brands(id, name),
                 category:categories(id, name)
                 `,
