@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     css: ['~/assets/css/main.css'],
     devtools: { enabled: true },
     modules: ['@nuxt/ui', '@pinia/nuxt', '@nuxtjs/supabase'],
-    serverDir: 'app/server',
+    serverDir: '~~/app/server',
     runtimeConfig: {
         public: {
             supabase: {
