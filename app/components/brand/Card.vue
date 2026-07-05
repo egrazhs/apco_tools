@@ -11,10 +11,11 @@
                 />
             </div>
 
-            <!-- Nombre de marca -->
+            <!-- Nombre de marca
             <h3 class="text-3xl text-stone-900 text-center mb-4 uppercase tracking-widest">
                 {{ brand.name }}
             </h3>
+            -->
 
             <!-- Descripción -->
             <p class="text-gray-700 text-sm leading-relaxed text-center mb-6 flex-grow">
