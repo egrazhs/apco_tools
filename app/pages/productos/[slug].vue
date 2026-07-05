@@ -61,8 +61,8 @@
                         <h1 class="text-3xl xl:text-4xl font-bold text-white leading-tight">
                             {{ producto.name }}
                         </h1>
-                        <p v-if="producto.slug" class="text-gray-500 text-xs mt-1">
-                            SKU: {{ producto.slug }}
+                        <p v-if="producto.code" class="text-gray-500 text-xs mt-1">
+                            SKU: {{ producto.code }}
                         </p>
                     </div>
 
