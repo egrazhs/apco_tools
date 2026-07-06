@@ -28,7 +28,7 @@
                     <div class="flex flex-col gap-4">
                         <UFormField label="Nombre de la categoría" required>
                             <UInput
-                                v-model="form.nombre"
+                                v-model="form.name"
                                 placeholder="Ej: Herramientas Eléctricas"
                                 size="lg"
                                 icon="i-heroicons-folder"
@@ -50,26 +50,26 @@
                         <UFormField label="Estado">
                             <div
                                 class="flex items-center justify-between px-4 rounded-lg border h-[42px] transition-all duration-200"
-                                :class="form.activo
+                                :class="form.is_active
                                     ? 'border-primary-500/40 bg-primary-500/5'
                                     : 'border-gray-700 bg-gray-800/50'"
                             >
                                 <div class="flex items-center gap-2">
                                     <UIcon
-                                        :name="form.activo ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
+                                        :name="form.is_active ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
                                         class="text-lg transition-colors"
-                                        :class="form.activo ? 'text-primary-400' : 'text-gray-500'"
+                                        :class="form.is_active ? 'text-primary-400' : 'text-gray-500'"
                                     />
                                     <div>
                                         <p class="text-sm font-medium leading-tight">
-                                            {{ form.activo ? 'Activa' : 'Inactiva' }}
+                                            {{ form.is_active ? 'Activa' : 'Inactiva' }}
                                         </p>
                                         <p class="text-[10px] text-gray-500 leading-none mt-0.5">
-                                            {{ form.activo ? 'Visible en tienda' : 'Oculta en tienda' }}
+                                            {{ form.is_active ? 'Visible en tienda' : 'Oculta en tienda' }}
                                         </p>
                                     </div>
                                 </div>
-                                <USwitch v-model="form.activo" size="lg" />
+                                <USwitch v-model="form.is_active" size="lg" />
                             </div>
                         </UFormField>
                     </div>
@@ -107,13 +107,13 @@
     const isEdit = computed(() => !!props.initialData)
 
     const form = reactive({
-        nombre: props.initialData?.nombre || '',
+        name: props.initialData?.name || '',
         slug: props.initialData?.slug || '',
-        activo: props.initialData?.activo ?? true,
+        is_active: props.initialData?.is_active ?? true,
     })
 
     // Auto-genera slug desde nombre (solo al crear o si slug está vacío)
-    watch(() => form.nombre, (val) => {
+    watch(() => form.name, (val) => {
         if (!isEdit.value || !form.slug) {
             form.slug = val
                 .toLowerCase()
