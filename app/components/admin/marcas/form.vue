@@ -27,7 +27,7 @@
 
                     <UFormField label="Nombre de la marca" required>
                         <UInput
-                            v-model="form.nombre"
+                            v-model="form.name"
                             placeholder="Ej: DeWalt, Bosch, Stanley..."
                             size="lg"
                             icon="i-heroicons-building-storefront"
@@ -66,7 +66,7 @@
     const isEdit = computed(() => !!props.initialData)
 
     const form = reactive({
-        nombre: props.initialData?.nombre || '',
+        name: props.initialData?.name || '',
     })
 
     const handleSubmit = () => { emit('submit', form) }

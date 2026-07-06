@@ -5,12 +5,8 @@
       <!-- Header Section -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-1">
-            <UIcon name="i-heroicons-home" class="w-4 h-4" />
-            <span>Admin</span>
-            <UIcon name="i-heroicons-chevron-right" class="w-3 h-3" />
-            <span class="text-gray-900 dark:text-white font-medium">Marcas</span>
-          </div>
+          <AdminBreadcrumb actual_page="Marcas" />
+
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Marcas</h1>
           <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             {{ brands?.length ?? 0 }} marca{{ (brands?.length ?? 0) !== 1 ? 's' : '' }} registrada{{ (brands?.length ?? 0) !== 1 ? 's' : '' }}
@@ -243,7 +239,7 @@
 
 	// Columns
 	const columns = [
-		{ accessorKey: 'nombre', header: 'Nombre' },
+		{ accessorKey: 'name', header: 'Nombre' },
 		{ id: 'actions', header: 'Acciones' }
 	]
 </script>
