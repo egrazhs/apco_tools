@@ -43,12 +43,19 @@
                     <!-- Lista de productos -->
                     <div v-for="item in cart.items" :key="item.product_id"
                         class="flex gap-3 py-3 border-b border-stone-100 last:border-0">
-                        <!-- Imagen placeholder o real -->
+                        <!-- Imagen desde product_images (o fallback) -->
                         <div class="size-14 bg-stone-100 shrink-0 overflow-hidden">
-                            <img v-if="item.image_url" :src="item.image_url" :alt="item.name"
-                                class="w-full h-full object-contain p-1" />
-                            <UIcon v-else name="i-heroicons-wrench-screwdriver"
-                                class="w-full h-full p-3 text-stone-300" />
+                            <img 
+                                v-if="cartImages.get(item.product_id)"
+                                :src="cartImages.get(item.product_id).url"
+                                :alt="cartImages.get(item.product_id).altText"
+                                class="w-full h-full object-contain p-1"
+                            />
+                            <UIcon 
+                                v-else 
+                                name="i-heroicons-wrench-screwdriver"
+                                class="w-full h-full p-3 text-stone-300"
+                            />
                         </div>
 
                         <!-- Info -->
@@ -103,5 +110,31 @@
 <script setup>
     const cart = useCartStore()
     const { formatCurrency } = useCurrency()
+    const { getPrimaryImage } = useProductImages()
     const isOpen = ref(false)
+
+    // Mapear product_id → imagen
+    const cartImages = ref(new Map())
+
+    // Precarga imágenes de items del carrito
+    const loadCartImages = async () => {
+        // Crear Map vacío
+        cartImages.value.clear()
+
+        // Para cada item único en el carrito, obtener su imagen primaria
+        for (const item of cart.items) {
+            if (!cartImages.value.has(item.product_id)) {
+                try {
+                    const image = await getPrimaryImage(item.product_id)
+                    cartImages.value.set(item.product_id, image)
+                } catch (error) {
+                    console.error(`Error loading image for product ${item.product_id}:`, error)
+                    cartImages.value.set(item.product_id, null)
+                }
+            }
+        }
+    }
+
+    // Ejecutar cuando se abre el sidebar o items cambian
+    watch(() => cart.items, loadCartImages, { immediate: true })
 </script>
