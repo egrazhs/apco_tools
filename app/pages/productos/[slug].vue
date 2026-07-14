@@ -31,21 +31,67 @@
             <!-- SECCIÓN PRINCIPAL -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
 
-                <!-- Imagen -->
+                <!-- GALERÍA CON USEPRODUCTIMAGES -->
                 <div class="space-y-4">
-                    <div class="relative overflow-hidden rounded-2xl bg-gray-800/60 border border-white/5 aspect-[4/3] flex items-center justify-center">
-                        <img
-                            :src="producto.image_url"
-                            :alt="producto.name"
-                            class="w-full h-full object-contain"
+                    <!-- Imagen Grande -->
+                    <div class="relative overflow-hidden rounded-2xl bg-white border border-white/5 aspect-[4/3] flex items-center justify-center">
+                        <!-- Skeleton while loading -->
+                        <USkeleton
+                            v-if="loadingMainImage"
+                            class="w-full h-full"
                         />
-                        <div class="absolute top-4 left-4">
+
+                        <!-- Imagen principal -->
+                        <img
+                            v-show="!loadingMainImage && selectedImage"
+                            :src="selectedImage?.url"
+                            :alt="selectedImage?.altText"
+                            class="w-full h-full object-contain"
+                            @load="loadingMainImage = false"
+                        />
+
+                        <!-- Fallback si no hay imagen -->
+                        <div
+                            v-if="!selectedImage && !loadingMainImage"
+                            class="w-full h-full flex items-center justify-center text-gray-500"
+                        >
+                            <UIcon name="i-heroicons-photo" class="text-6xl" />
+                        </div>
+
+                        <!-- Badge Stock -->
+                        <div class="absolute top-4 left-4 text-black">
                             <UBadge v-if="producto.stock > 0" color="green" variant="soft" class="font-semibold">
                                 En stock · {{ producto.stock }} disponibles
                             </UBadge>
                             <UBadge v-else color="red" variant="soft" class="font-semibold">
                                 Agotado
                             </UBadge>
+                        </div>
+                    </div>
+
+                    <!-- GALERÍA TIPO RIDGID: Thumbnails Scrollables -->
+                    <div v-if="productImages.length > 1" class="space-y-2">
+                        <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Imágenes del producto</p>
+                        
+                        <!-- Carrusel de thumbnails -->
+                        <div class="overflow-x-auto scrollbar-hide">
+                            <div class="flex gap-2 pb-2">
+                                <button
+                                    v-for="(img, idx) in productImages"
+                                    :key="idx"
+                                    @click="selectImage(img)"
+                                    class="flex-shrink-0 w-20 h-20 rounded-lg border-2 overflow-hidden transition-all duration-200"
+                                    :class="selectedImage?.imageKey === img.imageKey 
+                                        ? 'border-green-400 ring-1 ring-green-400' 
+                                        : 'border-white/10 hover:border-white/30'"
+                                >
+                                    <img
+                                        :src="img.url"
+                                        :alt="img.altText"
+                                        class="w-full h-full object-cover"
+                                    />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -244,6 +290,7 @@
     const { addItem, removeItem, updateQuantity } = useSupabaseCart()
     const toast = useToast()
     const { parseLinks } = useTextParser()
+    const { getPrimaryImage, getProductImages } = useProductImages()
 
     // ── Fetch producto principal ──────────────────────────────────────
     const { data: producto, pending, error } = await useAsyncData(
@@ -344,4 +391,44 @@
             desc: 'Disponible sin costo. Listo en 24 horas hábiles.',
         },
     ]
+
+    // Estado para la galería
+    const productImages = ref([])
+    const selectedImage = ref(null)
+    const loadingMainImage = ref(true)
+
+    // Cuando monta, fetch las imágenes
+    onMounted(async () => {
+        if (!producto.value) return
+
+        try {
+            const images = await getProductImages(producto.value.id)
+            productImages.value = images
+
+            // Selecciona la primaria por defecto
+            if (images.length > 0) {
+                selectedImage.value = images.find(img => img.isPrimary) || images[0]
+            }
+        } catch (error) {
+            console.error('Error loading product images:', error)
+            loadingMainImage.value = false
+        }
+    })
+
+    // Función para cambiar imagen seleccionada
+    const selectImage = (image) => {
+        loadingMainImage.value = true
+        selectedImage.value = image
+    }
 </script>
+
+<style scoped>
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+</style>

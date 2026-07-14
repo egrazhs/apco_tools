@@ -1,17 +1,30 @@
- <template>
+<template>
     <div
         class="group bg-white overflow-hidden border border-stone-200
                hover:border-red-600 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col"
     >
         <!-- Imagen -->
-        <div class="relative overflow-hidden bg-stone-100 aspect-square">
-            <img
-                v-if="product.image_url"
-                :src="product.image_url"
-                :alt="product.name"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        <div class="relative overflow-hidden aspect-square">
+            <!-- Skeleton while loading -->
+            <USkeleton
+                v-if="loadingImage"
+                class="w-full h-full"
             />
-            <div v-else class="w-full h-full flex items-center justify-center text-stone-300">
+
+            <!-- Imagen cargada -->
+            <img
+                v-show="!loadingImage && primaryImage"
+                :src="primaryImage?.url"
+                :alt="primaryImage?.altText || product.name"
+                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                @load="loadingImage = false"
+            />
+
+            <!-- Fallback si no hay imagen -->
+            <div
+                v-if="!primaryImage && !loadingImage"
+                class="w-full h-full flex items-center justify-center text-stone-300"
+            >
                 <UIcon name="i-heroicons-photo" class="text-5xl" />
             </div>
 
@@ -79,17 +92,6 @@
                 >
                     Ver detalles
                 </UButton>
-                <!--
-                <UButton
-                    block
-                    size="sm"
-                    :disabled="product.stock === 0"
-                    class="rounded-none font-bold uppercase tracking-widest text-xs bg-red-600 hover:bg-stone-900 text-white transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-                    icon="i-heroicons-shopping-cart"
-                >
-                    Agregar al carrito
-                </UButton>
-                -->
             </div>
         </div>
     </div>
@@ -97,11 +99,32 @@
 
 <script setup>
     const { formatCurrency } = useCurrency()
+    const { getPrimaryImage } = useProductImages()
 
-    defineProps({
+    const props = defineProps({
         product: {
             type: Object,
             required: true
+        }
+    })
+
+    // ============================================
+    // DECISIÓN: Skeleton loader vs spinner
+    // Por qué: USkeleton es más elegante, mantiene
+    // layout estable (sin CLS), mejor UX general
+    // ============================================
+
+    const loadingImage = ref(true)
+    const primaryImage = ref(null)
+
+    // Fetch imagen primaria al montar
+    onMounted(async () => {
+        try {
+            const image = await getPrimaryImage(props.product.id)
+            primaryImage.value = image
+        } catch (error) {
+            console.error('Error loading primary image:', error)
+            loadingImage.value = false
         }
     })
 </script>
