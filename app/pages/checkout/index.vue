@@ -222,11 +222,11 @@
                                 class="flex gap-3 py-3"
                             >
                                 <!-- Imagen thumbnail -->
-                                <div class="w-14 h-14 bg-stone-100 border border-stone-200 shrink-0 overflow-hidden">
+                                <div class="w-14 h-14 border border-stone-200 shrink-0 overflow-hidden">
                                     <img
-                                        v-if="item.image_url"
-                                        :src="item.image_url"
-                                        :alt="item.name"
+                                        v-if="cartImages.get(item.product_id)"
+                                        :src="cartImages.get(item.product_id).url"
+                                        :alt="cartImages.get(item.product_id).altText"
                                         class="w-full h-full object-contain p-1"
                                     />
                                     <UIcon
@@ -338,6 +338,7 @@ definePageMeta({
 
 const { formatCurrency } = useCurrency()
 const cartStore = useCartStore()
+const { getPrimaryImage } = useProductImages()
 
 // ─── Direcciones guardadas ────────────────────────────────────────────────────
 
@@ -482,4 +483,25 @@ async function handleCheckout() {
         loading.value = false
     }
 }
+
+/**Imagenes*/
+const cartImages = ref(new Map())
+
+const loadCartImages = async () => {
+    cartImages.value.clear()
+
+    for (const item of cartStore.items) {
+        if (!cartImages.value.has(item.product_id)) {
+            try {
+                const image = await getPrimaryImage(item.product_id)
+                cartImages.value.set(item.product_id, image)
+            } catch (error) {
+                console.error(`Error loading image for product ${item.product_id}:`, error)
+                cartImages.value.set(item.product_id, null)
+            }
+        }
+    }
+}
+
+watch(() => cartStore.items, loadCartImages, { immediate: true })
 </script>

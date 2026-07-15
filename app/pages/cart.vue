@@ -28,17 +28,17 @@
                         class="flex flex-col md:flex-row gap-6 border border-stone-200 rounded-xl p-6 bg-white"
                     >
                         <!-- Imagen -->
-                        <div class="size-32 bg-stone-100 shrink-0 overflow-hidden rounded-lg">
+                        <div class="size-32 shrink-0 overflow-hidden rounded-lg">
                             <img
-                                v-if="item.image_url"
-                                :src="item.image_url"
-                                :alt="item.name"
+                                v-if="cartImages.get(item.product_id)"
+                                :src="cartImages.get(item.product_id).url"
+                                :alt="cartImages.get(item.product_id).altText"
                                 class="w-full h-full object-contain p-2"
                             />
                             <UIcon
                                 v-else
                                 name="i-heroicons-wrench-screwdriver"
-                                class="w-full h-full p-6 text-stone-300"
+                                class="w-full h-full p-3 text-stone-300"
                             />
                         </div>
 
@@ -142,10 +142,9 @@
     const cart = useCartStore()
     const { formatCurrency } = useCurrency()
     const { removeItem, updateQuantity } = useSupabaseCart()
+    const { getPrimaryImage } = useProductImages()  // ← Agregar esto
 
     // ── IVA y total ───────────────────────────────────────────────────
-    // cart.subtotal ya incluye IVA si tus precios son con IVA.
-    // Ajusta esta lógica según si tus precios son con o sin IVA.
     const subtotalSinIva = computed(() =>
         cart.subtotal / 1.16
     )
@@ -154,11 +153,32 @@
     )
     const total = computed(() => cart.subtotal)
 
+    // ── Imágenes del carrito ───────────────────────────────────────────
+    const cartImages = ref(new Map())
+
+    const loadCartImages = async () => {
+        cartImages.value.clear()
+
+        for (const item of cart.items) {
+            if (!cartImages.value.has(item.product_id)) {
+                try {
+                    const image = await getPrimaryImage(item.product_id)
+                    cartImages.value.set(item.product_id, image)
+                } catch (error) {
+                    console.error(`Error loading image for product ${item.product_id}:`, error)
+                    cartImages.value.set(item.product_id, null)
+                }
+            }
+        }
+    }
+
+    // Precarga cuando items cambian
+    watch(() => cart.items, loadCartImages, { immediate: true })
+
     // ── Handlers ──────────────────────────────────────────────────────
     async function handleUpdateQty(product_id: number, quantity: number) {
         await updateQuantity(product_id, quantity)
     }
-
     async function handleRemove(product_id: number) {
         await removeItem(product_id)
     }
