@@ -1,0 +1,45 @@
+﻿Listado de rutas de carpetas
+El número de serie del volumen es 00000082 B84F:1A70
+C:\XAMPP\HTDOCS\APCO_TOOLS\APP\SERVER
+├───api
+│   │   hello.ts
+│   │   
+│   ├───checkout
+│   │       create-order.post.ts
+│   │       create-payment.post.ts
+│   │       create-preference.post.ts
+│   │       
+│   ├───mail
+│   │       contact.post.ts
+│   │       order-confirmation.post.ts
+│   │       
+│   ├───payments
+│   │   ├───mp
+│   │   │       create-preference.post.ts
+│   │   │       verify-payment.post.ts
+│   │   │       webhook.post.ts
+│   │   │       
+│   │   └───stripe
+│   │           create-intent.post.ts
+│   │           webhook.post.ts
+│   │           
+│   └───webhooks
+│           mercadopago.post.ts
+│           
+├───routes
+│   │   hello.get.ts
+│   │   
+│   └───admin
+│       └───images
+│           │   reorder.patch.ts
+│           │   set-primary.patch.ts
+│           │   upload.post.ts
+│           │   
+│           └───[imageKey]
+│                   delete.delete.ts
+│                   
+└───utils
+        auth.ts
+        emailTemplates.ts
+        mailer.ts
+        

@@ -49,6 +49,7 @@ export const requireAuth = (event: any) => {
  */
 export const checkAdminRole = async (userId: string): Promise<boolean> => {
     try {
+        
         const supabase = useSupabaseAdmin()
 
         const { data, error } = await supabase
@@ -57,14 +58,15 @@ export const checkAdminRole = async (userId: string): Promise<boolean> => {
             .eq('id', userId)
             .single()
 
+
         if (error) {
-            console.error('Error checking admin role:', error)
             return false
         }
 
-        return data?.role === 'admin'
+        const isAdmin = data?.role === 'admin'
+        
+        return isAdmin
     } catch (error) {
-        console.error('Error in checkAdminRole:', error)
         return false
     }
 }
@@ -82,8 +84,8 @@ export const useSupabaseServiceRole = () => {
     const config = useRuntimeConfig()
 
     return createClient(
-        config.public.supabaseUrl,
-        config.supabaseServiceKey, // Env var privada
+        config.public.supabase.url,
+        config.supabaseServiceKey,
         {
             auth: {
                 autoRefreshToken: false,

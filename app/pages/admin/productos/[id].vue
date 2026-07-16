@@ -1,6 +1,6 @@
 <template>
 	<div class="p-6">
-		<AdminProductosForm :initialData="product" :marcas="marcasOptions || []" :categories="category_options" :subcategories="subcategory_options" @submit="updateProduct"/>
+		<AdminProductosForm :productId="Number(route.params.id)" :initialData="product" :marcas="marcasOptions || []" :categories="category_options" :subcategories="subcategory_options" @submit="updateProduct"/>
 	</div>
 </template>
 

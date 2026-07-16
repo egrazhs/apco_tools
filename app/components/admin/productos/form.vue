@@ -234,6 +234,8 @@
                             <p class="text-xs text-gray-500 mt-1.5">Tamaño recomendado: 300×200px.</p>
                         </div>
                     </div>
+
+                    <AdminProductosGallery :productId="productId" />
                 </div>
 
                 <!-- ACCIONES -->
@@ -264,6 +266,10 @@
 
 <script setup lang="ts">
     const props = defineProps<{ 
+        productId: {
+            type: Number,
+            required: true
+        },
         initialData?: any, 
         marcas: Array<{ label: string; value: number }>,
         categories: Array<{ label: string; value: number }>,

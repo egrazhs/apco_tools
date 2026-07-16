@@ -8,8 +8,7 @@ export default defineNuxtConfig({
     compatibilityDate: '2025-07-15',
     css: ['~/assets/css/main.css'],
     devtools: { enabled: true },
-    modules: ['@nuxt/ui', '@pinia/nuxt', '@nuxtjs/supabase'],
-    serverDir: '~~/app/server',
+    modules: ['@nuxt/ui', '@pinia/nuxt', '@nuxtjs/supabase'], 
     runtimeConfig: {
         public: {
             supabase: {
@@ -21,6 +20,7 @@ export default defineNuxtConfig({
             stripePublicKey: process.env.STRIPE_PUBLIC_KEY,
             siteUrl:         process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
         },
+        supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
         resendApiKey: process.env.RESEND_API_KEY,
         mailFrom: process.env.MAIL_FROM,
         mailToContact: process.env.MAIL_TO_CONTACT,
@@ -33,11 +33,17 @@ export default defineNuxtConfig({
         colorMode: false
     },
     nitro: {
-        preset: 'firebase',
-        firebase: {
-            gen: 2,  // Cloud Functions 2ª generación (más moderna y recomendada)
-            nodeVersion: '22'
+        preset: process.env.NODE_ENV === 'production' ? 'firebase' : 'node-server',
+        externals: {
+            external: ['stripe']  // ← Solo stripe
         },
+        ...(process.env.NODE_ENV === 'production' && {
+            firebase: {
+                gen: 2,
+                nodeVersion: '22'
+            }
+        }),
+        logLevel: 2,
     },
     vite: {
         optimizeDeps: {                                                                                                                                   

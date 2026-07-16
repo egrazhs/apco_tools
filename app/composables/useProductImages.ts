@@ -47,6 +47,7 @@ export const useProductImages = () => {
     const getProductImages = async (productId: number) => {
         try {
             const id = Number(productId)
+            //console.log(id);
             
             const { data, error } = await supabase
                 .from('product_images')
@@ -100,6 +101,13 @@ export const useProductImages = () => {
         altText?: string
     }) => {
         try {
+            // Obtener el token de Supabase
+            const { data: { session } } = await useSupabaseClient().auth.getSession()
+            
+            if (!session?.access_token) {
+                throw new Error('No estás autenticado')
+            }
+
             const formData = new FormData()
             formData.append('file', data.file)
             formData.append('productId', data.productId.toString())
@@ -108,7 +116,10 @@ export const useProductImages = () => {
 
             const response = await $fetch('/admin/images/upload', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`  // ← AGREGAR ESTO
+                }
             })
 
             return response
@@ -129,9 +140,18 @@ export const useProductImages = () => {
      */
     const setPrimaryImage = async (productId: number, imageKey: string) => {
         try {
+            const { data: { session } } = await useSupabaseClient().auth.getSession()
+            
+            if (!session?.access_token) {
+                throw new Error('No estás autenticado')
+            }
+
             const response = await $fetch('/admin/images/set-primary', {
                 method: 'PATCH',
-                body: { productId, imageKey }
+                body: { productId, imageKey },
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`
+                }
             })
 
             return response
@@ -152,9 +172,18 @@ export const useProductImages = () => {
      */
     const reorderImages = async (productId: number, order: Array<{ imageKey: string, displayOrder: number }>) => {
         try {
+            const { data: { session } } = await useSupabaseClient().auth.getSession()
+            
+            if (!session?.access_token) {
+                throw new Error('No estás autenticado')
+            }
+
             const response = await $fetch('/admin/images/reorder', {
                 method: 'PATCH',
-                body: { productId, order }
+                body: { productId, order },
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`
+                }
             })
 
             return response
@@ -175,14 +204,34 @@ export const useProductImages = () => {
      */
     const deleteProductImage = async (productId: number, imageKey: string) => {
         try {
-            const response = await $fetch(`/admin/images/${imageKey}`, {
+            const { data: { session } } = await useSupabaseClient().auth.getSession()
+            
+            if (!session?.access_token) {
+                throw new Error('No estás autenticado')
+            }
+            
+            const url = `/admin/images/${imageKey}/delete`
+            const queryObj = { productId: productId.toString() }
+            
+            const response = await $fetch(url, {
                 method: 'DELETE',
-                query: { productId }
+                query: queryObj,
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`
+                }
             })
-
+            
             return response
+            
         } catch (err: any) {
-            console.error('Error deleting image:', err)
+            console.error('[DEBUG deleteProductImage] Error completo:', {
+                message: err.message,
+                data: err.data,
+                status: err.status,
+                statusCode: err.statusCode,
+                statusMessage: err.statusMessage,
+                fullError: err
+            })
             return {
                 success: false,
                 error: err.message || 'Error al eliminar imagen'

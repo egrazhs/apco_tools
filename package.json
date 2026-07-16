@@ -19,7 +19,6 @@
     "dotenv": "^17.4.2",
     "firebase-admin": "^13.10.0",
     "firebase-functions": "^7.2.5",
-    "mercadopago": "^2.12.0",
     "node-fetch": "^3.3.2",
     "nuxt": "^4.4.5",
     "pinia": "^3.0.4",
