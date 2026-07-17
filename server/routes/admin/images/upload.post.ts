@@ -35,10 +35,6 @@ export default defineEventHandler(async (event) => {
         // ============================================
         // 3. Validar tipo MIME
         // ============================================
-        // DECISIÓN: Validar MIME porque:
-        // - Evita subir archivos maliciosos
-        // - Sharp puede fallar con archivos inválidos
-        // - Mejor experiencia de usuario (error claro)
         const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
         if (!ALLOWED_MIMES.includes(file.type)) {
             throw createError({
@@ -74,13 +70,18 @@ export default defineEventHandler(async (event) => {
             .from('product-images')
             .upload(filename, webpBuffer, {
                 contentType: 'image/webp',
-                upsert: false // Si ya existe (mismo hash), no sobrescribir
+                upsert: true // ✅ CORREGIDO: true para deduplicación segura
+                             // El hash SHA-256 garantiza que archivos idénticos = mismo contenido
+                             // Sobrescribir es idempotente y seguro
             })
 
-        // Si el archivo ya existe (deduplicación), no es error
-        // Solo continuamos con la BD
-        if (uploadError && uploadError.message !== 'Duplicate') {
-            throw uploadError
+        // Si sigue habiendo error (no relacionado con duplicados), lanzar
+        if (uploadError) {
+            console.error('Supabase Storage error:', uploadError)
+            throw createError({
+                statusCode: 500,
+                statusMessage: 'Error al subir archivo a Storage'
+            })
         }
 
         // ============================================
@@ -109,11 +110,10 @@ export default defineEventHandler(async (event) => {
             .select()
             .single()
 
-        if (insertError) {
-            // Si es constraint violation (duplicate), no es error crítico
-            if (insertError.code !== '23505') {
-                throw insertError
-            }
+        // Si es constraint violation (duplicate product_id + image_key), ignorar
+        // Esto es correcto: significa que este producto ya tiene esta imagen
+        if (insertError && insertError.code !== '23505') {
+            throw insertError
         }
 
         // ============================================
