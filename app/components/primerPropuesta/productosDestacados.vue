@@ -21,7 +21,7 @@
             </div>
  
             <!-- Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 border border-stone-700">
+            <div class="grid grid-cols-1 md:grid-cols-4 border border-stone-700">
                 <NuxtLink
                     v-for="(product, i) in products"
                     :key="product.sku"
@@ -83,9 +83,16 @@
         {
             sku: 'No. Cat. 61748',
             slug: 'aspiradora-12-galones-5-hp-mod-rt1200m',
-            name: 'Máquina Sectorial de Limpieza 12 Gal K-60SP',
+            name: 'Aspiradora 12 Gal K-60SP',
             img: 'https://http2.mlstatic.com/D_NQ_NP_2X_947032-MLA99464329204_112025-F.webp',
             desc: 'Compacta y portátil, pero con potencia para desazolves difíciles. Motor ½ HP, ideal para drenajes residenciales, comerciales e industriales de 1¼" a 4".',
+        },
+        {
+            sku: 'No. Cat. 70835',
+            slug: 'galon-de-aceite-para-roscado-nu-clear',
+            name: 'Galón de Aceite para Roscado "Nu-Clear"',
+            img: 'https://gqgdzvkoydpuefloilmr.supabase.co/storage/v1/object/public/product-images/83f4639f3d0ac00ac74a5873245ef02b75c9c36afaa245e268ef42df884c3eef.webp',
+            desc: ' Uso para Máquina Roscadora.',
         },
         {
             sku: 'No. Cat. 36475',
