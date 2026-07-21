@@ -2,7 +2,8 @@
 export default defineNuxtConfig({
     app: {
         head: {
-            title: "Herramientas y Suministros de Alta Calidad SA de CV"
+            title: "Herramientas y Suministros de Alta Calidad SA de CV",
+            link:[{rel: 'icon', type:'image/webp', href:'/favicon.webp'}]
         }
     },
     compatibilityDate: '2025-07-15',
