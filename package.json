@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
+    "postbuild": "node postbuild.js",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -16,10 +17,8 @@
     "@pinia/nuxt": "^0.11.3",
     "@stripe/stripe-js": "^9.4.0",
     "@supabase/supabase-js": "^2.95.3",
-    "dotenv": "^17.4.2",
     "firebase-admin": "^13.10.0",
-    "firebase-functions": "^7.2.5",
-    "node-fetch": "^3.3.2",
+    "firebase-functions": "^7.3.0",
     "nuxt": "^4.4.5",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",
@@ -32,7 +31,9 @@
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
-    "postcss": "^8.5.6",
+    "@types/node": "^20.14.0",
+    "dotenv": "^17.4.2",
+    "firebase-functions-test": "^3.5.0",
     "supabase": "^2.98.0"
   }
 }

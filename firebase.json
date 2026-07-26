@@ -1,24 +1,24 @@
 {
-  "functions": [
+  "functions": {
+    "source": ".output/server",
+    "runtime": "nodejs22"
+  },
+  "hosting": [
     {
-      "codebase": "default",
-      "source": ".output/server",
-      "runtime": "nodejs22"
+      "site": "apco-tools",
+      "public": ".output/public",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "cleanUrls": true,
+      "rewrites": [
+        {
+          "source": "**",
+          "function": "server"
+        }
+      ]
     }
-  ],
-  "hosting": {
-    "public": ".output/public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "function": "server",
-        "region": "us-central1"
-      }
-    ]
-  }
+  ]
 }

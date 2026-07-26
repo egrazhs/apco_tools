@@ -8,7 +8,15 @@ export default defineNuxtConfig({
     },
     compatibilityDate: '2025-07-15',
     css: ['~/assets/css/main.css'],
-    devtools: { enabled: true },
+    devtools: { enabled: false },
+    experimental: {
+        checkIfPageUnused: false
+    },
+    icon: {
+        serverBundle: {
+            collections: ['heroicons'],
+        }
+    },
     modules: ['@nuxt/ui', '@pinia/nuxt', '@nuxtjs/supabase'], 
     runtimeConfig: {
         public: {
@@ -34,17 +42,21 @@ export default defineNuxtConfig({
         colorMode: false
     },
     nitro: {
-        preset: process.env.NODE_ENV === 'production' ? 'firebase' : 'node-server',
         externals: {
-            external: ['stripe']  // ← Solo stripe
+          external: ['stripe']
         },
-        ...(process.env.NODE_ENV === 'production' && {
-            firebase: {
-                gen: 2,
-                nodeVersion: '22'
+        //preset: 'firebase',
+        traceDeps: [
+          '!@img/sharp-win32-x64',
+          '!@img/sharp-win32-ia32'
+        ],
+        firebase: {
+            gen: 2,
+            nodeVersion: '22',
+            httpsOptions: {
+                region: 'us-central1'
             }
-        }),
-        logLevel: 2,
+        },
     },
     vite: {
         optimizeDeps: {                                                                                                                                   
