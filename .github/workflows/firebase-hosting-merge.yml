@@ -30,7 +30,7 @@ jobs:
         run: npx firebase-tools deploy --only hosting,functions
       - name: Deployment Summary
         if: success()
-        run: echo "✅ Deploy exitoso - Commit: ${{ github.sha }}"
+        run: echo "Deploy exitoso - Commit: ${{ github.sha }}"
       - name: Deployment Failed
         if: failure()
-        run: echo "❌ Deploy falló - Commit: ${{ github.sha }}"
+        run: echo "Deploy falló - Commit: ${{ github.sha }}"
