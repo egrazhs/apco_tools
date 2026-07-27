@@ -32,13 +32,6 @@ jobs:
           npm ci
           npm run build
 
-      # Replicamos tu paso manual instalando solo dependencias de producción de forma aislada
-      - name: Install Nuxt Server Dependencies
-        run: |
-          cd .output/server
-          npm install --no-package-lock --omit=dev
-          cd ../..
-
 
       # Desplegamos tanto el frontend (Hosting) como la función de servidor generada por Nuxt (.output/server)
       - name: Deploy to Firebase
