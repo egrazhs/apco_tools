@@ -45,7 +45,7 @@ export default defineNuxtConfig({
         externals: {
           external: ['stripe']
         },
-        //preset: 'firebase',
+        preset: 'firebase',
         traceDeps: [
           '!@img/sharp-win32-x64',
           '!@img/sharp-win32-ia32'
