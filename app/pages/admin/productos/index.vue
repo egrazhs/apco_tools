@@ -54,8 +54,14 @@
                 <UTable v-else :data="products" :columns="columns" :loading="pending" :ui="{tr: { base: 'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors' }, th: { base: 'bg-gray-50 dark:bg-gray-800/50 text-xs uppercase tracking-wider' }, td: { base: 'text-sm' }}">
                     <template #name-cell="{ row }">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
-                                <img :src="row.original.image_url" />
+                            <div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                <img 
+                                    v-if="row.original.primary_image_url" 
+                                    :src="row.original.primary_image_url" 
+                                    :alt="row.original.name"
+                                    class="w-full h-full object-contain"
+                                />
+                                <UIcon v-else name="i-heroicons-cube" class="w-4 h-4 text-gray-400" />
                             </div>
                             <span class="font-medium text-gray-900 dark:text-white">{{ row.original.name }}</span>
                         </div>
@@ -202,6 +208,7 @@
 
     const columns = [
         { accessorKey: 'name', header: 'Nombre' },
+        { accessorKey: 'brand.name', header: 'Marca'},
         { accessorKey: 'code', header: 'Código' },
         { id: 'actions', header: 'Acciones' }
     ]

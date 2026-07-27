@@ -8,6 +8,7 @@ export interface AdminProductListItem
     extends Pick<Product, 'id' | 'name' | 'code' | 'slug' | 'price' | 'stock' | 'is_active' | 'created_at'> {
     brand: { id: number; name: string } | null
     category: { id: number; name: string } | null
+    primary_image_url: string | null
 }
 
 export interface AdminProductsParams {
@@ -64,7 +65,8 @@ export const useAdminProducts = () => {
                 created_at,
                 image_url,
                 brand:brands(id, name),
-                category:categories(id, name)
+                category:categories(id, name),
+                product_images(id, image_key, is_primary)
                 `,
                 { count: 'exact' }
             )
@@ -94,8 +96,31 @@ export const useAdminProducts = () => {
 
         const { data, count, error } = await query
 
+        // Procesar datos para extraer imagen primaria
+        const processedData = (data as any[])?.map(product => {
+            const primaryImage = product.product_images?.find((img: any) => img.is_primary)
+            const imageKey = primaryImage?.image_key
+            const imageUrl = imageKey 
+                ? `https://gqgdzvkoydpuefloilmr.supabase.co/storage/v1/object/public/product-images/${imageKey}.webp`
+                : null
+
+            return {
+                id: product.id,
+                name: product.name,
+                code: product.code,
+                slug: product.slug,
+                price: product.price,
+                stock: product.stock,
+                is_active: product.is_active,
+                created_at: product.created_at,
+                brand: product.brand,
+                category: product.category,
+                primary_image_url: imageUrl
+            } as AdminProductListItem
+        }) ?? []
+
         return {
-            data: (data as unknown as AdminProductListItem[]) ?? [],
+            data: processedData,
             count: count ?? 0,
             error
         }
