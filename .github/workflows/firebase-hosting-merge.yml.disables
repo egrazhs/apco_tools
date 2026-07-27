@@ -25,7 +25,7 @@ jobs:
         env:
           NODE_ENV: production
       - name: Deploy to Firebase
-        run: npx firebase-tools deploy --only hosting,functions --project apco-tools
+        run: npx firebase-tools deploy
       - name: Deployment Summary
         if: success()
         run: echo "Deploy exitoso"
