@@ -70,6 +70,7 @@
                             </template>
                         </UFormField>
 
+
                         <UFormField label="Descripción detallada" class="col-span-2">
                             <UTextarea
                                 v-model="form.long_description"
@@ -77,6 +78,27 @@
                                 :rows="4"
                                 resize
                                 class="w-full"
+                            />
+                        </UFormField>
+
+
+                        <UFormField label="Especificaciones (opcional)" class="col-span-2">
+                            <UTextarea
+                                v-model="form.specifications"
+                                placeholder="Datos tecnicos del producto"
+                                :rows="4"
+                                resize
+                                class="w-full"
+                            />
+                        </UFormField>
+
+                        <UFormField label="Modelo (opcional)" class="col-span-2">
+                            <UInput
+                                v-model="form.model"
+                                placeholder="Modelo del producto"
+                                size="lg"
+                                icon="i-heroicons-bars-2"
+                                :maxlength="120"
                             />
                         </UFormField>
                     </div>
@@ -204,35 +226,7 @@
                 <div class="py-6">
                     <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary-400 mb-5">
                         <UIcon name="i-heroicons-photo" />
-                        <span>Imagen del Producto</span>
-                    </div>
-
-                    <div class="flex gap-5 items-start">
-                        <div class="w-[120px] h-[90px] shrink-0 rounded-lg overflow-hidden border border-gray-700 bg-gray-800">
-                            <img
-                                v-if="form.image_url"
-                                :src="form.image_url"
-                                alt="Vista previa"
-                                class="w-full h-full object-cover"
-                            />
-                            <div v-else class="w-full h-full flex flex-col items-center justify-center gap-1 text-gray-600 text-[11px]">
-                                <UIcon name="i-heroicons-photo" class="text-2xl" />
-                                <span>Sin imagen</span>
-                            </div>
-                        </div>
-
-                        <div class="flex-1 min-w-0">
-                            <UFormField label="URL de imagen principal">
-                                <UInput
-                                    v-model="form.image_url"
-                                    placeholder="https://ejemplo.com/imagen.jpg"
-                                    size="lg"
-                                    icon="i-heroicons-link"
-                                    class="w-full"
-                                />
-                            </UFormField>
-                            <p class="text-xs text-gray-500 mt-1.5">Tamaño recomendado: 300×200px.</p>
-                        </div>
+                        <span>Imágenes del Producto</span>
                     </div>
 
                     <AdminProductosGallery :productId="productId" />
@@ -293,6 +287,8 @@
         stock: props.initialData?.stock || 50,
         is_active: props.initialData?.is_active ?? true,
         mercadopago_link: props.initialData?.mercadopago_link ?? '',
+        model: props.initialData?.model ?? '',
+        specifications: props.initialData?.specifications ?? '',
     })
 
     // Auto-genera slug desde nombre (solo al crear o si slug está vacío)

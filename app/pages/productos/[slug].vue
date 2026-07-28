@@ -107,9 +107,16 @@
                         <h1 class="text-3xl xl:text-4xl font-bold text-white leading-tight">
                             {{ producto.name }}
                         </h1>
-                        <p v-if="producto.code" class="text-gray-500 text-xs mt-1">
-                            SKU: {{ producto.code }}
-                        </p>
+
+                        <div class="flex">
+                            <p v-if="producto.code" class="text-gray-500 text-xs mt-1 mr-2">
+                                SKU: {{ producto.code }}
+                            </p>
+
+                            <p v-if="producto.model" class="text-gray-500 text-xs mt-1">
+                                Modelo: {{ producto.model }}
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Precio -->
@@ -217,16 +224,9 @@
 
                 <template #especificaciones>
                     <div class="py-6 max-w-2xl">
-                        <div v-if="producto.especificaciones && Object.keys(producto.especificaciones).length" class="divide-y divide-white/5 rounded-xl overflow-hidden border border-white/5">
-                            <div
-                                v-for="(valor, clave) in producto.especificaciones"
-                                :key="clave"
-                                class="grid grid-cols-2 bg-gray-800/40 hover:bg-gray-800/70 transition-colors"
-                            >
-                                <span class="px-5 py-3 text-sm text-gray-400 font-medium capitalize">{{ clave }}</span>
-                                <span class="px-5 py-3 text-sm text-white">{{ valor }}</span>
-                            </div>
-                        </div>
+                        <p v-if="producto.specifications" class="text-gray-300 leading-relaxed text-base whitespace-pre-line">
+                            {{producto.specifications}}
+                        </p>
                         <p v-else class="text-gray-500 text-sm">No hay especificaciones registradas.</p>
                     </div>
                 </template>
