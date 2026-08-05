@@ -49,8 +49,10 @@ export const requireAuth = (event: any) => {
  */
 export const checkAdminRole = async (userId: string): Promise<boolean> => {
     try {
+        //console.log('🔍 [checkAdminRole] Verificando userId:', userId)
         
         const supabase = useSupabaseAdmin()
+        //console.log('🔍 [checkAdminRole] Supabase client creado')
 
         const { data, error } = await supabase
             .from('profiles')
@@ -58,15 +60,19 @@ export const checkAdminRole = async (userId: string): Promise<boolean> => {
             .eq('id', userId)
             .single()
 
+        //console.log('🔍 [checkAdminRole] Query result:', { data, error })
 
         if (error) {
+            console.log('🔍 [checkAdminRole] Error en query:', error)
             return false
         }
 
         const isAdmin = data?.role === 'admin'
+        //console.log('🔍 [checkAdminRole] Role:', data?.role, '| isAdmin:', isAdmin)
         
         return isAdmin
     } catch (error) {
+        //console.error('🔍 [checkAdminRole] Error en catch:', error)
         return false
     }
 }

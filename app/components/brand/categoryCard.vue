@@ -1,5 +1,5 @@
 <template>
-    <NuxtLink :to="`/catalogo/ridgid/${category.slug}`" class="group relative overflow-hidden h-64 md:h-72 block">
+    <NuxtLink :to="`/catalogo/${brand}/${category.slug}`" class="group relative overflow-hidden h-64 md:h-72 block">
         <!-- Imagen de fondo -->
         <img 
             :src="category.image" 
@@ -37,6 +37,10 @@
 
 <script setup>
 defineProps({
+    brand: {
+        type: String,
+        default: 'ridgid'
+    },
     category: {
         type: Object,
         required: true,

@@ -111,7 +111,24 @@
               <div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
                 <UIcon name="i-heroicons-bookmark" class="w-4 h-4 text-primary-500" />
               </div>
-              <span class="font-medium text-gray-900 dark:text-white">{{ row.original.nombre }}</span>
+              <span class="font-medium text-gray-900 dark:text-white">{{ row.original.name }}</span>
+            </div>
+          </template>
+
+          <template #imagen-cell="{ row }">
+            <div v-if="row.original.image_key" class="flex items-center gap-2">
+              <img
+                :src="getImageUrl(row.original.image_key)"
+                :alt="row.original.name"
+                class="h-10 max-w-20 rounded-lg object-contain border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1"
+              />
+              <span class="text-xs text-gray-500">Sí</span>
+            </div>
+            <div v-else class="flex items-center gap-2">
+              <div class="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <UIcon name="i-heroicons-photo" class="w-5 h-5 text-gray-400" />
+              </div>
+              <span class="text-xs text-gray-500">No</span>
             </div>
           </template>
 
@@ -168,7 +185,7 @@
       <template #body>
         <p class="text-sm text-gray-600 dark:text-gray-300 py-2">
           ¿Estás seguro que deseas eliminar
-          <span class="font-semibold text-gray-900 dark:text-white">{{ deleteModal.marca?.nombre }}</span>?
+          <span class="font-semibold text-gray-900 dark:text-white">{{ deleteModal.marca?.name }}</span>?
         </p>
       </template>
 
@@ -187,59 +204,62 @@
 </template>
 
 <script setup lang="ts">
-	definePageMeta({
-		middleware: ['auth'],
+  definePageMeta({
+    middleware: ['auth'],
     layout: false,
-	})
+  })
 
-	const { getBrands, deleteBrand } = useBrands()
-	const { data: brands, refresh } = await useAsyncData('brands', async () => {
-		const { data } = await getBrands()
-		return data ?? []
-	})
+  const { getBrands, deleteBrand } = useBrands()
+  const { getImageUrl } = useStorageImage('brand-images')
 
-	// Search
-	const search = ref('')
-	const filteredBrands = computed(() => {
-		if (!search.value) return brands.value ?? []
-		const q = search.value.toLowerCase()
-		return (brands.value ?? []).filter((b: any) => b.nombre?.toLowerCase().includes(q))
-	})
+  const { data: brands, refresh } = await useAsyncData('brands', async () => {
+    const { data } = await getBrands()
+    return data ?? []
+  })
 
-	// Refresh
-	const refreshing = ref(false)
-	const handleRefresh = async () => {
-		refreshing.value = true
-		await refresh()
-		refreshing.value = false
-	}
+  // Search
+  const search = ref('')
+  const filteredBrands = computed(() => {
+    if (!search.value) return brands.value ?? []
+    const q = search.value.toLowerCase()
+    return (brands.value ?? []).filter((b: any) => b.name?.toLowerCase().includes(q))
+  })
 
-	// Delete modal
-	const deleteModalOpen = ref(false)
-	const deleteModal = reactive({
-		loading: false,
-		marca: null as any
-	})
+  // Refresh
+  const refreshing = ref(false)
+  const handleRefresh = async () => {
+    refreshing.value = true
+    await refresh()
+    refreshing.value = false
+  }
 
-	const confirmDelete = (marca: any) => {
-		deleteModal.marca = marca
-		deleteModalOpen.value = true
-	}
+  // Delete modal
+  const deleteModalOpen = ref(false)
+  const deleteModal = reactive({
+    loading: false,
+    marca: null as any
+  })
 
-	const handleDelete = async () => {
-		deleteModal.loading = true
-		await deleteBrand(deleteModal.marca.id)
-		await refresh()
-		deleteModal.loading = false
-		deleteModalOpen.value = false
-	}
+  const confirmDelete = (marca: any) => {
+    deleteModal.marca = marca
+    deleteModalOpen.value = true
+  }
 
-	// Edit
-	const editBrand = (id: string) => { navigateTo(`/admin/marcas/${id}`) }
+  const handleDelete = async () => {
+    deleteModal.loading = true
+    await deleteBrand(deleteModal.marca.id)
+    await refresh()
+    deleteModal.loading = false
+    deleteModalOpen.value = false
+  }
 
-	// Columns
-	const columns = [
-		{ accessorKey: 'name', header: 'Nombre' },
-		{ id: 'actions', header: 'Acciones' }
-	]
+  // Edit
+  const editBrand = (id: string) => { navigateTo(`/admin/marcas/${id}`) }
+
+  // Columns
+  const columns = [
+    { accessorKey: 'name', header: 'Nombre' },
+    { accessorKey: 'imagen', header: 'Logo' },
+    { id: 'actions', header: 'Acciones' }
+  ]
 </script>

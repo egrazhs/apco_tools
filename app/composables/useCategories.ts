@@ -3,6 +3,8 @@ export interface Category {
 	name: string
 	slug: string
 	is_active: boolean
+	brand_id?: string
+    image_key?: string
 	created_at?: string
 }
 
@@ -36,5 +38,10 @@ export const useCategories = () => {
 		return await supabase.from('categories').delete().eq('id', id)
 	}
 
-	return { getCategories, getCategoryById, getCategoryBySlug, createCategory, updateCategory, deleteCategory}
+	const getCategoriesByBrand = async (brandId: string) => {
+	    if (!brandId) throw new Error('Brand ID requerido')
+	    return await supabase.from('categories').select('*').eq('brand_id', brandId).eq('is_active', true).order('created_at', { ascending: false })
+	}
+
+	return { getCategories, getCategoryById, getCategoryBySlug, createCategory, updateCategory, deleteCategory, getCategoriesByBrand }
 }

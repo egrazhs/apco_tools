@@ -98,6 +98,7 @@
 
                 <!-- Info -->
                 <div class="flex flex-col gap-5">
+                    <NuxtLink v-if="user" to="/admin/productos">Editar Producto</NuxtLink>
 
                     <!-- Marca + nombre -->
                     <div>
@@ -291,6 +292,9 @@
     const toast = useToast()
     const { parseLinks } = useTextParser()
     const { getPrimaryImage, getProductImages } = useProductImages()
+
+    const user = useSupabaseUser()
+
 
     // ── Fetch producto principal ──────────────────────────────────────
     const { data: producto, pending, error } = await useAsyncData(

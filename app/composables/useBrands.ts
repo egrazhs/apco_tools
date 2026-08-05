@@ -1,6 +1,7 @@
 export interface Brand {
 	id?: string
 	name: string
+	image_key?: string
 }
 
 export const useBrands = () => {

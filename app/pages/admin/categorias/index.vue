@@ -34,11 +34,9 @@
             />
           </div>
           <div class="flex gap-2">
-            <USelectMenu
+            <USelect
               v-model="filterEstado"
               :options="estadoOptions"
-              value-attribute="value"
-              option-attribute="label"
               placeholder="Estado"
               class="w-36"
             />
@@ -125,6 +123,32 @@
             </div>
           </template>
 
+          <template #imagen-cell="{ row }">
+            <div v-if="row.original.image_key" class="flex items-center gap-2">
+              <img
+                :src="getImageUrl(row.original.image_key)"
+                :alt="row.original.name"
+                class="w-10 h-10 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
+              />
+              <span class="text-xs text-gray-500">Sí</span>
+            </div>
+            <div v-else class="flex items-center gap-2">
+              <div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <UIcon name="i-heroicons-photo" class="w-5 h-5 text-gray-400" />
+              </div>
+              <span class="text-xs text-gray-500">No</span>
+            </div>
+          </template>
+
+          <template #marca-cell="{ row }">
+            <div v-if="row.original.brand_id" class="flex items-center gap-2">
+              <UBadge color="blue" variant="subtle">
+                {{ getBrandName(row.original.brand_id) }}
+              </UBadge>
+            </div>
+            <div v-else class="text-xs text-gray-500">—</div>
+          </template>
+
           <template #slug-cell="{ row }">
             <span class="font-mono text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
               {{ row.original.slug }}
@@ -208,7 +232,7 @@
       <template #body>
         <p class="text-sm text-gray-600 dark:text-gray-300 py-2">
           ¿Estás seguro que deseas eliminar
-          <span class="font-semibold text-gray-900 dark:text-white">{{ deleteModal.categoria?.nombre }}</span>?
+          <span class="font-semibold text-gray-900 dark:text-white">{{ deleteModal.categoria?.name }}</span>?
         </p>
       </template>
 
@@ -233,18 +257,29 @@ definePageMeta({
 })
 
 const { getCategories, deleteCategory } = useCategories()
+const { getBrands } = useBrands()
+const { getImageUrl } = useStorageImage('category-images')
+
+// Cargar categorías
 const { data: categories, refresh } = await useAsyncData('categories', async () => {
   const { data } = await getCategories()
   return data ?? []
+})
+
+// Cargar marcas
+const brands = ref<any[]>([])
+onMounted(async () => {
+  const { data } = await getBrands()
+  brands.value = data ?? []
 })
 
 // Search & Filters
 const search = ref('')
 const filterEstado = ref<boolean | null>(null)
 const estadoOptions = [
-  { label: 'Todos', value: null },
-  { label: 'Activas', value: true },
-  { label: 'Inactivas', value: false }
+  { value: null, label: 'Todos' },
+  { value: true, label: 'Activas' },
+  { value: false, label: 'Inactivas' }
 ]
 
 const filteredCategories = computed(() => {
@@ -252,22 +287,27 @@ const filteredCategories = computed(() => {
   if (search.value) {
     const q = search.value.toLowerCase()
     result = result.filter((c: any) =>
-      c.nombre?.toLowerCase().includes(q) ||
+      c.name?.toLowerCase().includes(q) ||
       c.slug?.toLowerCase().includes(q)
     )
   }
   if (filterEstado.value !== null) {
-    result = result.filter((c: any) => c.activo === filterEstado.value)
+    result = result.filter((c: any) => c.is_active === filterEstado.value)
   }
   return result
 })
 
-const activeCount = computed(() => (categories.value ?? []).filter((c: any) => c.activo).length)
-const inactiveCount = computed(() => (categories.value ?? []).filter((c: any) => !c.activo).length)
+const activeCount = computed(() => (categories.value ?? []).filter((c: any) => c.is_active).length)
+const inactiveCount = computed(() => (categories.value ?? []).filter((c: any) => !c.is_active).length)
 
 const clearFilters = () => {
   search.value = ''
   filterEstado.value = null
+}
+
+// Helper para obtener nombre de marca
+const getBrandName = (brandId: string) => {
+  return brands.value.find(b => b.id === brandId)?.name || 'Sin marca'
 }
 
 // Refresh
@@ -305,9 +345,11 @@ const editCategory = (id: string) => {
 
 // Columns
 const columns = [
-  { accessorKey: 'nombre', header: 'Nombre' },
+  { accessorKey: 'name', header: 'Nombre' },
+  { accessorKey: 'imagen', header: 'Imagen' },
+  { accessorKey: 'marca', header: 'Marca' },
   { accessorKey: 'slug', header: 'Slug' },
-  { accessorKey: 'activo', header: 'Estado' },
+  { accessorKey: 'is_active', header: 'Estado' },
   { id: 'actions', header: 'Acciones' }
 ]
 </script>
