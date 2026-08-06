@@ -81,6 +81,17 @@
                                 <USwitch v-model="form.is_active" size="lg" />
                             </div>
                         </UFormField>
+
+
+
+                        <UFormField label="Descripcion" required>
+                            <UInput
+                                v-model="form.description"
+                                placeholder="Descripcion"
+                                size="lg"
+                                icon="i-heroicons-folder"
+                            />
+                        </UFormField>
                     </div>
                 </div>
 
@@ -187,6 +198,7 @@
         slug: props.initialData?.slug || '',
         is_active: props.initialData?.is_active ?? true,
         brand_id: props.initialData?.brand_id || '',
+        description: props.initialData?.description || '',
         image_key: props.initialData?.image_key || ''
     })
 

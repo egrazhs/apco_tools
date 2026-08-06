@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Fondo grayáceo -->
+  <rect width="400" height="400" fill="#f3f4f6"/>
+  
+  <!-- Elemento decorativo sutil -->
+  <circle cx="200" cy="180" r="50" fill="#e5e7eb" opacity="0.5"/>
+  <circle cx="120" cy="120" r="30" fill="#e5e7eb" opacity="0.3"/>
+  
+  <!-- Icono de imagen simplificado -->
+  <g transform="translate(200, 200)">
+    <!-- Marco rectangular -->
+    <rect x="-60" y="-60" width="120" height="120" fill="none" stroke="#d1d5db" stroke-width="2"/>
+    
+    <!-- Icono de montaña/foto -->
+    <path d="M -40,-20 L 0,-50 L 40,-20 M -30,30 L 30,30 M -30,30 L -20,10 L 0,25 L 20,10 L 30,30" 
+          fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Texto -->
+  <text x="200" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#9ca3af" text-anchor="middle" font-weight="500">
+    Sin imagen disponible
+  </text>
+</svg>

@@ -1,6 +1,6 @@
 <!-- Sección de información adicional (opcional) -->
 <template>
-   <div class="mt-20 pt-12 border-t border-gray-200">
+   <div class="mt-20 mb-10 pt-12 border-t border-gray-200">
         <h3 class="text-2xl text-stone-900 mb-4 uppercase tracking-widest text-center">
             ¿No encuentras lo que buscas?
         </h3>

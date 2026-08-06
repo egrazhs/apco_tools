@@ -2,7 +2,7 @@
     <NuxtLink :to="`/catalogo/${brand}/${category.slug}`" class="group relative overflow-hidden h-64 md:h-72 block">
         <!-- Imagen de fondo -->
         <img 
-            :src="category.image" 
+            :src="`${category.image}.webp`" 
             :alt="category.name"
             class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
@@ -14,7 +14,7 @@
         <div class="absolute inset-0 flex flex-col items-center justify-center p-6">
             <!-- Label pequeño en la esquina superior (visible siempre) -->
             <span class="absolute top-4 right-4 text-white text-xs uppercase tracking-widest font-semibold opacity-100">
-                {{ category.label }}
+                {{ category.name }}
             </span>
 
             <!-- Título principal - visible solo en hover -->

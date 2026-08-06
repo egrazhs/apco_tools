@@ -20,7 +20,6 @@
                         class="h-20 object-contain"
                     />
                 </div>
-
                 <!-- Descripción -->
                 <div class="flex-grow">
                     <h1 class="text-4xl md:text-5xl font-serif text-stone-900 uppercase tracking-widest mb-4">
@@ -32,7 +31,6 @@
                     </p>
                 </div>
             </div>
-
             <hr class="border-red-600 border-y-4 w-full md:w-[350px]" />
         </div>
 
@@ -68,15 +66,15 @@
 <script setup>
     const { getCategoriesByBrand } = useCategories()
     
-    const HPTR_BRAND_ID = 18
-
+    const BRAND_ID = '18'
+    
     const { data: categories, pending, error } = await useAsyncData(
-        `hptr-categories`,
+        'categories',
         async () => {
-            const { data, error: fetchError } = await getCategoriesByBrand(HPTR_BRAND_ID)
+            const { data, error: fetchError } = await getCategoriesByBrand(BRAND_ID)
             
             if (fetchError) {
-                console.error('Error fetching HPTR categories:', fetchError)
+                console.error('Error fetching categories:', fetchError)
                 throw fetchError
             }
             
