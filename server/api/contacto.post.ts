@@ -1,21 +1,34 @@
 import { Resend } from 'resend'
 
 export default defineEventHandler(async (event) => {
+    console.log('═══════════════════════════════════════')
+    console.log('📧 CONTACT ENDPOINT INICIADO')
+    console.log('═══════════════════════════════════════')
+
     const config = useRuntimeConfig()
     
+    console.log('🔍 CONFIG DISPONIBLE:')
+    console.log('   resendApiKey:', config.resendApiKey ? '✅ EXISTE' : '❌ NO EXISTE')
+    console.log('   mailFrom:', config.mailFrom || '❌ NO EXISTE')
+    console.log('   mailToContact:', config.mailToContact || '❌ NO EXISTE')
+
     if (!config.resendApiKey) {
+        console.error('❌ RESEND_API_KEY NO CONFIGURADA')
         throw createError({
             statusCode: 500,
             statusMessage: 'Email service not configured',
         })
     }
 
-    const resend = new Resend(config.resendApiKey)
+    console.log('✅ Variables configuradas correctamente')
+
     const body = await readBody(event)
+    console.log('📥 Body recibido:', { nombre: body.nombre, email: body.email, asunto: body.asunto })
 
     const { nombre, email, asunto, mensaje } = body
 
     if (!nombre || !email || !mensaje) {
+        console.error('❌ Faltan campos requeridos')
         throw createError({
             statusCode: 400,
             statusMessage: 'Faltan campos requeridos',
@@ -23,39 +36,51 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-        // Email al cliente (confirmación)
-        await resend.emails.send({
+        console.log('🚀 Inicializando Resend...')
+        const resend = new Resend(config.resendApiKey)
+        console.log('✅ Resend inicializado')
+
+        console.log('📨 Enviando email al cliente:', email)
+        const clientResult = await resend.emails.send({
             from: config.mailFrom,
             to: email,
-            subject: `Confirmación de tu mensaje - ${asunto}`,
-            html: emailClienteContactoTemplate({
-                nombre,
-                asunto,
-            }),
+            subject: `Confirmación de tu mensaje - ${asunto || 'Contacto APCO TOOLS'}`,
+            html: emailClienteContactoTemplate({ nombre, asunto }),
         })
+        
+        if (clientResult.error) {
+            console.error('❌ Error enviando email cliente:', clientResult.error)
+            throw new Error(clientResult.error.message)
+        }
+        console.log('✅ Email cliente enviado:', clientResult.data?.id)
 
-        // Email al administrador
-        await resend.emails.send({
+        console.log('📨 Enviando email al admin:', config.mailToContact)
+        const adminResult = await resend.emails.send({
             from: config.mailFrom,
             to: config.mailToContact,
-            subject: `Nuevo mensaje de contacto: ${asunto}`,
-            html: emailAdminContactoTemplate({
-                nombre,
-                email,
-                asunto,
-                mensaje,
-            }),
+            subject: `Nuevo mensaje de contacto: ${asunto || nombre}`,
+            html: emailAdminContactoTemplate({ nombre, email, asunto, mensaje }),
         })
+        
+        if (adminResult.error) {
+            console.error('❌ Error enviando email admin:', adminResult.error)
+            throw new Error(adminResult.error.message)
+        }
+        console.log('✅ Email admin enviado:', adminResult.data?.id)
 
         return {
             success: true,
             message: 'Mensaje enviado correctamente',
         }
-    } catch (error) {
-        console.error('Error al enviar email de contacto:', error)
+    } catch (error: any) {
+        console.error('❌ ERROR AL ENVIAR:')
+        console.error('   Tipo:', error.constructor.name)
+        console.error('   Mensaje:', error.message)
+        console.error('   Stack:', error.stack)
+        
         throw createError({
             statusCode: 500,
-            statusMessage: 'Error al enviar el mensaje',
+            statusMessage: `Error al enviar el mensaje: ${error.message}`,
         })
     }
 })
@@ -84,7 +109,7 @@ function emailClienteContactoTemplate({ nombre, asunto }: any) {
                     
                     <p>Gracias por contactarnos. Recibimos tu mensaje correctamente y te responderemos lo antes posible.</p>
                     
-                    <p><strong>Asunto:</strong> ${asunto}</p>
+                    ${asunto ? `<p><strong>Asunto:</strong> ${asunto}</p>` : ''}
                     
                     <p>Si tienes urgencia, puedes llamarnos directamente:</p>
                     <p>📞 +52 33 2486 0054</p>
@@ -127,14 +152,14 @@ function emailAdminContactoTemplate({ nombre, email, asunto, mensaje }: any) {
                         <p>${nombre} &lt;<a href="mailto:${email}">${email}</a>&gt;</p>
                     </div>
                     
-                    <div class="field">
+                    ${asunto ? `<div class="field">
                         <span class="field-label">Asunto:</span>
                         <p>${asunto}</p>
-                    </div>
+                    </div>` : ''}
                     
                     <div class="field">
                         <span class="field-label">Mensaje:</span>
-                        <div class="message-box">${mensaje}</div>
+                        <div class="message-box">${mensaje.replace(/\n/g, '<br>')}</div>
                     </div>
                     
                     <p style="margin-top: 30px; color: #666; font-size: 12px;">
