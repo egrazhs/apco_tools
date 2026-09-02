@@ -1,26 +1,16 @@
 <script setup lang="ts">
 useSeoMeta({
-    title: 'Pedir Cotización',
+    title: 'Pedir Cotización - APCO TOOLS',
     description: 'Solicita una cotización personalizada para nuestros productos.',
 })
 
 const route = useRoute()
-
-const productosDisponibles = [
-    'Producto A',
-    'Producto B',
-    'Producto C',
-    'Producto D',
-    'Otro / No sé cuál necesito',
-]
 
 const form = reactive({
     nombre: '',
     empresa: '',
     email: '',
     telefono: '',
-    producto: route.query.producto ? String(route.query.producto) : '',
-    cantidad: '',
     mensaje: '',
 })
 
@@ -86,7 +76,7 @@ async function handleSubmit() {
                             Pedir Cotización
                         </h1>
                         <p class="mt-2 text-gray-500 dark:text-gray-400 text-lg max-w-xl">
-                            Completa el formulario y te enviamos una propuesta personalizada en menos de 24 horas.
+                            Completa el formulario y te enviamos una propuesta personalizada en cuanto nos sea disponible.
                         </p>
                     </div>
                 </div>
@@ -114,7 +104,7 @@ async function handleSubmit() {
                                         ¡Solicitud enviada!
                                     </h2>
                                     <p class="mt-2 text-gray-500 dark:text-gray-400">
-                                        Gracias <strong>{{ form.nombre }}</strong>, revisaremos tu solicitud y nos pondremos en contacto a través de <strong>{{ form.email }}</strong>.
+                                        Gracias <strong>{{ form.nombre }}</strong>, revisaremos tu solicitud y nos pondremos en contacto a través de <strong>{{ form.email }}</strong> o tu telefono <strong>{{ form.telefono }}</strong>.
                                     </p>
                                 </div>
                                 <UButton
@@ -132,9 +122,7 @@ async function handleSubmit() {
                     <template v-else>
                         <UCard>
                             <template #header>
-                                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Datos de contacto y solicitud
-                                </h2>
+                                <h2 class="text-lg font-semibold text-gray-900 dark:text-white"> Datos de contacto y solicitud</h2>
                             </template>
 
                             <UForm :state="form" @submit="handleSubmit" class="space-y-5">
@@ -144,7 +132,7 @@ async function handleSubmit() {
                                 
                                         <UInput
                                             v-model="form.nombre"
-                                            placeholder="Juan Pérez"
+                                            placeholder="Nombre"
                                             icon="i-heroicons-user"
                                             size="md"
                                         />
@@ -153,7 +141,7 @@ async function handleSubmit() {
                                     
                                         <UInput
                                             v-model="form.empresa"
-                                            placeholder="Mi Empresa S.A."
+                                            placeholder="Mi Empresa (Opcional)"
                                             icon="i-heroicons-building-office-2"
                                             size="md"
                                         />
@@ -166,7 +154,7 @@ async function handleSubmit() {
                                         <UInput
                                             v-model="form.email"
                                             type="email"
-                                            placeholder="correo@ejemplo.com"
+                                            placeholder="email"
                                             icon="i-heroicons-envelope"
                                             size="md"
                                         />
@@ -182,38 +170,15 @@ async function handleSubmit() {
                                         />
                                     
                                 </div>
-
-                                <!-- Fila: Producto + Cantidad -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    
-                                        <USelect
-                                            v-model="form.producto"
-                                            :options="productosDisponibles"
-                                            placeholder="Selecciona un producto"
-                                            size="md"
-                                        />
-                                
-
-                                    
-                                        <UInput
-                                            v-model="form.cantidad"
-                                            type="number"
-                                            placeholder="Ej. 100"
-                                            icon="i-heroicons-hashtag"
-                                            min="1"
-                                            size="md"
-                                        />
-                                    
-                                </div>
-
                                 <!-- Mensaje -->
                                 
                                     <UTextarea
                                         v-model="form.mensaje"
                                         placeholder="Cuéntanos más sobre tu proyecto, especificaciones o cualquier duda..."
                                         :rows="5"
-                                        size="md"
+                                        size="xl"
                                         autoresize
+                                        class="w-full"
                                     />
                                     
                                 <!-- Error general -->
@@ -274,17 +239,19 @@ async function handleSubmit() {
                             </h3>
                         </template>
                         <div class="space-y-3">
-                            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                            <span class="italic text-sm">También puedes mandarnos un mensaje directo para  mejor atencion:</span>
+
+                            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mt-2">
                                 <UIcon name="i-heroicons-envelope" class="w-4 h-4 text-primary-500 flex-shrink-0" />
-                                <span>contacto@tuempresa.com</span>
+                                <span class="text-xsxx">HerramientasAltaCalidad@hotmail.com</span>
                             </div>
                             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                 <UIcon name="i-heroicons-phone" class="w-4 h-4 text-primary-500 flex-shrink-0" />
-                                <span>+52 33 1234 5678</span>
+                                <span>+52 33 2486 0054</span>
                             </div>
                             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                 <UIcon name="i-heroicons-clock" class="w-4 h-4 text-primary-500 flex-shrink-0" />
-                                <span>Lun – Vie, 9:00 – 18:00</span>
+                                <p>Lun – Vie, 9:00 – 18:30 <br> Sabado, 9:00 - 15:00</p>
                             </div>
                         </div>
                     </UCard>
