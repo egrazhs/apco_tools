@@ -379,7 +379,7 @@
     const beneficios = [
         { icon: 'i-heroicons-truck', text: 'Envío a todo México' },
         { icon: 'i-heroicons-shield-check', text: 'Garantía incluida' },
-        { icon: 'i-heroicons-arrow-path', text: 'Devoluciones fáciles' },
+        //{ icon: 'i-heroicons-arrow-path', text: 'Devoluciones fáciles' },
         { icon: 'i-heroicons-lock-closed', text: 'Pago seguro' },
     ]
 
