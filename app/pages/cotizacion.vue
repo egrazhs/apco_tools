@@ -1,51 +1,71 @@
 <script setup lang="ts">
-useSeoMeta({
-    title: 'Pedir Cotización - APCO TOOLS',
-    description: 'Solicita una cotización personalizada para nuestros productos.',
-})
+    useSeoMeta({
+        title: 'Pedir Cotización - APCO TOOLS',
+        description: 'Solicita una cotización personalizada para nuestros productos.',
+    })
 
-const route = useRoute()
-
-const form = reactive({
-    nombre: '',
-    empresa: '',
-    email: '',
-    telefono: '',
-    mensaje: '',
-})
-
-const loading = ref(false)
-const enviado = ref(false)
-const errorEnvio = ref(false)
-
-const toast = useToast()
-
-async function handleSubmit() {
-    loading.value = true
-    errorEnvio.value = false
-
-    try {
-        // Aquí iría la llamada al endpoint real, ej: await $fetch('/api/cotizacion', { method: 'POST', body: form })
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        enviado.value = true
-        toast.add({
-            title: '¡Solicitud enviada!',
-            description: 'Nos pondremos en contacto contigo a la brevedad.',
-            color: 'green',
-            icon: 'i-heroicons-check-circle',
-        })
-    } catch (e) {
-        errorEnvio.value = true
-        toast.add({
-            title: 'Ocurrió un error',
-            description: 'No pudimos enviar tu solicitud. Intenta de nuevo.',
-            color: 'red',
-            icon: 'i-heroicons-x-circle',
-        })
-    } finally {
-        loading.value = false
+    interface FormData {
+        nombre: string
+        empresa: string
+        email: string
+        telefono: string
+        mensaje: string
     }
-}
+
+    const form = reactive<FormData>({
+        nombre: '',
+        empresa: '',
+        email: '',
+        telefono: '',
+        mensaje: '',
+    })
+
+    const enviado = ref(false)
+    const { sendEmail, loading, error } = useEmailService()
+    const toast = useToast()
+
+    async function handleSubmit() {
+        // Validar campos requeridos
+        if (!form.nombre.trim() || !form.email.trim() || !form.mensaje.trim()) {
+            toast.add({
+                title: 'Campos incompletos',
+                description: 'Por favor completa los campos marcados con *',
+                color: 'red',
+                icon: 'i-heroicons-exclamation-triangle',
+            })
+            return
+        }
+
+        try {
+            await sendEmail('/api/cotizacion', {
+                nombre: form.nombre.trim(),
+                empresa: form.empresa.trim(),
+                email: form.email.trim(),
+                telefono: form.telefono.trim(),
+                mensaje: form.mensaje.trim(),
+            })
+
+            enviado.value = true
+            toast.add({
+                title: '¡Solicitud enviada!',
+                description: 'Nos pondremos en contacto contigo a la brevedad.',
+                color: 'green',
+                icon: 'i-heroicons-check-circle',
+            })
+
+            // Scroll al top después de 1s
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+            }, 500)
+        } catch (err) {
+            toast.add({
+                title: 'Error al enviar',
+                description: error.value || 'Por favor intenta nuevamente',
+                color: 'red',
+                icon: 'i-heroicons-x-circle',
+            })
+        }
+    }
 </script>
 
 <template>
@@ -104,7 +124,7 @@ async function handleSubmit() {
                                         ¡Solicitud enviada!
                                     </h2>
                                     <p class="mt-2 text-gray-500 dark:text-gray-400">
-                                        Gracias <strong>{{ form.nombre }}</strong>, revisaremos tu solicitud y nos pondremos en contacto a través de <strong>{{ form.email }}</strong> o tu telefono <strong>{{ form.telefono }}</strong>.
+                                        Gracias <strong>{{ form.nombre }}</strong>, revisaremos tu solicitud y nos pondremos en contacto a través de <strong>{{ form.email }}</strong> o tu teléfono <strong>{{ form.telefono }}</strong>.
                                     </p>
                                 </div>
                                 <UButton
@@ -122,73 +142,70 @@ async function handleSubmit() {
                     <template v-else>
                         <UCard>
                             <template #header>
-                                <h2 class="text-lg font-semibold text-gray-900 dark:text-white"> Datos de contacto y solicitud</h2>
+                                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                    Datos de contacto y solicitud
+                                </h2>
                             </template>
 
-                            <UForm :state="form" @submit="handleSubmit" class="space-y-5">
+                            <form @submit.prevent="handleSubmit" class="space-y-5">
 
                                 <!-- Fila: Nombre + Empresa -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                
-                                        <UInput
-                                            v-model="form.nombre"
-                                            placeholder="Nombre"
-                                            icon="i-heroicons-user"
-                                            size="md"
-                                        />
-                                    
+                                    <UInput
+                                        v-model="form.nombre"
+                                        placeholder="Nombre *"
+                                        icon="i-heroicons-user"
+                                        size="md"
+                                        required
+                                    />
 
-                                    
-                                        <UInput
-                                            v-model="form.empresa"
-                                            placeholder="Mi Empresa (Opcional)"
-                                            icon="i-heroicons-building-office-2"
-                                            size="md"
-                                        />
-                                    
+                                    <UInput
+                                        v-model="form.empresa"
+                                        placeholder="Mi Empresa (Opcional)"
+                                        icon="i-heroicons-building-office-2"
+                                        size="md"
+                                    />
                                 </div>
 
                                 <!-- Fila: Email + Teléfono -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    
-                                        <UInput
-                                            v-model="form.email"
-                                            type="email"
-                                            placeholder="email"
-                                            icon="i-heroicons-envelope"
-                                            size="md"
-                                        />
-                                    
-
-                                    
-                                        <UInput
-                                            v-model="form.telefono"
-                                            type="tel"
-                                            placeholder="+52 33 1234 5678"
-                                            icon="i-heroicons-phone"
-                                            size="md"
-                                        />
-                                    
-                                </div>
-                                <!-- Mensaje -->
-                                
-                                    <UTextarea
-                                        v-model="form.mensaje"
-                                        placeholder="Cuéntanos más sobre tu proyecto, especificaciones o cualquier duda..."
-                                        :rows="5"
-                                        size="xl"
-                                        autoresize
-                                        class="w-full"
+                                    <UInput
+                                        v-model="form.email"
+                                        type="email"
+                                        placeholder="Email *"
+                                        icon="i-heroicons-envelope"
+                                        size="md"
+                                        required
                                     />
-                                    
+
+                                    <UInput
+                                        v-model="form.telefono"
+                                        type="tel"
+                                        placeholder="+52 33 1234 5678"
+                                        icon="i-heroicons-phone"
+                                        size="md"
+                                    />
+                                </div>
+
+                                <!-- Mensaje -->
+                                <UTextarea
+                                    v-model="form.mensaje"
+                                    placeholder="Cuéntanos más sobre tu proyecto, especificaciones o cualquier duda... *"
+                                    :rows="5"
+                                    size="xl"
+                                    autoresize
+                                    class="w-full"
+                                    required
+                                />
+
                                 <!-- Error general -->
                                 <UAlert
-                                    v-if="errorEnvio"
+                                    v-if="error"
                                     icon="i-heroicons-exclamation-triangle"
                                     color="red"
                                     variant="soft"
-                                    title="No se pudo enviar la solicitud"
-                                    description="Por favor intenta de nuevo o contáctanos directamente."
+                                    :title="'Error'"
+                                    :description="error"
                                 />
 
                                 <!-- Submit -->
@@ -199,9 +216,10 @@ async function handleSubmit() {
                                         icon="i-heroicons-paper-airplane"
                                         :loading="loading"
                                         label="Enviar solicitud"
+                                        :disabled="loading"
                                     />
                                 </div>
-                            </UForm>
+                            </form>
                         </UCard>
                     </template>
                 </div>
@@ -239,11 +257,11 @@ async function handleSubmit() {
                             </h3>
                         </template>
                         <div class="space-y-3">
-                            <span class="italic text-sm">También puedes mandarnos un mensaje directo para  mejor atencion:</span>
+                            <span class="italic text-sm">También puedes mandarnos un mensaje directo para mejor atención:</span>
 
                             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mt-2">
                                 <UIcon name="i-heroicons-envelope" class="w-4 h-4 text-primary-500 flex-shrink-0" />
-                                <span class="text-xsxx">HerramientasAltaCalidad@hotmail.com</span>
+                                <span class="text-xs">HerramientasAltaCalidad@hotmail.com</span>
                             </div>
                             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                 <UIcon name="i-heroicons-phone" class="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -251,7 +269,7 @@ async function handleSubmit() {
                             </div>
                             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                 <UIcon name="i-heroicons-clock" class="w-4 h-4 text-primary-500 flex-shrink-0" />
-                                <p>Lun – Vie, 9:00 – 18:30 <br> Sabado, 9:00 - 15:00</p>
+                                <p>Lun – Vie, 9:00 – 18:30 <br> Sábado, 9:00 - 15:00</p>
                             </div>
                         </div>
                     </UCard>

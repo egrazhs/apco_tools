@@ -31,8 +31,8 @@ export default defineNuxtConfig({
         },
         supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
         resendApiKey: process.env.RESEND_API_KEY,
-        mailFrom: process.env.MAIL_FROM,
-        mailToContact: process.env.MAIL_TO_CONTACT,
+        mailFrom: process.env.NUXT_MAIL_FROM,
+        mailToContact: process.env.NUXT_MAIL_TO_CONTACT,
     },
 
     supabase: {
