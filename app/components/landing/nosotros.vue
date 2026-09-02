@@ -50,7 +50,7 @@
 
                     <div class="bg-stone-50 p-8 sm:p-12 shadow-xl w-full">
                         <img
-                            src="/img/logo_grande.webp"
+                            src="/img/logo_apco_tools.jpg"
                             alt="APCO Tools"
                             class="w-full object-contain"
                             draggable="false"

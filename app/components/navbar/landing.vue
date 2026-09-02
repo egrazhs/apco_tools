@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <NuxtLink to="/" class="flex items-center">
                     <img
-                        src="/img/APCO_PNG.webp"
+                        src="/img/logo_apco_tools.jpg"
                         alt="APCO Tools"
                         class="h-10 object-contain"
                         draggable="false"
