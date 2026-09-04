@@ -83,7 +83,7 @@
         {
             sku: 'No. Cat. 61748',
             slug: 'aspiradora-12-galones-5-hp-mod-rt1200m',
-            name: 'Aspiradora 12 Gal K-60SP',
+            name: 'Aspiradora 12 Galones 5 H.P. Mod. RT1200M',
             img: 'https://http2.mlstatic.com/D_NQ_NP_2X_947032-MLA99464329204_112025-F.webp',
             desc: 'Compacta y portátil, pero con potencia para desazolves difíciles. Motor ½ HP, ideal para drenajes residenciales, comerciales e industriales de 1¼" a 4".',
         },
