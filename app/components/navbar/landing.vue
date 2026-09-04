@@ -96,7 +96,7 @@
     const navLinks = [
         { label: 'Inicio',    href: '#inicio' },
         { label: 'Nosotros',  href: '#nosotros' },
-        { label: 'Productos', href: '#productos' },
+        { label: 'Productos', href: '/productos' },
         { label: 'Marcas',    href: '#marcas' },
         { label: 'Contacto',  href: '#contacto' },
     ]
