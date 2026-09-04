@@ -12,25 +12,28 @@ import { createClient } from '@supabase/supabase-js'
  */
 export const requireAuth = (event: any) => {
     const authHeader = getHeader(event, 'authorization')
-
+    console.log('🔐 [requireAuth] Authorization header:', authHeader ? 'PRESENTE' : 'AUSENTE ❌')
+    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         throw createError({
             statusCode: 401,
             statusMessage: 'Token no proporcionado o formato inválido'
         })
     }
-
-    const token = authHeader.slice(7) // Remove "Bearer "
-
+    
+    const token = authHeader.slice(7)
     try {
-        // Decodificar JWT (sin validar firma, porque Supabase ya lo hizo en cliente)
-        // Si necesitas validar firma, usarías jsonwebtoken package
         const decoded = JSON.parse(
             Buffer.from(token.split('.')[1], 'base64').toString('utf-8')
         )
-
+        console.log('🔐 [requireAuth] JWT decodificado:')
+        console.log('  sub (userId):', decoded.sub)
+        console.log('  email:', decoded.email)
+        console.log('  iat:', decoded.iat)
+        console.log('  exp:', decoded.exp)
         return decoded
     } catch (error) {
+        console.error('❌ [requireAuth] Error al decodificar JWT:', error)
         throw createError({
             statusCode: 401,
             statusMessage: 'Token inválido o malformado'
@@ -49,7 +52,7 @@ export const requireAuth = (event: any) => {
  */
 export const checkAdminRole = async (userId: string): Promise<boolean> => {
     try {
-        //console.log('🔍 [checkAdminRole] Verificando userId:', userId)
+        console.log('🔍 [checkAdminRole] Verificando userId:', userId)
         
         const supabase = useSupabaseAdmin()
         //console.log('🔍 [checkAdminRole] Supabase client creado')
@@ -60,7 +63,7 @@ export const checkAdminRole = async (userId: string): Promise<boolean> => {
             .eq('id', userId)
             .single()
 
-        //console.log('🔍 [checkAdminRole] Query result:', { data, error })
+        console.log('🔍 [checkAdminRole] Query result:', { data, error })
 
         if (error) {
             console.log('🔍 [checkAdminRole] Error en query:', error)
@@ -68,11 +71,11 @@ export const checkAdminRole = async (userId: string): Promise<boolean> => {
         }
 
         const isAdmin = data?.role === 'admin'
-        //console.log('🔍 [checkAdminRole] Role:', data?.role, '| isAdmin:', isAdmin)
+        console.log('🔍 [checkAdminRole] Role:', data?.role, '| isAdmin:', isAdmin)
         
         return isAdmin
     } catch (error) {
-        //console.error('🔍 [checkAdminRole] Error en catch:', error)
+        console.error('🔍 [checkAdminRole] Error en catch:', error)
         return false
     }
 }

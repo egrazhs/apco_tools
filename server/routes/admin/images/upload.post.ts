@@ -6,15 +6,28 @@ export default defineEventHandler(async (event) => {
         // ============================================
         // 1. Validar autenticación (admin)
         // ============================================
+
+        console.log('\n📤 [upload.post] ===== NUEVA SOLICITUD =====')
+        console.log('📤 [upload.post] Timestamp:', new Date().toISOString())
+
         const user = await requireAuth(event)
+        console.log('📤 [upload.post] Usuario autenticado:')
+        console.log('  sub:', user.sub)
+        console.log('  email:', user.email)
+        
         const isAdmin = await checkAdminRole(user.sub)
+        console.log('📤 [upload.post] Resultado checkAdminRole:', isAdmin)
 
         if (!isAdmin) {
+            console.log('❌ [upload.post] Usuario NO es admin → Error 403\n')
+
             throw createError({
                 statusCode: 403,
                 statusMessage: 'No autorizado. Solo administradores pueden subir imágenes.'
             })
         }
+
+        console.log('✅ [upload.post] Usuario ES admin → Continuando\n')
 
         // ============================================
         // 2. Parsear FormData
