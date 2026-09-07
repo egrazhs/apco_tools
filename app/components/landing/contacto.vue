@@ -90,7 +90,7 @@
                         </a>
                     </h6>
                     <h6 class="text-lg my-3">
-                        <a href="https://www.facebook.com/profile.php?id=100082649351265" target="_blank" class="flex items-center gap-2 hover:text-red-600 transition-colors text-stone-700">
+                        <a href="https://www.facebook.com/profile.php?id=61591373657120" target="_blank" class="flex items-center gap-2 hover:text-red-600 transition-colors text-stone-700">
                             <img src="/img/facebook.webp" class="w-12" alt="Facebook" />
                             <i>Herramientas y Suministros SA de CV</i>
                         </a>
