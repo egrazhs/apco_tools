@@ -5,17 +5,11 @@
             <!-- Logo de marca -->
             <div class="flex justify-center items-center h-24 mb-6 bg-white">
                 <img 
-                    :src="brand.logo" 
+                    :src="`https://gqgdzvkoydpuefloilmr.supabase.co/storage/v1/object/public/brand-images/${brand.image_key}.webp`"
                     :alt="brand.name"
                     class="h-20 object-contain transition-transform duration-300 group-hover:scale-110"
                 />
             </div>
-
-            <!-- Nombre de marca
-            <h3 class="text-3xl text-stone-900 text-center mb-4 uppercase tracking-widest">
-                {{ brand.name }}
-            </h3>
-            -->
 
             <!-- Descripción -->
             <p class="text-gray-700 text-sm leading-relaxed text-center mb-6 flex-grow">
@@ -42,7 +36,7 @@ defineProps({
         type: Object,
         required: true,
         validator: (brand) => {
-            return brand.id && brand.name && brand.slug && brand.logo;
+            return brand.id && brand.name && brand.slug && brand.image_key;
         }
     }
 });

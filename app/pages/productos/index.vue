@@ -46,11 +46,11 @@
 </template>
 
 <script setup>
-    const { getBrands } = useBrands()
+    const { getBrandsByDisplayOrder } = useBrands()
     const { getTotalProductsByBrand } = useProducts()
 
     const { data: brands } = await useAsyncData('brands-with-counts', async () => {
-        const { data: raw_brands } = await getBrands()
+        const { data: raw_brands } = await getBrandsByDisplayOrder()
         if (!raw_brands) return []
 
         const with_counts = await Promise.all(

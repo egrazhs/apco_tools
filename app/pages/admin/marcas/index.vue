@@ -122,13 +122,11 @@
                 :alt="row.original.name"
                 class="h-10 max-w-20 rounded-lg object-contain border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1"
               />
-              <span class="text-xs text-gray-500">Sí</span>
             </div>
             <div v-else class="flex items-center gap-2">
               <div class="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                 <UIcon name="i-heroicons-photo" class="w-5 h-5 text-gray-400" />
               </div>
-              <span class="text-xs text-gray-500">No</span>
             </div>
           </template>
 

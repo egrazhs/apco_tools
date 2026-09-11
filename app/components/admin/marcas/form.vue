@@ -33,6 +33,25 @@
                             icon="i-heroicons-building-storefront"
                         />
                     </UFormField>
+
+                    <UFormField label="Slug" required>
+                        <UInput
+                            v-model="form.slug"
+                            placeholder="Misma que el nombre de la marca, en minusculas y - en vez de espacio"
+                            size="lg"
+                            icon="i-heroicons-building-storefront"
+                        />
+                    </UFormField>
+
+                    <UFormField label="Descripción">
+                        <UTextarea
+                            v-model="form.description"
+                            placeholder="Descripcion de la marca..."
+                            size="lg"
+                            icon="i-heroicons-building-storefront"
+                            class="w-full"
+                        />
+                    </UFormField>
                 </div>
 
                 <!-- IMAGEN -->
@@ -125,7 +144,9 @@
     // Formulario
     const form = reactive({
         name: props.initialData?.name || '',
-        image_key: props.initialData?.image_key || ''
+        image_key: props.initialData?.image_key || '',
+        description: props.initialData?.description || '',
+        slug: props.initialData?.slug || ''
     })
 
     // Imagen

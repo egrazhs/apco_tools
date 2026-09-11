@@ -42,6 +42,7 @@
                 v-for="category in categories"
                 :key="category.id"
                 :category="category"
+                brand="wurth"
             />
         </div>
         
@@ -56,12 +57,12 @@
     const BRAND_ID = '8' //Wurth
 
     const { data: categories, pending, error } = await useAsyncData(
-        'ridgid-categories',
+        'wurth-categories',
         async () => {
             const { data, error: fetchError } = await getCategoriesByBrand(BRAND_ID)
             
             if (fetchError) {
-                console.error('Error fetching RIDGID categories:', fetchError)
+                console.error('Error fetching Wurth categories:', fetchError)
                 throw fetchError
             }
             

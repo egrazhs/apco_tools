@@ -210,6 +210,8 @@
         { accessorKey: 'name', header: 'Nombre' },
         { accessorKey: 'brand.name', header: 'Marca'},
         { accessorKey: 'code', header: 'Código' },
+        { accessorKey: 'price', header: 'Precio'},
+        { accessorKey: 'is_active', header: 'Activo'},
         { id: 'actions', header: 'Acciones' }
     ]
 </script>

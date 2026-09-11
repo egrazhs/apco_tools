@@ -1,7 +1,10 @@
 export interface Brand {
 	id?: string
 	name: string
+	slug?: string
+	description?: string
 	image_key?: string
+	display_order?: number
 }
 
 export const useBrands = () => {
@@ -9,6 +12,10 @@ export const useBrands = () => {
 
 	const getBrands = async () => {
 		return await supabase.from('brands').select('*')
+	}
+
+	const getBrandsByDisplayOrder = async () => {
+		return await supabase.from('brands').select('*').order('display_order', { ascending: true })
 	}
 
 	const getBrandById = async (id: string) => {
@@ -30,5 +37,5 @@ export const useBrands = () => {
 		return await supabase.from('brands').delete().eq('id', id)
 	}
 
-	return { getBrands, getBrandById, createBrand, updateBrand, deleteBrand}
+	return { getBrands, getBrandsByDisplayOrder, getBrandById, createBrand, updateBrand, deleteBrand }
 }
