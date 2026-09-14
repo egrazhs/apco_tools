@@ -46,7 +46,7 @@
                 </UButton>
 
                 <UButton
-                    to="#contacto"
+                    to="/#contacto"
                     variant="solid"
                     color="red"
                     size="lg"
