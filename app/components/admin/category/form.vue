@@ -39,12 +39,13 @@
                         <UFormField label="Slug">
                             <UInput
                                 v-model="form.slug"
-                                placeholder="ej: herramientas-electricas"
+                                placeholder="Slug"
                                 size="lg"
                                 icon="i-heroicons-link"
+                                :disabled="isEdit"
                             />
                             <template #hint>
-                                <span class="text-xs text-gray-500">Usado en la URL de la categoría</span>
+                                <span class="text-xs text-gray-500">Se genera automáticamente*</span>
                             </template>
                         </UFormField>
 
@@ -81,8 +82,6 @@
                                 <USwitch v-model="form.is_active" size="lg" />
                             </div>
                         </UFormField>
-
-
 
                         <UFormField label="Descripcion" required>
                             <UInput
@@ -215,15 +214,33 @@
         }
     })
 
-    // Auto-genera slug desde nombre
-    watch(() => form.name, (val) => {
+    // Función helper para generar slug con marca
+    const generateSlug = (categoryName: string, brandId: string) => {
+        if (!categoryName) return ''
+
+        // Generar slug de la categoría
+        const categorySlug = categoryName
+            .toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+
+        // Si hay marca seleccionada, agregar su slug
+        if (brandId) {
+            const brand = brands.value.find(b => b.id === brandId)
+            const brandSlug = brand?.slug || ''
+            return brandSlug ? `${categorySlug}-${brandSlug}` : categorySlug
+        }
+
+        // Si no hay marca, devolver solo el slug de categoría
+        return categorySlug
+    }
+
+    // Auto-genera slug desde nombre y marca
+    watch([() => form.name, () => form.brand_id], ([name, brandId]) => {
         if (!isEdit.value || !form.slug) {
-            form.slug = val
-                .toLowerCase()
-                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-z0-9\s-]/g, '')
-                .trim()
-                .replace(/\s+/g, '-')
+            form.slug = generateSlug(name, brandId)
         }
     })
 

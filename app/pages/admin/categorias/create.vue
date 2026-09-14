@@ -1,7 +1,7 @@
 <template>
-  <div class="p-6">
-    <AdminCategoryForm @submit="saveCategory" />
-  </div>
+	<div class="p-6">
+		<AdminCategoryForm @submit="saveCategory" />
+	</div>
 </template>
 
 <script setup lang="ts">
