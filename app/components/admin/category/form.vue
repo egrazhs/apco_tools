@@ -179,14 +179,14 @@
     const emit = defineEmits(['submit'])
     const isEdit = computed(() => !!props.initialData)
 
-    const { getBrands } = useBrands()
+    const { getBrandsSorted } = useBrands()
     const { uploadImage, getImageUrl, deleteImage } = useStorageImage('category-images')
 
     // Cargar marcas
     const brands = ref([])
 
     onMounted(async () => {
-        const { data } = await getBrands()
+        const { data } = await getBrandsSorted()
         brands.value = data ?? []
         console.log('🔍 Marcas cargadas:', brands.value)
     })

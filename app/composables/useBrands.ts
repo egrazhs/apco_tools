@@ -14,6 +14,10 @@ export const useBrands = () => {
 		return await supabase.from('brands').select('*')
 	}
 
+	const getBrandsSorted = async () => {
+    	return await supabase.from('brands').select('*').order('name', { ascending: true })
+	}
+
 	const getBrandsByDisplayOrder = async () => {
 		return await supabase.from('brands').select('*').order('display_order', { ascending: true })
 	}
@@ -37,5 +41,5 @@ export const useBrands = () => {
 		return await supabase.from('brands').delete().eq('id', id)
 	}
 
-	return { getBrands, getBrandsByDisplayOrder, getBrandById, createBrand, updateBrand, deleteBrand }
+	return { getBrands, getBrandsSorted, getBrandsByDisplayOrder, getBrandById, createBrand, updateBrand, deleteBrand }
 }
