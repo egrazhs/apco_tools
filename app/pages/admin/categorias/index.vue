@@ -130,13 +130,11 @@
                 :alt="row.original.name"
                 class="w-10 h-10 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
               />
-              <span class="text-xs text-gray-500">Sí</span>
             </div>
             <div v-else class="flex items-center gap-2">
               <div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                 <UIcon name="i-heroicons-photo" class="w-5 h-5 text-gray-400" />
               </div>
-              <span class="text-xs text-gray-500">No</span>
             </div>
           </template>
 
@@ -155,7 +153,7 @@
             </span>
           </template>
 
-          <template #activo-cell="{ row }">
+          <template #is_active-cell="{ row }">
             <UBadge
               :color="row.original.is_active ? 'green' : 'red'"
               variant="subtle"
@@ -252,8 +250,8 @@
 
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['auth'],
-  layout: false,
+    middleware: ['auth'],
+    layout: false,
 })
 
 const { getCategories, deleteCategory } = useCategories()
@@ -262,94 +260,94 @@ const { getImageUrl } = useStorageImage('category-images')
 
 // Cargar categorías
 const { data: categories, refresh } = await useAsyncData('categories', async () => {
-  const { data } = await getCategories()
-  return data ?? []
+    const { data } = await getCategories()
+    return data ?? []
 })
 
 // Cargar marcas
 const brands = ref<any[]>([])
 onMounted(async () => {
-  const { data } = await getBrands()
-  brands.value = data ?? []
+    const { data } = await getBrands()
+    brands.value = data ?? []
 })
 
 // Search & Filters
 const search = ref('')
 const filterEstado = ref<boolean | null>(null)
 const estadoOptions = [
-  { value: null, label: 'Todos' },
-  { value: true, label: 'Activas' },
-  { value: false, label: 'Inactivas' }
+    { value: null, label: 'Todos' },
+    { value: true, label: 'Activas' },
+    { value: false, label: 'Inactivas' }
 ]
 
 const filteredCategories = computed(() => {
-  let result = categories.value ?? []
-  if (search.value) {
-    const q = search.value.toLowerCase()
-    result = result.filter((c: any) =>
-      c.name?.toLowerCase().includes(q) ||
-      c.slug?.toLowerCase().includes(q)
-    )
-  }
-  if (filterEstado.value !== null) {
-    result = result.filter((c: any) => c.is_active === filterEstado.value)
-  }
-  return result
+    let result = categories.value ?? []
+    if (search.value) {
+        const q = search.value.toLowerCase()
+        result = result.filter((c: any) =>
+            c.name?.toLowerCase().includes(q) ||
+            c.slug?.toLowerCase().includes(q)
+        )
+    }
+    if (filterEstado.value !== null) {
+        result = result.filter((c: any) => c.is_active === filterEstado.value)
+    }
+    return result
 })
 
 const activeCount = computed(() => (categories.value ?? []).filter((c: any) => c.is_active).length)
 const inactiveCount = computed(() => (categories.value ?? []).filter((c: any) => !c.is_active).length)
 
 const clearFilters = () => {
-  search.value = ''
-  filterEstado.value = null
+    search.value = ''
+    filterEstado.value = null
 }
 
 // Helper para obtener nombre de marca
 const getBrandName = (brandId: string) => {
-  return brands.value.find(b => b.id === brandId)?.name || 'Sin marca'
+    return brands.value.find(b => b.id === brandId)?.name || 'Sin marca'
 }
 
 // Refresh
 const refreshing = ref(false)
 const handleRefresh = async () => {
-  refreshing.value = true
-  await refresh()
-  refreshing.value = false
+    refreshing.value = true
+    await refresh()
+    refreshing.value = false
 }
 
 // Delete modal
 const deleteModalOpen = ref(false)
 const deleteModal = reactive({
-  loading: false,
-  categoria: null as any
+    loading: false,
+    categoria: null as any
 })
 
 const confirmDelete = (categoria: any) => {
-  deleteModal.categoria = categoria
-  deleteModalOpen.value = true
+    deleteModal.categoria = categoria
+    deleteModalOpen.value = true
 }
 
 const handleDelete = async () => {
-  deleteModal.loading = true
-  await deleteCategory(deleteModal.categoria.id)
-  await refresh()
-  deleteModal.loading = false
-  deleteModalOpen.value = false
+    deleteModal.loading = true
+    await deleteCategory(deleteModal.categoria.id)
+    await refresh()
+    deleteModal.loading = false
+    deleteModalOpen.value = false
 }
 
 // Edit
 const editCategory = (id: string) => {
-  navigateTo(`/admin/categorias/${id}`)
+    navigateTo(`/admin/categorias/${id}`)
 }
 
 // Columns
 const columns = [
-  { accessorKey: 'name', header: 'Nombre' },
-  { accessorKey: 'imagen', header: 'Imagen' },
-  { accessorKey: 'marca', header: 'Marca' },
-  { accessorKey: 'slug', header: 'Slug' },
-  { accessorKey: 'is_active', header: 'Estado' },
-  { id: 'actions', header: 'Acciones' }
+    { accessorKey: 'name', header: 'Nombre' },
+    { accessorKey: 'imagen', header: 'Imagen' },
+    { accessorKey: 'marca', header: 'Marca' },
+    { accessorKey: 'slug', header: 'Slug' },
+    { accessorKey: 'is_active', header: 'Estado' },
+    { id: 'actions', header: 'Acciones' }
 ]
 </script>
