@@ -86,12 +86,9 @@
 </template>
 
 <script setup lang="ts">
-    const props = defineProps({
-        productId: {
-            type: Number,
-            required: true
-        }
-    })
+    const props = defineProps<{ 
+        productId?: number
+    }>()
 
     const { getProductImages, uploadProductImage, setPrimaryImage: setPrimaryImageApi, deleteProductImage } = useProductImages()
     const toast = useToast()
@@ -103,6 +100,10 @@
 
     // Cargar imágenes al montar
     onMounted(async () => {
+        if (!props.productId) {
+            //console.log('ℹ️ Nuevo producto, sin imágenes aún')
+            return
+        }
         await loadImages()
     })
 

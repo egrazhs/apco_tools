@@ -21,7 +21,8 @@
 
 	const marca_options = computed(() => (marcas || []).map(m => ({
 		label: m.name,
-		value: m.id as number  // si m.id ya viene como number desde Supabase, está bien
+		value: m.id as number,
+		slug: m.slug   
 	})))
 
 	const category_options = computed(() => (categories || []).map(c =>({

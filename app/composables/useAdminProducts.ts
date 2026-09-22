@@ -77,7 +77,7 @@ export const useAdminProducts = () => {
             // La coma separa condiciones en el filtro .or() de PostgREST,
             // así que la quitamos para no romper la sintaxis del filtro
             const safeTerm = term.replace(/,/g, ' ')
-            query = query.or(`name.ilike.%${safeTerm}%,code.ilike.%${safeTerm}%`)
+            query = query.or(`name.ilike.%${safeTerm}%,code.ilike.%${safeTerm}%,slug.ilike.%${safeTerm}%`)
         }
 
         if (isActive !== null && isActive !== undefined) {

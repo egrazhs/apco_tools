@@ -266,12 +266,9 @@
 
 <script setup lang="ts">
     const props = defineProps<{ 
-        productId: {
-            type: Number,
-            required: true
-        },
+        productId?: number,  // ← Cambiar de required a opcional
         initialData?: any, 
-        marcas: Array<{ label: string; value: number }>,
+        marcas: Array<{ label: string; value: number; slug: string }>,
         categories: Array<{ label: string; value: number }>,
         subcategories: Array<{ label: string; value: number }>,
     }>()
@@ -306,20 +303,37 @@
         }))
     )
 
-    // Watch para ver cambios en tiempo real
-    watch(() => form.subcategory_ids, (newVal) => {
-        console.log('🔄 form.subcategory_ids cambió a:', newVal)
-    }, { immediate: true })
+    // Función helper para generar slug con marca
+    const generateSlug = (productName: string, brandId: number | null) => {
+        if (!productName) return ''
 
-    // Auto-genera slug desde nombre
-    watch(() => form.name, (val) => {
+        // Generar slug del producto
+        const productSlug = productName
+            .toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+
+        // Si hay marca seleccionada, agregar su slug
+        if (brandId) {
+            const brand = props.marcas.find(b => b.value === brandId)
+            
+            const brandSlug = brand?.slug || ''
+            const finalSlug = brandSlug ? `${productSlug}-${brandSlug}` : productSlug
+
+            return finalSlug
+        }
+
+        return productSlug
+    }
+
+    // Auto-genera slug desde nombre y marca
+    watch([() => form.name, () => form.brand_id], ([name, brandId]) => {
+
         if (!isEdit.value || !form.slug) {
-            form.slug = val
-                .toLowerCase()
-                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-z0-9\s-]/g, '')
-                .trim()
-                .replace(/\s+/g, '-')
+            const nuevoSlug = generateSlug(name, brandId)
+            form.slug = nuevoSlug
         }
     })
 

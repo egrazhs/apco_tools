@@ -67,13 +67,34 @@
                         </div>
                     </template>
 
+                    <template #price-cell="{ row }">
+                        <span class="font-medium text-gray-900 dark:text-white">
+                            {{ formatPrice(row.original.price) }}
+                        </span>
+                    </template>
+
+                    <template #is_active-cell="{ row }">
+                        <UBadge
+                            :color="row.original.is_active ? 'green' : 'red'"
+                            variant="subtle"
+                            class="gap-1.5"
+                        >
+                        <span
+                            class="w-1.5 h-1.5 rounded-full inline-block"
+                            :class="row.original.is_active ? 'bg-green-500' : 'bg-red-500'"
+                        />
+                            {{ row.original.is_active ? 'Activa' : 'Inactiva' }}
+                        </UBadge>
+                    </template>
+
                     <template #actions-cell="{ row }">
                         <div class="flex items-center gap-1">
                             <UTooltip text="Editar">
                                 <UButton size="xs" color="gray" variant="ghost" icon="i-heroicons-pencil-square" @click="editProduct(row.original.id)" />
                             </UTooltip>
-                            <UTooltip text="Eliminar">
-                                <UButton size="xs" color="red" variant="ghost" icon="i-heroicons-trash" @click="confirmDelete(row.original)" />
+
+                            <UTooltip :text="row.original.is_active ? 'Desactivar producto' : 'Activar producto'">
+                                <UButton size="xs" :color="row.original.is_active ? 'green' : 'gray'"variant="ghost" :icon="row.original.is_active ? 'i-heroicons-eye' : 'i-heroicons-eye-slash'" :loading="toggling[row.original.id]" @click="toggleProduct(row.original)" />
                             </UTooltip>
                         </div>
                     </template>
@@ -121,6 +142,8 @@
         middleware: ['auth'],
         layout: false,
     })
+
+    const supabase = useSupabaseClient()
 
     const { getAdminProducts } = useAdminProducts()
     const { deleteProduct } = useProducts()
@@ -204,6 +227,32 @@
 
     const editProduct = (id: number) => {
         navigateTo(`/admin/productos/${id}`)
+    }
+
+    // Función para formatear precios
+    const formatPrice = (price: number | null) => {
+        if (price === null || price === undefined) return '$0.00'
+        return new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(price)
+    }
+
+    const toggling = ref<Record<number, boolean>>({})
+
+    const toggleProduct = async (product: AdminProductListItem) => {
+        toggling.value[product.id] = true
+        try {
+            await supabase
+                .from('products')
+                .update({ is_active: !product.is_active })
+                .eq('id', product.id)
+            await refresh()
+        } finally {
+            toggling.value[product.id] = false
+        }
     }
 
     const columns = [
