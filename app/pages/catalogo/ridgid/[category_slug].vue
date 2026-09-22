@@ -1,7 +1,6 @@
 <template>
     <div class="min-h-screen bg-white">
         <UContainer class="py-8 md:py-12 xl:py-16">
- 
             <!-- Breadcrumb -->
             <nav class="flex items-center gap-2 text-xs uppercase tracking-widest text-stone-400 mb-8">
                 <NuxtLink to="/" class="hover:text-red-600 transition-colors">Inicio</NuxtLink>
@@ -40,10 +39,10 @@
                     {{ sub.name }}
                 </button>
             </div>
- 
+
+
             <!-- Layout principal -->
             <div class="flex gap-8 xl:gap-12 items-start">
- 
                 <!-- ── Sidebar (desktop) ───────────────────────────────────── -->
                 <aside class="hidden lg:block w-56 xl:w-64 shrink-0 sticky top-8">
                     <div class="border border-stone-200">
@@ -86,10 +85,10 @@
                         </nav>
                     </div>
                 </aside>
- 
+
+
                 <!-- ── Contenido principal ─────────────────────────────────── -->
                 <main class="flex-1 min-w-0">
- 
                     <!-- Título de sección -->
                     <div class="mb-8 xl:mb-10">
                         <h1 class="font-serif text-3xl md:text-4xl xl:text-5xl text-stone-800 leading-tight">
@@ -171,48 +170,65 @@
 </template>
 
 <script setup lang="ts">
-const route = useRoute()
-const router = useRouter()
+    const route = useRoute()
+    const router = useRouter()
 
-const { getCategoryBySlug } = useCategories()
-const { getSubcategoriesByCategory } = useSubcategories()
-const { getProductsBySubcategory } = useProducts()
+    const { getCategoryBySlug } = useCategories()
+    const { getSubcategoriesByCategory } = useSubcategories()
+    const { getProductsBySubcategory } = useProducts()
 
-const { data:category_data } = await getCategoryBySlug(route.params.slug)
-const { data: subcategories_data } = await getSubcategoriesByCategory(category_data.id)
+    // ── CARGAR CATEGORÍA Y SUBCATEGORÍAS ──────────────────────────────────
+    const { data: categoryData } = await useAsyncData(
+        `category-${route.params.category_slug}`,
+        async () => {
+            const { data } = await getCategoryBySlug(route.params.category_slug)
+            return data
+        }
+    )
 
-const category = ref(category_data || {} )
-const subcategories = ref(subcategories_data || [])
+    const { data: subcategoriesData } = await useAsyncData(
+        `subcategories-${categoryData.value?.id}`,
+        async () => {
+            if (!categoryData.value?.id) return []
+            const { data } = await getSubcategoriesByCategory(categoryData.value.id)
+            return data ?? []
+        },
+        { watch: [() => categoryData.value?.id] }
+    )
 
-const selectedSub = computed(() =>
-    subcategories.value.find(s => s.slug === route.query.sub) ?? null
-)
+    // ── REFS REACTIVOS ────────────────────────────────────────────────────
+    const category = computed(() => categoryData.value || {})
+    const subcategories = computed(() => subcategoriesData.value || [])
 
+    // ── SUBCATEGORÍA SELECCIONADA ─────────────────────────────────────────
+    const selectedSub = computed(() => 
+        subcategories.value.find(s => s.slug === route.query.sub) ?? null
+    )
 
-// ── 3. Productos de la subcategoría seleccionada ──────────────────────────────
-const { data: products, pending: loadingProducts } = await useAsyncData(
-    `products-${route.query.sub}`,   // ← clave por sub, no por slug de categoría
-    async () => {
-        if (!selectedSub.value) return []
-        const { data } = await getProductsBySubcategory(selectedSub.value.id)
-        return data ?? []
-    },
-    { watch: [() => route.query.sub] }
-)
+    // ── PRODUCTOS DE LA SUBCATEGORÍA SELECCIONADA ─────────────────────────
+    const { data: products, pending: loadingProducts } = await useAsyncData(
+        () => `products-${selectedSub.value?.id}`,
+        async () => {
+            if (!selectedSub.value?.id) return []
+            const { data } = await getProductsBySubcategory(selectedSub.value.id)
+            return data ?? []
+        },
+        { watch: [() => selectedSub.value?.id] }
+    )
 
-// ── Navegación ────────────────────────────────────────────────────────────────
-function selectSubcategory(sub: { slug: string }) {
-    router.push({ query: { sub: sub.slug } })
-}
+    // ── NAVEGACIÓN ────────────────────────────────────────────────────────
+    function selectSubcategory(sub: { slug: string }) {
+        router.push({ query: { sub: sub.slug } })
+    }
 
-function clearSub() {
-    router.push({ query: {} })
-}
+    function clearSub() {
+        router.push({ query: {} })
+    }
 
-// ── SEO ───────────────────────────────────────────────────────────────────────
-useSeoMeta({
-    title: () => selectedSub.value
-        ? `${selectedSub.value.name} | ${category.value?.name} | RIDGID — APCO Tools`
-        : `${category.value?.name} | RIDGID — APCO Tools`,
-})
+    // ── SEO ───────────────────────────────────────────────────────────────
+    useSeoMeta({
+        title: () => selectedSub.value
+            ? `${selectedSub.value.name} | ${category.value?.name} | RIDGID — APCO Tools`
+            : `${category.value?.name} | RIDGID — APCO Tools`,
+    })
 </script>

@@ -173,11 +173,17 @@
                             />
                         </UFormField>
 
-                        <UFormField label="Subcategoría" class="col-span-1">
-                            <USelect
-                                v-model="form.subcategory_id"
-                                :items="subcategories"
-                                placeholder="Selecciona una Subcategoría"
+
+                        <UFormField label="Subcategoría/s" required class="col-span-2">
+                            <!--{{subcategoriesOptions}}-->
+                            <USelectMenu
+                                v-model="form.subcategory_ids"
+                                :items="subcategoriesOptions"
+                                value-key="value"
+                                label-key="label"
+                                placeholder="Selecciona una o más subcategorías"
+                                multiple
+                                searchable
                                 size="lg"
                                 icon="i-heroicons-building-storefront"
                             />
@@ -276,7 +282,9 @@
     const form = reactive({
         brand_id: props.initialData?.brand_id || null,
         category_id: props.initialData?.category_id || null,
-        subcategory_id: props.initialData?.subcategory_id || null,
+        subcategory_ids: props.initialData?.product_subcategories 
+            ? props.initialData.product_subcategories.map((ps: any) => Number(ps.subcategory_id))
+            : [],
         name: props.initialData?.name || '',
         long_description: props.initialData?.long_description || '',
         short_description: props.initialData?.short_description || '',
@@ -291,7 +299,19 @@
         specifications: props.initialData?.specifications ?? '',
     })
 
-    // Auto-genera slug desde nombre (solo al crear o si slug está vacío)
+    const subcategoriesOptions = computed(() => 
+        (props.subcategories || []).map(s => ({
+            label: s.label,
+            value: s.value
+        }))
+    )
+
+    // Watch para ver cambios en tiempo real
+    watch(() => form.subcategory_ids, (newVal) => {
+        console.log('🔄 form.subcategory_ids cambió a:', newVal)
+    }, { immediate: true })
+
+    // Auto-genera slug desde nombre
     watch(() => form.name, (val) => {
         if (!isEdit.value || !form.slug) {
             form.slug = val
@@ -304,10 +324,16 @@
     })
 
     const handleSubmit = () => { 
+        if (!form.subcategory_ids || form.subcategory_ids.length === 0) {
+            alert('Debes seleccionar al menos una subcategoría para el producto')
+            return
+        }
+
         emit('submit', { 
-        ...form, 
-        brand_id: form.brand_id ? Number(form.brand_id) : null, 
-        category_id: form.category_id ? Number(form.category_id) : null, 
-        subcategory_id: form.subcategory_id ? Number(form.subcategory_id) : null 
-    }) }
+            ...form, 
+            brand_id: form.brand_id ? Number(form.brand_id) : null, 
+            category_id: form.category_id ? Number(form.category_id) : null, 
+            subcategory_ids: form.subcategory_ids.map(id => Number(id))
+        }) 
+    }
 </script>

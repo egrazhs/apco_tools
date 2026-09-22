@@ -23,6 +23,7 @@
 		getSubcategories(),
 	])
 
+	
 	const marcas = ref(brandsData || [])
 	const product = ref(productData)
 	const categories = ref(categoriesData)

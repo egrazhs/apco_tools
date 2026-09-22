@@ -9,6 +9,9 @@ export default defineEventHandler(async (event) => {
     
     console.log('🔍 CONFIG DISPONIBLE:')
     console.log('   resendApiKey:', config.resendApiKey ? '✅ EXISTE' : '❌ NO EXISTE')
+    if(config.resendApiKey){
+        console.log('apikey:', config.resendApiKey)
+    }
     console.log('   mailFrom:', config.mailFrom || '❌ NO EXISTE')
     console.log('   mailToContact:', config.mailToContact || '❌ NO EXISTE')
 
