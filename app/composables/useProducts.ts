@@ -130,6 +130,28 @@ export const useProducts = () => {
 	    return { data: products, error }
 	}
 
+	const getProductsByBrand = async (brand_id: string | number) => {
+	    if (!brand_id) throw new Error('ID de marca requerido')
+	    
+	    return await supabase
+	        .from('products')
+	        .select(`
+	            *,
+	            brand:brands(*),
+	            category:categories(*),
+	            product_subcategories(
+	                id,
+	                product_id,
+	                subcategory_id,
+	                created_at,
+	                subcategories(id, name, slug, category_id, is_active)
+	            )
+	        `)
+	        .eq('brand_id', brand_id)
+	        .eq('is_active', true)
+	        .order('created_at', { ascending: false })
+	}
+
     const getTotalProductsByBrand = async (brand_id: string) => {
         if (!brand_id) throw new Error('ID requerido')
         return await supabase
@@ -263,6 +285,7 @@ export const useProducts = () => {
         getProducts,
         getProductById,
         getProductsBySubcategory,
+        getProductsByBrand,
         getTotalProductsByBrand,
         createProduct,
         updateProduct,
