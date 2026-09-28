@@ -2,11 +2,19 @@
     <section class="container mx-auto">
         <!-- Header con breadcrumb -->
         <div class="pt-20 pb-8 flex items-center gap-2 text-sm text-gray-600">
-            <NuxtLink to="/productos" class="hover:text-red-600 transition-colors">
-                Productos
-            </NuxtLink>
-            <span>/</span>
-            <span class="text-stone-900 font-semibold">KLEIN</span>
+
+            <!-- Breadcrumb -->
+            <nav class="flex items-center gap-2 text-xs uppercase tracking-widest text-stone-400 mb-8">
+                <NuxtLink to="/" class="hover:text-red-600 transition-colors">
+                    Inicio
+                </NuxtLink>
+                <span>/</span>
+                <NuxtLink to="/productos" class="hover:text-red-600 transition-colors">
+                    Catálogo
+                </NuxtLink>
+                <span>/</span>
+                <span class="text-stone-600">KLEIN</span>
+            </nav>
         </div>
 
         <!-- Encabezado con logo y descripción -->
