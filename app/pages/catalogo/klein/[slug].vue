@@ -58,7 +58,7 @@
                                 class="w-3 h-3 text-stone-400 group-hover:text-red-600 transition-colors"
                             />
                             <span class="text-xs uppercase tracking-widest text-stone-500 group-hover:text-red-600 transition-colors">
-                                RIDGID
+                                KLEIN
                             </span>
                         </NuxtLink>
  

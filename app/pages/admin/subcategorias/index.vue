@@ -100,6 +100,7 @@
 					<template #name-cell="{ row }">
 						<div class="flex items-center gap-3">
 							<div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
+								
 								<UIcon name="i-heroicons-tag" class="w-4 h-4 text-primary-500" />
 							</div>
 							<span class="font-medium text-gray-900 dark:text-white">{{ row.original.name }}</span>
@@ -205,9 +206,9 @@ definePageMeta({
     layout: false,
 })
 
-const { getSubcategories, deleteSubcategory } = useSubcategories()
+const { getSubcategories, getSubcategoriesWithDetails, deleteSubcategory } = useSubcategories()
 const { data: subcategories, refresh } = await useAsyncData('subcategories', async () => {
-    const { data } = await getSubcategories()
+    const { data } = await getSubcategoriesWithDetails()
     return data ?? []
 })
 
@@ -280,6 +281,7 @@ const editSubcategory = (id: string) => {
 // Columns
 const columns = [
     { accessorKey: 'name', header: 'Nombre' },
+    { accessorKey: 'categories.brands.name', header: 'Marca'},
     { accessorKey: 'slug', header: 'Slug' },
     { accessorKey: 'is_active', header: 'Estado' },
     { id: 'actions', header: 'Acciones' }

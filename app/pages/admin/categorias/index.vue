@@ -343,9 +343,10 @@ const editCategory = (id: string) => {
 
 // Columns
 const columns = [
+	{ accessorKey: 'marca', header: 'Marca' },
 	{ accessorKey: 'name', header: 'Nombre' },
 	{ accessorKey: 'imagen', header: 'Imagen' },
-	{ accessorKey: 'marca', header: 'Marca' },
+	//{ accessorKey: 'description', header: 'Descripcion' },
 	{ accessorKey: 'slug', header: 'Slug' },
 	{ accessorKey: 'is_active', header: 'Estado' },
 	{ id: 'actions', header: 'Acciones' }

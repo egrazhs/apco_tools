@@ -9,20 +9,90 @@ export interface Subcategory {
 
 export const useSubcategories = () => {
 	const supabase = useSupabaseClient()
+	const { getPublicUrl } = useStorageImage('subcategory_images')
+	const PLACEHOLDER = '/img/placeholder-category.svg'
+
+	const resolveImageUrl = (category: Category): string => {
+		if (category.image_key) {
+			return getPublicUrl(category.image_key) || PLACEHOLDER
+		}
+		return PLACEHOLDER
+	}
+
+	/**
+	 * Mapea subcategorías raw añadiendo la URL de imagen resuelta
+	 */
+	const mapSubcategoriesWithImages = (categories: Category[]): Category[] => {
+		return categories.map(category => ({
+			...category,
+			image: resolveImageUrl(category)
+		}))
+	}
+
+
+
+
+
 
 	const getSubcategories = async () => {
-		return await supabase.from('subcategories').select('*').order('created_at', { ascending: false })
+		const {data, error} = await supabase.from('subcategories').select('*').order('created_at', { ascending: false })
+
+		if (error) return { data: null, error }
+
+		return { data: mapSubcategoriesWithImages(data || []), error: null }
 	}
 
 	const getSubcategoryById = async (id: string) => {
-		if (!id) throw new Error('ID requerido')
-		return await supabase.from('subcategories').select('*').eq('id', id).single()
+	    const { data, error } = await supabase
+	        .from('subcategories')
+	        .select(`
+	            *,
+	            categories(
+	                id,
+	                name,
+	                slug,
+	                brand_id,
+	                brands(id, name, slug)
+	            )
+	        `)
+	        .eq('id', id)
+	        .single()
+
+	    if (error) throw error
+	    return { data }
 	}
 
-	const getSubcategoriesByCategory = async (category_id: string) => {
-		if (!category_id) throw new Error('ID requerido')
-		return await supabase.from('subcategories').select('*').eq('category_id', category_id) 
-	}
+	const getSubcategoriesWithDetails = async () => {
+        const {data, error} = await supabase
+            .from('subcategories')
+            .select(`
+                *,
+                categories(
+                    id,
+                    name,
+                    slug,
+                    brand_id,
+                    brands(id, name, slug)
+                )
+            `)
+            .order('created_at', { ascending: false })
+
+        if (error) return { data: null, error }
+
+        return { data: mapSubcategoriesWithImages(data || []), error: null }
+    }
+
+	const getSubcategoriesByCategory = async (categoryId: number) => {
+        const { data, error } = await supabase
+            .from('subcategories')
+            .select('*')
+            .eq('category_id', categoryId)
+            .is('grouping_id', null)
+            .order('created_at', { ascending: true })
+
+        if (error) throw error
+        return { data: data || [] }
+    }
 
 	const createSubcategory = async (data: Category) => {
 		return await supabase.from('subcategories').insert(data).select().single()
@@ -38,5 +108,25 @@ export const useSubcategories = () => {
 		return await supabase.from('subcategories').delete().eq('id', id)
 	}
 
-	return { getSubcategories, getSubcategoryById, getSubcategoriesByCategory, createSubcategory, updateSubcategory, deleteSubcategory}
+	const getSubcategoriesByGrouping = async (groupingId: number) => {
+        const { data, error } = await supabase
+            .from('subcategories')
+            .select('*')
+            .eq('grouping_id', groupingId)
+            .order('created_at', { ascending: true })
+
+        if (error) throw error
+        return { data: data || [] }
+    }
+
+	return { 
+		getSubcategories,
+		getSubcategoriesWithDetails, 
+		getSubcategoryById, 
+		getSubcategoriesByCategory, 
+		createSubcategory, 
+		updateSubcategory, 
+		deleteSubcategory, 
+		getSubcategoriesByGrouping
+	}
 }

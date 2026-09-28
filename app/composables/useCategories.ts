@@ -35,11 +35,26 @@ export const useCategories = () => {
 	}
 	
 	const getCategories = async () => {
-		const { data, error } = await supabase.from('categories').select('*').order('created_at', { ascending: false })
-		
-		if (error) return { data: null, error }
-		
-		return { data: mapCategoriesWithImages(data || []), error: null }
+	    const { data, error } = await supabase
+	        .from('categories')
+	        .select('*, brands(name)')
+	    
+	    if (error) return { data: null, error }
+	    
+	    // Ordenar en el cliente: primero por marca, luego por nombre de categoría
+	    const sorted = (data || []).sort((a, b) => {
+	        const brandA = a.brands?.name || ''
+	        const brandB = b.brands?.name || ''
+	        
+	        // Comparar por marca
+	        const brandCompare = brandA.localeCompare(brandB, 'es-MX')
+	        if (brandCompare !== 0) return brandCompare
+	        
+	        // Si son la misma marca, comparar por nombre de categoría
+	        return a.name.localeCompare(b.name, 'es-MX')
+	    })
+	    
+	    return { data: mapCategoriesWithImages(sorted), error: null }
 	}
 	
 	const getCategoryById = async (id: string) => {
@@ -64,6 +79,18 @@ export const useCategories = () => {
 			data: data ? { ...data, image: resolveImageUrl(data) } : null, 
 			error: null 
 		}
+	}
+
+	const getCategoriesByBrandId = async (brandId: number) => {
+	    const { data, error } = await supabase
+	        .from('categories')
+	        .select('id, name, slug, brand_id')
+	        .eq('brand_id', brandId)
+	        .eq('is_active', true)
+	        .order('created_at', { ascending: false })
+
+	    if (error) throw error
+	    return { data: data || [] }
 	}
 	
 	const createCategory = async (data: Category) => {
@@ -112,14 +139,89 @@ export const useCategories = () => {
 		
 		return { data: mapCategoriesWithImages(categoriesWithProducts), error: null }
 	}
+
+
+	const getActiveCategories = async (brandId: string) => {
+	    if (!brandId) throw new Error('Brand ID requerido')
+	    
+	    // ── PASO 1: Obtener todas las categorías activas
+	    const { data: categories, error: catError } = await supabase
+	        .from('categories')
+	        .select('id, name, slug, is_active, brand_id, created_at, image_key')
+	        .eq('brand_id', brandId)
+	        .eq('is_active', true)
+	        .order('created_at', { ascending: false })
+	    
+	    if (catError) {
+	        return { data: null, error: catError }
+	    }
+	    
+	    if (!categories || categories.length === 0) {
+	        return { data: [], error: null }
+	    }
+	    
+	    // ── PASO 2: Obtener todas las subcategorías de estas categorías
+	    const categoryIds = categories.map(c => c.id)
+	    
+	    const { data: subcategories, error: subError } = await supabase
+	        .from('subcategories')
+	        .select('id, category_id, name')
+	        .in('category_id', categoryIds)
+	    
+	    if (subError) {
+	        return { data: null, error: subError }
+	    }
+	    
+	    
+	    // ── PASO 3: Obtener productos de estas subcategorías
+	    const subcategoryIds = subcategories?.map(s => s.id) || []
+	    
+	    if (subcategoryIds.length === 0) {
+	        return { data: [], error: null }
+	    }
+	    
+	    const { data: productSubcategories, error: psError } = await supabase
+	        .from('product_subcategories')
+	        .select('subcategory_id, products(id, is_active)')
+	        .in('subcategory_id', subcategoryIds)
+	    
+	    if (psError) {
+	        return { data: null, error: psError }
+	    }
+	    
+	    // ── PASO 4: Filtrar subcategorías con productos activos
+	    const subcategoryIdsWithActiveProducts = new Set(
+	        (productSubcategories || [])
+	            .filter(ps => ps.products?.is_active === true)
+	            .map(ps => ps.subcategory_id)
+	    )
+	    
+	    // ── PASO 5: Obtener categorías que tienen esas subcategorías
+	    const categoryIdsWithProducts = new Set(
+	        (subcategories || [])
+	            .filter(sub => subcategoryIdsWithActiveProducts.has(sub.id))
+	            .map(sub => sub.category_id)
+	    )
+	    
+	    const categoriesWithProducts = (categories || []).filter(cat =>
+	        categoryIdsWithProducts.has(cat.id)
+	    )
+	    
+	    return { 
+	        data: mapCategoriesWithImages(categoriesWithProducts), 
+	        error: null 
+	    }
+	}
 	
 	return { 
 		getCategories, 
 		getCategoryById, 
-		getCategoryBySlug, 
+		getCategoryBySlug,
+		getCategoriesByBrandId, 
 		createCategory, 
 		updateCategory, 
 		deleteCategory, 
-		getCategoriesByBrand 
+		getCategoriesByBrand,
+		getActiveCategories 
 	}
 }

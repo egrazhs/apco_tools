@@ -51,14 +51,14 @@
 </template>
 
 <script setup>
-    const { getCategoriesByBrand } = useCategories()
+    const { getCategoriesByBrand, getActiveCategories } = useCategories()
     
     const BRAND_ID = '6'
 
     const { data: categories, pending, error } = await useAsyncData(
         'ridgid-categories',
         async () => {
-            const { data, error: fetchError } = await getCategoriesByBrand(BRAND_ID)
+            const { data, error: fetchError } = await getActiveCategories(BRAND_ID)
             
             if (fetchError) {
                 console.error('Error fetching RIDGID categories:', fetchError)

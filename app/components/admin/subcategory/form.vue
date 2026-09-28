@@ -1,3 +1,5 @@
+
+
 <template>
     <div class="py-6">
         <UCard class="max-w-lg mx-auto">
@@ -19,6 +21,7 @@
 
             <UForm @submit="handleSubmit" class="flex flex-col">
 
+                <!-- INFORMACIÓN GENERAL -->
                 <div class="py-6 border-b border-gray-700/50">
                     <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary-400 mb-5">
                         <UIcon name="i-heroicons-information-circle" />
@@ -26,50 +29,145 @@
                     </div>
 
                     <div class="flex flex-col gap-4">
-                        <UFormField label="Nombre de la subcategoría" required>
+                        <!-- Nombre -->
+                        <UFormField label="Nombre de la subcategoría *" required>
                             <UInput
                                 v-model="form.name"
-                                placeholder="Ej: Herramientas Eléctricas"
+                                placeholder="Ej: Tarrajas Manuales"
                                 size="lg"
-                                icon="i-heroicons-folder"
+                                icon="i-heroicons-pencil"
                             />
                         </UFormField>
 
+                        <!-- Slug (auto-generado) -->
                         <UFormField label="Slug">
                             <UInput
                                 v-model="form.slug"
-                                placeholder="ej: herramientas-electricas"
+                                placeholder="auto-generado"
                                 size="lg"
                                 icon="i-heroicons-link"
+                                :disabled="true"
                             />
                             <template #hint>
-                                <span class="text-xs text-gray-500">Usado en la URL de la subcategoría</span>
+                                <span class="text-xs text-gray-500">Se genera automáticamente: nombre-marca</span>
                             </template>
                         </UFormField>
 
-                        <UFormField label="Estado">
-                            <div
-                                class="flex items-center justify-between px-4 rounded-lg border h-[42px] transition-all duration-200"
-                                :class="form.is_active
-                                    ? 'border-primary-500/40 bg-primary-500/5'
-                                    : 'border-gray-700 bg-gray-800/50'"
+
+
+                        <!-- Categoría (FILTRADA por marca) -->
+                        <UFormField label="Categoría *" required>
+                            <USelect
+                                v-model="form.category_id"
+                                :items="categoriesByBrand"
+                                placeholder="Selecciona una categoría"
+                                size="lg"
+                                icon="i-heroicons-folder"
+                            />
+                            <template v-if="!form.brand_id" #hint>
+                                <span class="text-xs text-gray-500">Selecciona una marca primero</span>
+                            </template>
+                            <template v-else-if="form.brand_id && categoriesByBrand.length === 0" #hint>
+                                <span class="text-xs text-yellow-500">No hay categorías para esta marca</span>
+                            </template>
+                        </UFormField>
+
+                        <!-- Marca (FILTRO) -->
+                        <UFormField label="Marca *" required>
+                            <USelect
+                                v-model="form.brand_id"
+                                :items="marcas"
+                                placeholder="Selecciona una marca"
+                                size="lg"
+                                icon="i-heroicons-building-storefront"
+                                value-attribute="value"
+                            />
+                        </UFormField>
+                    </div>
+                </div>
+
+                <!-- ESTADO -->
+                <div class="py-6 border-b border-gray-700/50">
+                    <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary-400 mb-5">
+                        <UIcon name="i-heroicons-cog-6-tooth" />
+                        <span>Estado</span>
+                    </div>
+
+                    <div
+                        class="flex items-center justify-between px-4 rounded-lg border h-[42px] transition-all duration-200"
+                        :class="form.is_active
+                            ? 'border-primary-500/40 bg-primary-500/5'
+                            : 'border-gray-700 bg-gray-800/50'"
+                    >
+                        <div class="flex items-center gap-2">
+                            <UIcon
+                                :name="form.is_active ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
+                                class="text-lg transition-colors"
+                                :class="form.is_active ? 'text-primary-400' : 'text-gray-500'"
+                            />
+                            <div>
+                                <p class="text-sm font-medium leading-tight">
+                                    {{ form.is_active ? 'Activa' : 'Inactiva' }}
+                                </p>
+                                <p class="text-[10px] text-gray-500 leading-none mt-0.5">
+                                    {{ form.is_active ? 'Visible en tienda' : 'Oculta en tienda' }}
+                                </p>
+                            </div>
+                        </div>
+                        <USwitch v-model="form.is_active" size="lg" />
+                    </div>
+                </div>
+
+                <!-- IMAGEN -->
+                <div class="py-6 border-b border-gray-700/50">
+                    <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary-400 mb-5">
+                        <UIcon name="i-heroicons-photo" />
+                        <span>Imagen de la Subcategoría</span>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                        <div v-if="imagePreview" class="relative">
+                            <img
+                                :src="imagePreview"
+                                alt="Preview"
+                                class="w-full h-48 object-cover rounded-lg border border-gray-700"
+                            />
+                            <UButton
+                                type="button"
+                                color="red"
+                                variant="ghost"
+                                size="sm"
+                                icon="i-heroicons-x-mark"
+                                class="absolute top-2 right-2"
+                                @click="clearImage"
                             >
-                                <div class="flex items-center gap-2">
-                                    <UIcon
-                                        :name="form.is_active ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'"
-                                        class="text-lg transition-colors"
-                                        :class="form.is_active ? 'text-primary-400' : 'text-gray-500'"
-                                    />
-                                    <div>
-                                        <p class="text-sm font-medium leading-tight">
-                                            {{ form.is_active ? 'Activa' : 'Inactiva' }}
-                                        </p>
-                                        <p class="text-[10px] text-gray-500 leading-none mt-0.5">
-                                            {{ form.is_active ? 'Visible en tienda' : 'Oculta en tienda' }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <USwitch v-model="form.is_active" size="lg" />
+                                Eliminar
+                            </UButton>
+                        </div>
+
+                        <UFormField :label="imagePreview ? 'Cambiar imagen' : 'Subir imagen'">
+                            <div class="flex flex-col gap-2">
+                                <input
+                                    ref="fileInput"
+                                    type="file"
+                                    accept="image/*"
+                                    class="hidden"
+                                    @change="handleFileSelect"
+                                />
+                                <UButton
+                                    type="button"
+                                    color="gray"
+                                    variant="outline"
+                                    icon="i-heroicons-arrow-up-tray"
+                                    class="w-full"
+                                    :loading="uploadingImage"
+                                    @click="$refs.fileInput?.click()"
+                                >
+                                    {{ uploadingImage ? 'Subiendo...' : 'Seleccionar imagen' }}
+                                </UButton>
+                                <p class="text-xs text-gray-500">
+                                    JPG, PNG o WebP. Máximo 5MB.
+                                </p>
                             </div>
                         </UFormField>
                     </div>
@@ -91,6 +189,7 @@
                         type="submit"
                         size="lg"
                         :icon="isEdit ? 'i-heroicons-check' : 'i-heroicons-plus'"
+                        :disabled="!form.brand_id || !form.category_id || !form.name || uploadingImage"
                     >
                         {{ isEdit ? 'Guardar cambios' : 'Crear subcategoría' }}
                     </UButton>
@@ -101,28 +200,121 @@
     </div>
 </template>
 
+
 <script setup lang="ts">
-    const props = defineProps<{ initialData?: any }>()
+    const props = defineProps<{
+        subcategory_id: Number
+        initialData?: any
+        marcas: Array<{ label: string; value: number; slug: string }>
+        categoriesByBrand: Array<{ label: string; value: number }>
+        initialBrandId?: number
+    }>()
+
+    const { uploadImage, getImageUrl, deleteImage } = useStorageImage('subcategory_images')
     const emit = defineEmits(['submit'])
+
     const isEdit = computed(() => !!props.initialData)
 
     const form = reactive({
+        brand_id: props.initialBrandId || null,
+        category_id: props.initialData?.category_id || null,
+        grouping_id: props.initialData?.grouping_id || null,
         name: props.initialData?.name || '',
         slug: props.initialData?.slug || '',
+        image_key: props.initialData?.image_key || null,
         is_active: props.initialData?.is_active ?? true,
     })
 
-    // Auto-genera slug desde nombre (solo al crear o si slug está vacío)
-    watch(() => form.name, (val) => {
-        if (!isEdit.value || !form.slug) {
-            form.slug = val
-                .toLowerCase()
-                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-z0-9\s-]/g, '')
-                .trim()
-                .replace(/\s+/g, '-')
+    // Imagen
+    const fileInput = ref(null)
+    const uploadingImage = ref(false)
+    const imagePreview = ref('')
+
+    // Cargar preview de imagen actual
+    onMounted(() => {
+        if (props.initialData?.image_key) {
+            imagePreview.value = getImageUrl(props.initialData.image_key)
         }
     })
 
-    const handleSubmit = () => { emit('submit', form) }
+    // ── GENERAR SLUG CON SUFIJO DE MARCA ───────────────────────────────
+    const generateSlug = () => {
+        // Obtener slug de marca seleccionada
+        const selectedMarca = props.marcas.find(m => m.value === form.brand_id)
+        const marcaSlug = selectedMarca?.slug || ''
+
+        // Generar slug base del nombre
+        let baseSlug = form.name
+            .toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+
+        // Combinar: nombre-marca
+        return marcaSlug ? `${baseSlug}-${marcaSlug}` : baseSlug
+    }
+
+    // Auto-generar slug cuando cambia nombre O marca
+    watch([() => form.name, () => form.brand_id], () => {
+        if (!isEdit.value || !form.slug) {
+            form.slug = generateSlug()
+        }
+    })
+
+    // ── MANEJO DE IMAGEN ───────────────────────────────────────────────
+    const handleFileSelect = async (e: Event) => {
+        const target = e.target as HTMLInputElement
+        const file = target.files?.[0]
+
+        if (!file) return
+
+        uploadingImage.value = true
+
+        try {
+            const result = await uploadImage(file)
+
+            if (result.success) {
+                form.image_key = result.imageKey
+                imagePreview.value = result.url
+
+                if (fileInput.value) {
+                    (fileInput.value as HTMLInputElement).value = ''
+                }
+            } else {
+                console.error('Error al subir imagen:', result.error)
+            }
+        } catch (err) {
+            console.error('Error:', err)
+        } finally {
+            uploadingImage.value = false
+        }
+    }
+
+    const clearImage = async () => {
+        if (isEdit.value && props.initialData?.image_key) {
+            await deleteImage(props.initialData.image_key)
+        }
+
+        form.image_key = ''
+        imagePreview.value = ''
+    }
+
+    // ── SUBMIT ─────────────────────────────────────────────────────────
+    const handleSubmit = () => {
+        if (!form.brand_id) {
+            alert('Selecciona una marca')
+            return
+        }
+        if (!form.category_id) {
+            alert('Selecciona una categoría')
+            return
+        }
+        if (!form.name.trim()) {
+            alert('El nombre es requerido')
+            return
+        }
+
+        emit('submit', form)
+    }
 </script>
