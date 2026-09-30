@@ -258,6 +258,7 @@
   const columns = [
     { accessorKey: 'name', header: 'Nombre' },
     { accessorKey: 'imagen', header: 'Logo' },
+    { accessorKey: 'order', header: 'Orden'},
     { id: 'actions', header: 'Acciones' }
   ]
 </script>
