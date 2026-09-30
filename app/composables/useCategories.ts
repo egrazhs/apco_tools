@@ -88,7 +88,7 @@ export const useCategories = () => {
 	        .select('id, name, slug, brand_id')
 	        .eq('brand_id', brandId)
 	        .eq('is_active', true)
-	        .order('created_at', { ascending: false })
+	        .order('order', { ascending: true })
 
 	    if (error) throw error
 	    return { data: data || [] }
@@ -117,7 +117,7 @@ export const useCategories = () => {
 			.select('*')
 			.eq('brand_id', brandId)
 			.eq('is_active', true)
-			.order('created_at', { ascending: false })
+			.order('order', { ascending: true })
 		
 		if (catError) return { data: null, error: catError }
 		

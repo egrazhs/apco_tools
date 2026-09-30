@@ -91,6 +91,18 @@
                                 icon="i-heroicons-folder"
                             />
                         </UFormField>
+
+                        <UFormField label="Orden de muestra" required class="col-span-2">
+                            <UInput
+                                v-model.number="form.order"
+                                type="number"
+                                min="0"
+                                step="1"
+                                placeholder="999"
+                                size="lg"
+                                icon="i-heroicons-numbered-list"
+                            />
+                        </UFormField>
                     </div>
                 </div>
 
@@ -198,7 +210,8 @@
         is_active: props.initialData?.is_active ?? true,
         brand_id: props.initialData?.brand_id || '',
         description: props.initialData?.description || '',
-        image_key: props.initialData?.image_key || ''
+        image_key: props.initialData?.image_key || '',
+        order: props.initialData?.order || 999
     })
 
     // Imagen

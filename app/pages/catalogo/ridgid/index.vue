@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-    const { getCategoriesByBrand, getActiveCategoriesByBrand } = useCategories()
+    const { getActiveCategoriesByBrand } = useCategories()
     
     const BRAND_ID = '6'
 
