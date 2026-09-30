@@ -189,6 +189,18 @@
                             />
                         </UFormField>
 
+                        <UFormField label="Orden de muestra" required class="col-span-2">
+                            <UInput
+                                v-model.number="form.order"
+                                type="number"
+                                min="0"
+                                step="1"
+                                placeholder="999"
+                                size="lg"
+                                icon="i-heroicons-numbered-list"
+                            />
+                        </UFormField>
+
                         <UFormField label="Estado del producto" class="col-span-1">
                             <div
                                 class="flex items-center justify-between px-4 rounded-lg border h-[42px] transition-all duration-200"
@@ -294,6 +306,7 @@
         mercadopago_link: props.initialData?.mercadopago_link ?? '',
         model: props.initialData?.model ?? '',
         specifications: props.initialData?.specifications ?? '',
+        order: props.initialData?.order || 999
     })
 
     const subcategoriesOptions = computed(() => 
