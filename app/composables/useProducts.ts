@@ -54,7 +54,7 @@ export const useProducts = () => {
                 )
             `)
             .eq('is_active', true)
-            .order('created_at', { ascending: false })
+            .order('order', { ascending: true })
     }
 
     const getProductById = async (id: string) => {
@@ -119,7 +119,7 @@ export const useProducts = () => {
 	        `)
 	        .in('id', productIds)
 	        .eq('is_active', true)
-	        .order('created_at', { ascending: false })
+	        .order('order', { ascending: true })
 
 	    //console.log('🎁 Products found:', products?.length || 0, products)
 	    
@@ -149,7 +149,7 @@ export const useProducts = () => {
 	        `)
 	        .eq('brand_id', brand_id)
 	        .eq('is_active', true)
-	        .order('created_at', { ascending: false })
+	        .order('order', { ascending: true })
 	}
 
     const getTotalProductsByBrand = async (brand_id: string) => {
