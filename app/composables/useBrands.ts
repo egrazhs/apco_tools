@@ -11,15 +11,16 @@ export const useBrands = () => {
 	const supabase = useSupabaseClient()
 
 	const getBrands = async () => {
-		return await supabase.from('brands').select('*')
+		return await supabase.from('brands').select('*').order('order', { ascending: true })
 	}
 
+	//Esta funcion se acomoda por nombre en vez de la columna order para los select de los crud
 	const getBrandsSorted = async () => {
     	return await supabase.from('brands').select('*').order('name', { ascending: true })
 	}
 
 	const getBrandsByDisplayOrder = async () => {
-		return await supabase.from('brands').select('*').order('display_order', { ascending: true })
+		return await supabase.from('brands').select('*').order('order', { ascending: true })
 	}
 
 	const getBrandById = async (id: string) => {

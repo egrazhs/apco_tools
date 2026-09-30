@@ -52,6 +52,18 @@
                             class="w-full"
                         />
                     </UFormField>
+
+                    <UFormField label="Orden de muestra" required class="col-span-2">
+                        <UInput
+                            v-model.number="form.order"
+                            type="number"
+                            min="0"
+                            step="1"
+                            placeholder="999"
+                            size="lg"
+                            icon="i-heroicons-numbered-list"
+                        />
+                    </UFormField>
                 </div>
 
                 <!-- IMAGEN -->
@@ -146,7 +158,8 @@
         name: props.initialData?.name || '',
         image_key: props.initialData?.image_key || '',
         description: props.initialData?.description || '',
-        slug: props.initialData?.slug || ''
+        slug: props.initialData?.slug || '',
+        order: props.initialData?.order || 999,
     })
 
     // Imagen
