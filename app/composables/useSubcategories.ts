@@ -35,7 +35,7 @@ export const useSubcategories = () => {
 
 
 	const getSubcategories = async () => {
-		const {data, error} = await supabase.from('subcategories').select('*').order('created_at', { ascending: false })
+		const {data, error} = await supabase.from('subcategories').select('*').order('order', { ascending: true })
 
 		if (error) return { data: null, error }
 
@@ -75,7 +75,7 @@ export const useSubcategories = () => {
                     brands(id, name, slug)
                 )
             `)
-            .order('created_at', { ascending: false })
+            .order('order', { ascending: true })
 
         if (error) return { data: null, error }
 
@@ -88,7 +88,7 @@ export const useSubcategories = () => {
             .select('*')
             .eq('category_id', categoryId)
             .is('grouping_id', null)
-            .order('created_at', { ascending: true })
+            .order('order', { ascending: true })
 
         if (error) throw error
         return { data: data || [] }
@@ -113,7 +113,7 @@ export const useSubcategories = () => {
             .from('subcategories')
             .select('*')
             .eq('grouping_id', groupingId)
-            .order('created_at', { ascending: true })
+            .order('order', { ascending: true })
 
         if (error) throw error
         return { data: data || [] }
