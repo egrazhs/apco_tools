@@ -1,5 +1,3 @@
-
-
 <template>
     <div class="py-6">
         <UCard class="max-w-lg mx-auto">
@@ -53,26 +51,7 @@
                             </template>
                         </UFormField>
 
-
-
-                        <!-- Categoría (FILTRADA por marca) -->
-                        <UFormField label="Categoría *" required>
-                            <USelect
-                                v-model="form.category_id"
-                                :items="categoriesByBrand"
-                                placeholder="Selecciona una categoría"
-                                size="lg"
-                                icon="i-heroicons-folder"
-                            />
-                            <template v-if="!form.brand_id" #hint>
-                                <span class="text-xs text-gray-500">Selecciona una marca primero</span>
-                            </template>
-                            <template v-else-if="form.brand_id && categoriesByBrand.length === 0" #hint>
-                                <span class="text-xs text-yellow-500">No hay categorías para esta marca</span>
-                            </template>
-                        </UFormField>
-
-                        <!-- Marca (FILTRO) -->
+                        <!-- Marca (FILTRO: define qué categorías se listan) -->
                         <UFormField label="Marca *" required>
                             <USelect
                                 v-model="form.brand_id"
@@ -81,6 +60,36 @@
                                 size="lg"
                                 icon="i-heroicons-building-storefront"
                                 value-attribute="value"
+                            />
+                        </UFormField>
+
+                        <!-- Categoría (FILTRADA por marca) -->
+                        <UFormField label="Categoría *" required>
+                            <USelect
+                                v-model="form.category_id"
+                                :items="filteredCategories"
+                                placeholder="Selecciona una categoría"
+                                size="lg"
+                                icon="i-heroicons-folder"
+                                :disabled="!form.brand_id"
+                            />
+                            <template v-if="!form.brand_id" #hint>
+                                <span class="text-xs text-gray-500">Selecciona una marca primero</span>
+                            </template>
+                            <template v-else-if="filteredCategories.length === 0" #hint>
+                                <span class="text-xs text-yellow-500">No hay categorías para esta marca</span>
+                            </template>
+                        </UFormField>
+
+                        <UFormField label="Orden de muestra" required class="col-span-2">
+                            <UInput
+                                v-model.number="form.order"
+                                type="number"
+                                min="0"
+                                step="1"
+                                placeholder="999"
+                                size="lg"
+                                icon="i-heroicons-numbered-list"
                             />
                         </UFormField>
                     </div>
@@ -202,12 +211,10 @@
 
 
 <script setup lang="ts">
-    const props = defineProps<{
-        subcategory_id: Number
+    const props = defineProps<{ 
         initialData?: any
         marcas: Array<{ label: string; value: number; slug: string }>
-        categoriesByBrand: Array<{ label: string; value: number }>
-        initialBrandId?: number
+        categories: Array<{ label: string; value: number; brand_id: number }>
     }>()
 
     const { uploadImage, getImageUrl, deleteImage } = useStorageImage('subcategory_images')
@@ -215,14 +222,30 @@
 
     const isEdit = computed(() => !!props.initialData)
 
+    // Marca inicial: en edición sale de la categoría actual; en create queda null
+    const initialBrandId = props.categories
+        .find(c => c.value === props.initialData?.category_id)?.brand_id ?? null
+
     const form = reactive({
-        brand_id: props.initialBrandId || null,
+        brand_id: initialBrandId as number | null,
         category_id: props.initialData?.category_id || null,
         grouping_id: props.initialData?.grouping_id || null,
         name: props.initialData?.name || '',
         slug: props.initialData?.slug || '',
         image_key: props.initialData?.image_key || null,
         is_active: props.initialData?.is_active ?? true,
+        order: props.initialData?.order || 999
+    })
+
+    // ── CATEGORÍAS FILTRADAS POR MARCA ─────────────────────────────────
+    const filteredCategories = computed(() =>
+        props.categories.filter(c => c.brand_id === form.brand_id)
+    )
+
+    // Al cambiar de marca, la categoría elegida ya no aplica.
+    // No dispara en la precarga de edición (brand_id se asigna al crear el reactive).
+    watch(() => form.brand_id, () => {
+        form.category_id = null
     })
 
     // Imagen
@@ -239,6 +262,9 @@
 
     // ── GENERAR SLUG CON SUFIJO DE MARCA ───────────────────────────────
     const generateSlug = () => {
+        console.log('brand_id:', form.brand_id, typeof form.brand_id)
+        console.log('marcas:', JSON.stringify(props.marcas))
+        
         // Obtener slug de marca seleccionada
         const selectedMarca = props.marcas.find(m => m.value === form.brand_id)
         const marcaSlug = selectedMarca?.slug || ''
@@ -315,6 +341,9 @@
             return
         }
 
-        emit('submit', form)
+        // brand_id es solo un filtro del form, no es columna de subcategories
+        const { brand_id, ...payload } = form
+
+        emit('submit', payload)
     }
 </script>

@@ -38,6 +38,7 @@ export const useCategories = () => {
 	    const { data, error } = await supabase
 	        .from('categories')
 	        .select('*, brands(name)')
+	        .order('order', { ascending: true })
 	    
 	    if (error) return { data: null, error }
 	    

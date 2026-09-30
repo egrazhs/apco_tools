@@ -5,6 +5,7 @@ export interface Subcategory {
 	is_active: boolean
 	created_at?: string
 	category_id: number
+	order: number
 }
 
 export const useSubcategories = () => {

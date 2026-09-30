@@ -1,12 +1,10 @@
 <template>
     <div class="p-6">
         <AdminSubcategoryForm
-            v-if="subcategory && brandData"
-            :subcategory_id="Number(route.params.id)"
+            v-if="subcategory"
             :initial-data="subcategory"
             :marcas="marca_options || []"
-            :categories-by-brand="categoriesByBrand"
-            :initial-brand-id="brandData.brand_id"
+            :categories="categoriesByBrand"
             @submit="updateSubcategory"
         />
     </div>
