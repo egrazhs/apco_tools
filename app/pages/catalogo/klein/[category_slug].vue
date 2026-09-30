@@ -7,7 +7,7 @@
                 <span>/</span>
                 <NuxtLink to="/productos" class="hover:text-red-600 transition-colors">Catálogo</NuxtLink>
                 <span>/</span>
-                <NuxtLink to="/catalogo/ridgid" class="hover:text-red-600 transition-colors">RIDGID</NuxtLink>
+                <NuxtLink to="/catalogo/klein" class="hover:text-red-600 transition-colors">KLEIN</NuxtLink>
                 <span>/</span>
                 <span class="text-stone-600">{{ category?.name }}</span>
             </nav>
@@ -91,7 +91,7 @@
 
                             <!-- Encabezado de categoría -->
                             <NuxtLink
-                                to="/catalogo/ridgid"
+                                to="/catalogo/klein"
                                 class="flex items-center gap-2 px-4 py-3 border-b border-stone-200 bg-stone-50 hover:bg-stone-100 transition-colors group"
                             >
                                 <UIcon
@@ -99,7 +99,7 @@
                                     class="w-3 h-3 text-stone-400 group-hover:text-red-600 transition-colors"
                                 />
                                 <span class="text-xs uppercase tracking-widest text-stone-500 group-hover:text-red-600 transition-colors">
-                                    RIDGID
+                                    KLEIN
                                 </span>
                             </NuxtLink>
 

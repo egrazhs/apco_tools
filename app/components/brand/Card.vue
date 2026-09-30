@@ -1,6 +1,6 @@
 <template>
     <NuxtLink :to="`/catalogo/${brand.slug}`" class="group">
-        <article class="bg-gray-200 p-8 min-h-64 flex flex-col justify-between hover:shadow-lg transition-all duration-300 cursor-pointer">
+        <article class="bg-gray-200 p-8 h-72 flex flex-col justify-between hover:shadow-lg transition-all duration-300 cursor-pointer">
             
             <!-- Logo de marca -->
             <div class="flex justify-center items-center h-24 mb-6 bg-white">

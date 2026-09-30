@@ -8,12 +8,12 @@
         />
         
         <!-- Overlay oscuro base -->
-        <div class="absolute inset-0 bg-black/40 transition-colors duration-300 group-hover:bg-red-600/90"></div>
+        <div class="absolute inset-0 transition-colors duration-300 group-hover:bg-red-600/90"></div>
 
         <!-- Contenido - texto y label -->
         <div class="absolute inset-0 flex flex-col items-center justify-center p-6">
             <!-- Label pequeño en la esquina superior (visible siempre) -->
-            <span class="absolute top-4 right-4 text-white text-xs uppercase tracking-widest font-semibold opacity-100">
+            <span class="absolute top-4 right-4 text-slate-600 text-xs uppercase tracking-widest font-semibold opacity-100 group-hover:opacity-0">
                 {{ category.name }}
             </span>
 
