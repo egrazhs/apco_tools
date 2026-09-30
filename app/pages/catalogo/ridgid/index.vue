@@ -12,7 +12,7 @@
                     Catálogo
                 </NuxtLink>
                 <span>/</span>
-                <span class="text-stone-600">WURTH</span>
+                <span class="text-stone-600">RIDGID</span>
             </nav>
         </div>
 
@@ -58,14 +58,14 @@
 </template>
 
 <script setup>
-    const { getCategoriesByBrand, getActiveCategories } = useCategories()
+    const { getCategoriesByBrand, getActiveCategoriesByBrand } = useCategories()
     
     const BRAND_ID = '6'
 
     const { data: categories, pending, error } = await useAsyncData(
         'ridgid-categories',
         async () => {
-            const { data, error: fetchError } = await getActiveCategories(BRAND_ID)
+            const { data, error: fetchError } = await getActiveCategoriesByBrand(BRAND_ID)
             
             if (fetchError) {
                 console.error('Error fetching RIDGID categories:', fetchError)

@@ -56,7 +56,8 @@ export const useCategories = () => {
 	    
 	    return { data: mapCategoriesWithImages(sorted), error: null }
 	}
-	
+
+
 	const getCategoryById = async (id: string) => {
 		if (!id) throw new Error('ID requerido')
 		
@@ -141,16 +142,16 @@ export const useCategories = () => {
 	}
 
 
-	const getActiveCategories = async (brandId: string) => {
+	const getActiveCategoriesByBrand = async (brandId: string) => {
 	    if (!brandId) throw new Error('Brand ID requerido')
 	    
 	    // ── PASO 1: Obtener todas las categorías activas
 	    const { data: categories, error: catError } = await supabase
 	        .from('categories')
-	        .select('id, name, slug, is_active, brand_id, created_at, image_key')
+	        .select('id, name, slug, is_active, brand_id, created_at, image_key, order')
 	        .eq('brand_id', brandId)
 	        .eq('is_active', true)
-	        .order('created_at', { ascending: false })
+	        .order('order', { ascending: true })
 	    
 	    if (catError) {
 	        return { data: null, error: catError }
@@ -222,6 +223,6 @@ export const useCategories = () => {
 		updateCategory, 
 		deleteCategory, 
 		getCategoriesByBrand,
-		getActiveCategories 
+		getActiveCategoriesByBrand
 	}
 }
