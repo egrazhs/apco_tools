@@ -33,10 +33,10 @@
 
 <script setup>
     const items = [
-        '/img/fotos_local/1.jpeg',
+        '/img/fotos_local/7.jpeg',
         '/img/fotos_local/2.jpeg',
         '/img/fotos_local/3.jpeg',
-        '/img/fotos_local/4.jpeg',
+        '/img/fotos_local/8.jpeg',
         '/img/fotos_local/5.jpeg',
         '/img/fotos_local/6.jpeg',
     ];
