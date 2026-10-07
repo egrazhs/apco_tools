@@ -30,7 +30,7 @@
                     <h5 class="text-3xl my-4 text-stone-900">Cotizaciones</h5>
                     <p class="text-stone-600">
                         Para todo tipo de preguntas, comentarios e inquietudes; por favor llámanos:
-                        <a href="tel:3324860054" class="font-semibold text-stone-900 hover:text-red-600 transition-colors">
+                        <a href="https://wa.me/3324860054" target="_blank" rel="noopener noreferrer" class="font-semibold text-stone-900 hover:text-red-600 transition-colors">
                             <em>33 2486 0054</em>
                         </a>
                     </p>
@@ -76,15 +76,15 @@
                     </p>
 
                     <h5 class="text-3xl my-4 text-stone-900">Contáctanos</h5>
-                    <p><a href="tel:3336672206" class="text-stone-600 hover:text-red-600 transition-colors">Tel: (33) 3667 2206</a></p>
-                    <p><a href="tel:3316691475" class="text-stone-600 hover:text-red-600 transition-colors">Tel: (33) 1699 1475</a></p>
-                    <p><a href="tel:3324860054" class="text-stone-600 hover:text-red-600 transition-colors">Tel: (33) 2486 0054</a></p>
+                    <p><a href="https://wa.me/3336672206" target="_blank" rel="noopener noreferrer" class="text-stone-600 hover:text-red-600 transition-colors">Tel: (33) 3667 2206</a></p>
+                    <p><a href="https://wa.me/3316991475" target="_blank" rel="noopener noreferrer" class="text-stone-600 hover:text-red-600 transition-colors">Tel: (33) 1699 1475</a></p>
+                    <p><a href="https://wa.me/3324860054" target="_blank" rel="noopener noreferrer" class="text-stone-600 hover:text-red-600 transition-colors">Tel: (33) 2486 0054</a></p>
 
                     <hr class="border-red-600 border-4 w-[150px] mt-4" />
 
                     <h6 class="text-2xl my-4 text-stone-900">Solicita Cotización</h6>
                     <h6 class="text-2xl my-3">
-                        <a href="tel:3324860054" class="flex items-center gap-2 hover:text-red-600 transition-colors text-stone-700">
+                        <a href="https://wa.me/3324860054" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 hover:text-red-600 transition-colors text-stone-700">
                             <img src="/img/whatsapp.webp" class="w-14" alt="WhatsApp" />
                             33 2486 0054
                         </a>

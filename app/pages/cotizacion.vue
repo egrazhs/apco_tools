@@ -263,8 +263,15 @@
                                 <span class="text-xs">HerramientasAltaCalidad@hotmail.com</span>
                             </div>
                             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <UIcon name="i-heroicons-phone" class="w-4 h-4 text-primary-500 flex-shrink-0" />
-                                <span>+52 33 2486 0054</span>
+                                <UIcon name="i-simple-icons-whatsapp" class="w-4 h-4 text-green-500 flex-shrink-0" />
+                                <ULink
+                                    to="https://wa.me/523324860054"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="hover:text-green-600 transition-colors"
+                                >
+                                    +52 33 2486 0054
+                                </ULink>
                             </div>
                             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                 <UIcon name="i-heroicons-clock" class="w-4 h-4 text-primary-500 flex-shrink-0" />

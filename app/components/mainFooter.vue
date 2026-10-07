@@ -26,9 +26,9 @@
                 <article>
                     <h5 class="text-white font-bold uppercase tracking-widest text-xs mb-5">Contáctanos</h5>
                     <div class="flex flex-col gap-2 text-sm">
-                        <a href="tel:3336672206" class="hover:text-red-500 transition-colors">(33) 3667 2206</a>
-                        <a href="tel:3316691475" class="hover:text-red-500 transition-colors">(33) 1699 1475</a>
-                        <a href="tel:3324860054" class="hover:text-red-500 transition-colors">(33) 2486 0054</a>
+                        <a href="https://wa.me/3336672206" target="_blank" rel="noopener noreferrer" class="hover:text-red-500 transition-colors">(33) 3667 2206</a>
+                        <a href="https://wa.me/3316991475" target="_blank" rel="noopener noreferrer"class="hover:text-red-500 transition-colors">(33) 1699 1475</a>
+                        <a href="https://wa.me/3324860054" target="_blank" rel="noopener noreferrer" class="hover:text-red-500 transition-colors">(33) 2486 0054</a>
                         <a href="mailto:HerramientasAltaCalidad@hotmail.com" class="hover:text-red-500 transition-colors italic break-all mt-2 text-xs">
                             HerramientasAltaCalidad@hotmail.com
                         </a>
