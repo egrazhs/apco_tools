@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
         // ============================================
         // 3. Validar bucket permitido
         // ============================================
-        const ALLOWED_BUCKETS = ['brand-images', 'category-images', 'product-images', 'subcategory_images']
+        const ALLOWED_BUCKETS = ['brand-images', 'category-images', 'product-images', 'subcategory_images', 'grouping-images']
         if (!ALLOWED_BUCKETS.includes(bucket)) {
             throw createError({
                 statusCode: 400,

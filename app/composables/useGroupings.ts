@@ -25,7 +25,7 @@ export const useGroupings = () => {
         
         const { data, error } = await supabase
             .from('category_groupings')
-            .select('id, name, slug')
+            .select('id, name, slug, image_key')
             .eq('category_id', categoryId)
             .order('display_order', { ascending: true })
 

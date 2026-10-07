@@ -38,7 +38,7 @@
                     </button>
                 </div>
 
-                <!-- Grid de agrupaciones -->
+                <!-- Grid de agrupaciones -->   
                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                     <SubcategoryCard
                         v-for="(group, index) in groupings"
@@ -46,8 +46,9 @@
                         :name="group.name"
                         :index="index"
                         :description="group.description"
+                        :imageKey="group.image_key"
                         action-label="Ver opciones"
-                        :show-image="false"
+                        bucket="grouping-images"
                         @select="selectGrouping(group)"
                     />
                 </div>

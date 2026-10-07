@@ -257,7 +257,7 @@ definePageMeta({
 const { getGroupings, deleteGrouping} = useGroupings()
 const { getCategories, deleteCategory } = useCategories()
 const { getBrands } = useBrands()
-const { getImageUrl } = useStorageImage('category-images')
+const { getImageUrl } = useStorageImage('grouping-images')
 
 // Cargar categorías
 const { data: categories } = await useAsyncData('categories', async () => {

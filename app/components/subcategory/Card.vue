@@ -45,11 +45,13 @@
         description?: string | null
         actionLabel?: string
         showImage?: boolean
+        bucket?: string
     }>(), {
         imageKey: null,
         description: null,
         actionLabel: 'Ver productos',
-        showImage: true
+        showImage: true,
+        bucket: 'subcategory_images'
     })
 
     defineEmits<{ (e: 'select'): void }>()
@@ -61,11 +63,11 @@
     const imageUrl = computed(() => {
         if (!props.showImage || !props.imageKey) return null
         const { data } = supabase.storage
-            .from('subcategory_images')
+            .from(props.bucket)
             .getPublicUrl(`${props.imageKey}.webp`)
         return data?.publicUrl ?? null
     })
 
-    // Si cambia la imagen, reintentar
-    watch(() => props.imageKey, () => { imageFailed.value = false })
+    // Si cambia la imagen o el bucket, reintentar
+    watch(() => [props.imageKey, props.bucket], () => { imageFailed.value = false })
 </script>
