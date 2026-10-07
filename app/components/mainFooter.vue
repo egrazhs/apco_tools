@@ -13,7 +13,7 @@
 				    </p>
 				    <!-- Redes sociales -->
 				    <div class="flex items-center gap-4 mt-6">
-				        <a href="tel:3324860054" class="opacity-60 hover:opacity-100 transition-opacity">
+				        <a href="https://wa.me/3324860054" target="_blank" rel="noopener noreferrer" class="opacity-60 hover:opacity-100 transition-opacity">
 				            <img src="/img/whatsapp.webp" alt="WhatsApp" class="w-8 h-8 object-contain" />
 				        </a>
 				        <a href="https://www.facebook.com/profile.php?id=100082649351265" target="_blank" class="opacity-60 hover:opacity-100 transition-opacity">
