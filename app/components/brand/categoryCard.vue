@@ -8,24 +8,28 @@
         />
         
         <!-- Overlay oscuro base -->
-        <div class="absolute inset-0 transition-colors duration-300 group-hover:bg-red-600/90"></div>
+        <!--<div class="absolute inset-0 transition-colors duration-300 group-hover:bg-red-600/90"></div>-->
 
         <!-- Contenido - texto y label -->
         <div class="absolute inset-0 flex flex-col items-center justify-center p-6">
             <!-- Label pequeño en la esquina superior (visible siempre) -->
-            <span class="absolute top-4 right-4 text-slate-600 text-xs uppercase tracking-widest font-semibold opacity-100 group-hover:opacity-0">
+            <span class="absolute top-4 right-4 text-slate-600 text-xs uppercase tracking-widest font-semibold opacity-100">
                 {{ category.name }}
             </span>
 
             <!-- Título principal - visible solo en hover -->
+            <!--
             <h3 class="text-white text-center font-serif text-2xl md:text-3xl uppercase tracking-widest leading-tight transition-opacity duration-300 opacity-0 group-hover:opacity-100">
                 {{ category.name }}
             </h3>
+            -->
 
             <!-- Descripción - visible solo en hover -->
+            <!--
             <p v-if="category.description" class="text-white text-sm text-center mt-3 transition-opacity duration-300 opacity-0 group-hover:opacity-100 max-w-xs">
                 {{ category.description }}
             </p>
+            -->
         </div>
 
         <!-- CTA flecha - visible en hover -->
