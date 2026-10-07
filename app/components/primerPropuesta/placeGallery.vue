@@ -9,7 +9,7 @@
         >
             <template #default="{ item }">
                 <!-- Altura fija aquí, overflow hidden aquí -->
-                <div class="relative w-full h-[480px] overflow-hidden">
+                <div class="relative w-full h-[480px] xl:h-[600px] overflow-hidden">
                     <img
                         :src="item"
                         alt="Nuestro local"
