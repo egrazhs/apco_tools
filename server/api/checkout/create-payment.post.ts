@@ -2,13 +2,13 @@ import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 
 // ─── Helpers de proveedor ────────────────────────────────────────────────────
 
-async function createStripeSession(order: any, items: any[], baseUrl: string) {
-    const stripe = await import('stripe').then(m => new m.default(process.env.STRIPE_SECRET_KEY!))
+async function createStripeSession(order: any, items: any[], baseUrl: string, config: any) {
+    const stripe = await import('stripe').then(m => new m.default(config.stripeSecretKey!))
 
     const lineItems = items.map((item: any) => ({
         price_data: {
             currency:     'mxn',
-            unit_amount:  Math.round(item.unit_price * 100), // Stripe trabaja en centavos
+            unit_amount:  Math.round(item.unit_price * 100),
             product_data: {
                 name: item.products?.name ?? `Producto #${item.product_id}`
             },
@@ -30,8 +30,8 @@ async function createStripeSession(order: any, items: any[], baseUrl: string) {
     return { redirect_url: session.url }
 }
 
-async function createMercadoPagoPreference(order: any, items: any[], baseUrl: string) {
-    const accessToken = process.env.MP_ACCESS_TOKEN!
+async function crahJ91ZuNL8Y2px8iYciYeHN8sfSh5eXH8(order: any, items: any[], baseUrl: string, config: any) {
+    const accessToken = config.mpAccessToken!
 
     const mpItems = items.map((item: any) => ({
         title: item.products?.name ?? `Producto #${item.product_id}`,
@@ -55,15 +55,14 @@ async function createMercadoPagoPreference(order: any, items: any[], baseUrl: st
         external_reference: String(order.id),
     }
 
-
     console.log('[MP BODY]', JSON.stringify({
         ...body,
-        notification_url: `${baseUrl}/api/payments/webhooks/mercadopago`,
+        notification_url: `${baseUrl}/api/webhooks/mercadopago`,
     }, null, 2))
     console.log('[MP baseUrl]', baseUrl)
     
     const response = await $fetch<{ id: string; init_point: string; sandbox_init_point: string }>(
-    'https://api.mercadopago.com/checkout/preferences',
+        'https://api.mercadopago.com/checkout/preferences',
         {
             method:  'POST',
             headers: {
@@ -72,7 +71,7 @@ async function createMercadoPagoPreference(order: any, items: any[], baseUrl: st
             },
             body: {
                 ...body,
-                notification_url: `${baseUrl}/api/payments/webhooks/mercadopago`,
+                notification_url: `${mpBaseUrl}/api/webhooks/mercadopago`,
             },
         }
     ).catch(err => {
@@ -87,8 +86,10 @@ async function createMercadoPagoPreference(order: any, items: any[], baseUrl: st
 // ─── Handler principal ───────────────────────────────────────────────────────
 
 export default defineEventHandler(async (event) => {
+    const config = useRuntimeConfig()
     const user = await serverSupabaseUser(event)
-    console.log('user en create-payment:', user)        // ← agregar
+    
+    console.log('user en create-payment:', user)
     console.log('cookies:', event.headers.get('cookie'))
     
     if (!user) {
@@ -102,7 +103,6 @@ export default defineEventHandler(async (event) => {
 
     const supabase = await serverSupabaseClient(event)
 
-    // Verificar que la orden pertenece al usuario y está en estado pending
     const { data: order, error: orderError } = await supabase
         .from('orders')
         .select(`
@@ -125,16 +125,16 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 404, statusMessage: 'Orden no encontrada o ya procesada' })
     }
 
-    const provider  = process.env.PAYMENT_PROVIDER ?? 'stripe'
-    const baseUrl   = process.env.NUXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+    const provider  = config.public.paymentProvider ?? 'stripe'
+    const baseUrl   = config.public.siteUrl ?? 'http://localhost:3000'
     const orderItems = order.order_items ?? []
 
     if (provider === 'stripe') {
-        return createStripeSession(order, orderItems, baseUrl)
+        return createStripeSession(order, orderItems, baseUrl, config)
     }
 
     if (provider === 'mercadopago') {
-        return createMercadoPagoPreference(order, orderItems, baseUrl)
+        return crahJ91ZuNL8Y2px8iYciYeHN8sfSh5eXH8(order, orderItems, baseUrl, config)
     }
 
     throw createError({

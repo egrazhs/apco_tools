@@ -113,5 +113,13 @@ const sections = [
     bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
     iconColor: 'text-emerald-600 dark:text-emerald-400',
   },
+  {
+    to: '/admin/agrupaciones',
+    label: 'Agrupaciones de categoria',
+    description: 'Gestiona las categorias intermedias entre categoria y subcategorias.',
+    icon: 'i-lucide-folder',
+    bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+    iconColor: 'text-blue-800 dark:text-blue-600',
+  },
 ]
 </script>

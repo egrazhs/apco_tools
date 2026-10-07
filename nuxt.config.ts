@@ -30,9 +30,13 @@ export default defineNuxtConfig({
             siteUrl:         process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
         },
         supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-        resendApiKey: process.env.RESEND_API_KEY,
+        // ← RESEND
+        resendApiKey: process.env.NUXT_RESEND_API_KEY,
         mailFrom: process.env.NUXT_MAIL_FROM,
         mailToContact: process.env.NUXT_MAIL_TO_CONTACT,
+        // ← MERCADOPAGO (private keys)
+        mpAccessToken: process.env.NUXT_MP_ACCESS_TOKEN,
+        stripeSecretKey: process.env.NUXT_STRIPE_SECRET_KEY,
     },
 
     supabase: {

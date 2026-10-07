@@ -4,7 +4,7 @@
             v-if="subcategory"
             :initial-data="subcategory"
             :marcas="marca_options || []"
-            :categories="category_options"
+            :categories="category_options || []"
             @submit="updateSubcategory"
         />
     </div>

@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
         // Petición HTTP directa a Mercado Pago - Evita el SDK y soluciona el error en Windows
         const payment: any = await $fetch(`https://api.mercadopago.com/v1/payments/${body.data.id}`, {
             headers: {
-                Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+                Authorization: `Bearer ${config.mpAccessToken}`,
             }
         })
 

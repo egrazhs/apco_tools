@@ -1,0 +1,360 @@
+<template>
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-950">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+	  <!-- Header Section -->
+	  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div>
+		  <AdminBreadcrumb actual_page="Agrupaciones" />
+
+		  <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Agrupaciones</h1>
+		  <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+			{{ groupings?.length ?? 0 }} Agrupacion{{ (groupings?.length ?? 0) !== 1 ? 'es' : '' }} registrada{{ (groupings?.length ?? 0) !== 1 ? 's' : '' }}
+		  </p>
+		</div>
+		<UButton
+		  icon="i-heroicons-plus"
+		  size="md"
+		  class="self-start sm:self-auto"
+		  @click="navigateTo('/admin/agrupaciones/create')"
+		>
+		  Nueva Agrupación
+		</UButton>
+	  </div>
+
+	  <!-- Filters & Search Bar -->
+	  <UCard :ui="{ body: { padding: 'p-4' } }">
+		<div class="flex flex-col sm:flex-row gap-3">
+		  <div class="flex-1">
+			<UInput
+			  v-model="search"
+			  icon="i-heroicons-magnifying-glass"
+			  placeholder="Buscar categorías..."
+			  :ui="{ wrapper: 'w-full' }"
+			/>
+		  </div>
+		  <div class="flex gap-2">
+			<USelect
+			  v-model="filterEstado"
+			  :options="estadoOptions"
+			  placeholder="Estado"
+			  class="w-36"
+			/>
+			<UButton
+			  color="gray"
+			  variant="outline"
+			  icon="i-heroicons-arrow-path"
+			  :loading="refreshing"
+			  @click="handleRefresh"
+			>
+			  Actualizar
+			</UButton>
+		  </div>
+		</div>
+	  </UCard>
+
+	  <!-- Table Card -->
+	  <UCard :ui="{ body: { padding: 'p-0' } }">
+		<!-- Table Header -->
+		<div class="px-4 py-3 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+		  <div class="flex items-center gap-2">
+			<UIcon name="i-heroicons-tag" class="w-4 h-4 text-primary-500" />
+			<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Lista de Categorías</span>
+		  </div>
+		  <UBadge
+			v-if="filteredGroupings.length !== groupings?.length"
+			color="primary"
+			variant="subtle"
+			size="xs"
+		  >
+			{{ filteredGroupings.length }} resultado{{ filteredGroupings.length !== 1 ? 's' : '' }}
+		  </UBadge>
+		</div>
+
+		<!-- Empty State -->
+		<div v-if="filteredGroupings.length === 0" class="flex flex-col items-center justify-center py-16 px-4">
+		  <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+			<UIcon name="i-heroicons-tag" class="w-8 h-8 text-gray-400" />
+		  </div>
+		  <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+			{{ search || filterEstado ? 'Sin resultados' : 'Sin categorías' }}
+		  </h3>
+		  <p class="text-sm text-gray-500 dark:text-gray-400 text-center max-w-xs">
+			{{ search || filterEstado ? 'Intenta con otros filtros o términos de búsqueda.' : 'Comienza agregando tu primera categoría.' }}
+		  </p>
+		  <UButton
+			v-if="!search && !filterEstado"
+			icon="i-heroicons-plus"
+			size="sm"
+			class="mt-4"
+			@click="navigateTo('/admin/categorias/create')"
+		  >
+			Agregar Agrupación
+		  </UButton>
+		  <UButton
+			v-else
+			color="gray"
+			variant="ghost"
+			size="sm"
+			class="mt-4"
+			@click="clearFilters"
+		  >
+			Limpiar filtros
+		  </UButton>
+		</div>
+
+		<!-- Table -->
+		<UTable
+		  v-else
+		  :data="filteredGroupings"
+		  :columns="columns"
+		  :ui="{
+			tr: { base: 'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors' },
+			th: { base: 'bg-gray-50 dark:bg-gray-800/50 text-xs uppercase tracking-wider' },
+			td: { base: 'text-sm' }
+		  }"
+		>
+		  <template #nombre-cell="{ row }">
+			<div class="flex items-center gap-3">
+			  <div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
+				<UIcon name="i-heroicons-tag" class="w-4 h-4 text-primary-500" />
+			  </div>
+			  <span class="font-medium text-gray-900 dark:text-white">{{ row.original.name }}</span>
+			</div>
+		  </template>
+
+		  <template #imagen-cell="{ row }">
+			<div v-if="row.original.image_key" class="flex items-center gap-2">
+			  <img
+				:src="getImageUrl(row.original.image_key)"
+				:alt="row.original.name"
+				class="w-10 h-10 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
+			  />
+			</div>
+			<div v-else class="flex items-center gap-2">
+			  <div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+				<UIcon name="i-heroicons-photo" class="w-5 h-5 text-gray-400" />
+			  </div>
+			</div>
+		  </template>
+
+		  <template #marca-cell="{ row }">
+			<div v-if="row.original.brand_id" class="flex items-center gap-2">
+			  <UBadge color="blue" variant="subtle">
+				{{ getBrandName(row.original.brand_id) }}
+			  </UBadge>
+			</div>
+			<div v-else class="text-xs text-gray-500">—</div>
+		  </template>
+
+		  <template #slug-cell="{ row }">
+			<span class="font-mono text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+			  {{ row.original.slug }}
+			</span>
+		  </template>
+
+		  <template #is_active-cell="{ row }">
+			<UBadge
+			  :color="row.original.is_active ? 'green' : 'red'"
+			  variant="subtle"
+			  class="gap-1.5"
+			>
+			  <span
+				class="w-1.5 h-1.5 rounded-full inline-block"
+				:class="row.original.is_active ? 'bg-green-500' : 'bg-red-500'"
+			  />
+			  {{ row.original.is_active ? 'Activa' : 'Inactiva' }}
+			</UBadge>
+		  </template>
+
+		  <template #actions-cell="{ row }">
+			<div class="flex items-center gap-1">
+			  <UTooltip text="Editar">
+				<UButton
+				  size="xs"
+				  color="gray"
+				  variant="ghost"
+				  icon="i-heroicons-pencil-square"
+				  @click="editGrouping(row.original.id)"
+				/>
+			  </UTooltip>
+			  <UTooltip text="Eliminar">
+				<UButton
+				  size="xs"
+				  color="red"
+				  variant="ghost"
+				  icon="i-heroicons-trash"
+				  @click="confirmDelete(row.original)"
+				/>
+			  </UTooltip>
+			</div>
+		  </template>
+		</UTable>
+
+		<!-- Table Footer -->
+		<div
+		  v-if="filteredGroupings.length > 0"
+		  class="px-4 py-3 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between"
+		>
+		  <p class="text-xs text-gray-500 dark:text-gray-400">
+			Mostrando <span class="font-medium">{{ filteredGroupings.length }}</span> de <span class="font-medium">{{ groupings?.length ?? 0 }}</span> Agrupaciones
+		  </p>
+		  <div class="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
+			<span class="flex items-center gap-1">
+			  <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+			  {{ activeCount }} activa{{ activeCount !== 1 ? 's' : '' }}
+			</span>
+			<span class="flex items-center gap-1">
+			  <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />
+			  {{ inactiveCount }} inactiva{{ inactiveCount !== 1 ? 's' : '' }}
+			</span>
+		  </div>
+		</div>
+	  </UCard>
+	</div>
+
+	<!-- Delete Confirmation Modal -->
+	<UModal v-model:open="deleteModalOpen">
+	  <template #header>
+		<div class="flex items-center gap-3">
+		  <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+			<UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-red-500" />
+		  </div>
+		  <div>
+			<h3 class="text-base font-semibold text-gray-900 dark:text-white">Eliminar Agrupación</h3>
+			<p class="text-sm text-gray-500 dark:text-gray-400">Esta acción no se puede deshacer</p>
+		  </div>
+		</div>
+	  </template>
+
+	  <template #body>
+		<p class="text-sm text-gray-600 dark:text-gray-300 py-2">
+		  ¿Estás seguro que deseas eliminar
+		  <span class="font-semibold text-gray-900 dark:text-white">{{ deleteModal.categoria?.name }}</span>?
+		</p>
+	  </template>
+
+	  <template #footer>
+		<div class="flex justify-end gap-3">
+		  <UButton color="gray" variant="ghost" @click="deleteModalOpen = false">
+			Cancelar
+		  </UButton>
+		  <UButton color="red" :loading="deleteModal.loading" @click="handleDelete">
+			Eliminar
+		  </UButton>
+		</div>
+	  </template>
+	</UModal>
+  </div>
+</template>
+
+<script setup lang="ts">
+definePageMeta({
+	middleware: ['auth'],
+	layout: false,
+})
+
+const { getGroupings, deleteGrouping} = useGroupings()
+const { getCategories, deleteCategory } = useCategories()
+const { getBrands } = useBrands()
+const { getImageUrl } = useStorageImage('category-images')
+
+// Cargar categorías
+const { data: categories } = await useAsyncData('categories', async () => {
+	const { data } = await getCategories()
+	return data ?? []
+})
+
+//Cargar Agrupaciones
+const { data: groupings, refresh } = await useAsyncData('groupings', async () => {
+	const { data } = await getGroupings()
+	return data ?? []
+})
+
+// Cargar marcas
+const brands = ref<any[]>([])
+onMounted(async () => {
+	const { data } = await getBrands()
+	brands.value = data ?? []
+})
+
+// Search & Filters
+const search = ref('')
+const filterEstado = ref<boolean | null>(null)
+const estadoOptions = [
+	{ value: null, label: 'Todos' },
+	{ value: true, label: 'Activas' },
+	{ value: false, label: 'Inactivas' }
+]
+
+const filteredGroupings = computed(() => {
+	let result = groupings.value ?? []
+	if (search.value) {
+		const q = search.value.toLowerCase()
+		result = result.filter((c: any) =>
+			c.name?.toLowerCase().includes(q) ||
+			c.slug?.toLowerCase().includes(q)
+		)
+	}
+	if (filterEstado.value !== null) {
+		result = result.filter((c: any) => c.is_active === filterEstado.value)
+	}
+	return result
+})
+
+const activeCount = computed(() => (groupings.value ?? []).filter((c: any) => c.is_active).length)
+const inactiveCount = computed(() => (groupings.value ?? []).filter((c: any) => !c.is_active).length)
+
+const clearFilters = () => {
+	search.value = ''
+	filterEstado.value = null
+}
+
+// Helper para obtener nombre de marca
+const getBrandName = (brandId: string) => {
+	return brands.value.find(b => b.id === brandId)?.name || 'Sin marca'
+}
+
+// Refresh
+const refreshing = ref(false)
+const handleRefresh = async () => {
+	refreshing.value = true
+	await refresh()
+	refreshing.value = false
+}
+
+// Delete modal
+const deleteModalOpen = ref(false)
+const deleteModal = reactive({
+	loading: false,
+	categoria: null as any
+})
+
+const confirmDelete = (categoria: any) => {
+	deleteModal.categoria = categoria
+	deleteModalOpen.value = true
+}
+
+const handleDelete = async () => {
+	deleteModal.loading = true
+	await deleteGrouping(deleteModal.categoria.id)
+	await refresh()
+	deleteModal.loading = false
+	deleteModalOpen.value = false
+}
+
+// Edit
+const editGrouping = (id: string) => {
+	navigateTo(`/admin/agrupaciones/${id}`)
+}
+
+// Columns
+const columns = [
+	{ accessorKey: 'name', header: 'Nombre' },
+	{ accessorKey: 'imagen', header: 'Imagen' },
+	{ accessorKey: 'description', header: 'Descripcion' },
+	{ accessorKey: 'slug', header: 'Slug' },
+	{ accessorKey: 'is_active', header: 'Estado' },
+	{ id: 'actions', header: 'Acciones' }
+]
+</script>
