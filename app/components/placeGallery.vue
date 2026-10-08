@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
     const items = [
-        '/img/fotos_local/7.jpeg',
+        '/img/fotos_local/7.png',
         '/img/fotos_local/2.jpeg',
         '/img/fotos_local/3.jpeg',
         '/img/fotos_local/8.jpeg',
