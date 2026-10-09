@@ -94,6 +94,21 @@ export const useCategories = () => {
 	    if (error) throw error
 	    return { data: data || [] }
 	}
+
+	const getAllCategoriesByBrand = async (brandId: string) => {
+	    if (!brandId) throw new Error('Brand ID requerido')
+
+	    const { data, error } = await supabase
+	        .from('categories')
+	        .select('id, name, slug, is_active, order')
+	        .eq('brand_id', brandId)
+	        .order('order', { ascending: true })
+	        .order('id', { ascending: true })
+
+	    if (error) return { data: null, error }
+
+	    return { data: data || [], error: null }
+	}
 	
 	const createCategory = async (data: Category) => {
 		return await supabase.from('categories').insert(data).select().single()
@@ -219,7 +234,8 @@ export const useCategories = () => {
 		getCategories, 
 		getCategoryById, 
 		getCategoryBySlug,
-		getCategoriesByBrandId, 
+		getCategoriesByBrandId,
+		getAllCategoriesByBrand, 
 		createCategory, 
 		updateCategory, 
 		deleteCategory, 

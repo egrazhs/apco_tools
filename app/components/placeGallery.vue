@@ -3,7 +3,6 @@
         <UCarousel
             :items="items"
             loop
-            arrows
             dots
             :autoplay="{ delay: 5000 }"
         >
