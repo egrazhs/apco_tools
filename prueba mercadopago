@@ -1,0 +1,90 @@
+Datos de las credenciales de prueba
+
+N.º de la aplicación
+7996432905597562
+
+User ID
+3438706462
+
+Usuario de prueba
+TESTUSER2383041062628794579
+
+Contraseña
+dn3sYIRiUO
+
+Código de verificación
+706462
+
+
+
+País de operación
+México
+
+Public Key
+APP_USR-e42e4829-946c-4c17-a839-04b24d9945de
+
+Access Token
+APP_USR-7996432905597562-053013-29a212aac9abb2b40b35d72a98b96f48-3438706462
+
+
+
+
+
+Tarjeta	Número	Código de seguridad	Fecha de caducidad
+Mastercard
+5474 9254 3267 0366
+123
+11/30
+Visa
+4075 5957 1648 3764
+123
+11/30
+Mastercard Debito
+5579 0534 6148 2647
+1234
+11/30
+Visa Debito
+4189 1412 2126 7633
+123
+11/30
+Para probar diferentes resultados de pago, completa el estado deseado en el nombre del titular de la tarjeta:
+Estado de pago	Descripción
+APRO
+Pago aprobado
+OTHE
+Rechazado por error general
+CONT
+Pendiente de pago
+CALL
+Rechazado con validación para autorizar
+FUND
+Rechazado por importe insuficiente
+SECU
+Rechazado por código de seguridad inválido
+EXPI
+Rechazado debido a un problema de fecha de vencimiento
+FORM
+Rechazado debido a un error de formulario
+
+
+
+
+
+Cliente de prueba 1
+
+Comprador
+
+País
+México
+
+User ID
+3379091180
+
+Usuario
+TESTUSER5941474116686502679
+
+Contraseña
+ARxZxo7GgS
+
+Código de verificación
+091180

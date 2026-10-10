@@ -1,12 +1,3 @@
-// Interfaces actualizadas
-export interface Subcategory {
-    id: number
-    name: string
-    slug: string
-    category_id: number
-    is_active: boolean
-}
-
 export interface ProductSubcategory {
     id: number
     product_id: number

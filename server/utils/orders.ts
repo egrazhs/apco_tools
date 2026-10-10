@@ -1,7 +1,76 @@
 import { Resend } from 'resend'
+import {
+    buildAdminEmail,
+    buildCustomerConfirmedEmail,
+    buildCustomerFailedEmail,
+} from './emailTemplates'
 
 /**
- * Procesa el pago de una orden y envía correos
+ * Resuelve los datos del cliente de una orden.
+ * Prioridad: columnas de la orden -> auth.users (correo) -> profiles (nombre).
+ * Requiere que `supabase` sea el cliente con service role.
+ */
+async function resolveCustomer(supabase: any, order: any) {
+    let email: string | null = order.customer_email ?? null
+    let name: string | null = order.customer_name ?? null
+
+    if (order.user_id) {
+        if (!email) {
+            const { data, error } = await supabase.auth.admin.getUserById(order.user_id)
+            if (error) {
+                console.warn('⚠️ No se pudo obtener el correo del usuario:', error.message)
+            }
+            email = data?.user?.email ?? null
+        }
+
+        if (!name) {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('name')
+                .eq('id', order.user_id)
+                .maybeSingle()
+            name = profile?.name ?? null
+        }
+    }
+
+    return { email, name: name ?? email ?? 'cliente' }
+}
+
+/**
+ * Carga los productos y la dirección de envío de la orden
+ * para armar el detalle de los correos.
+ */
+async function loadOrderDetails(supabase: any, order: any) {
+    const { data: items, error: itemsError } = await supabase
+        .from('order_items')
+        .select('quantity, unit_price, discount, subtotal, products(name, code, model)')
+        .eq('order_id', order.id)
+
+    if (itemsError) {
+        console.warn('⚠️ No se pudieron cargar los productos de la orden:', itemsError.message)
+    }
+
+    let address = null
+    if (order.address_id) {
+        const { data, error: addressError } = await supabase
+            .from('addresses')
+            .select('*')
+            .eq('id', order.address_id)
+            .maybeSingle()
+
+        if (addressError) {
+            console.warn('⚠️ No se pudo cargar la dirección de envío:', addressError.message)
+        }
+        address = data ?? null
+    }
+
+    return { items: items ?? [], address }
+}
+
+/**
+ * Procesa el pago de una orden y envía correos.
+ * Se puede llamar desde el webhook y desde la verificación: los correos
+ * se envían una sola vez por estado gracias a la columna `notified_status`.
  * Uso: await processOrderPayment(supabase, config, payment, orderId)
  */
 export async function processOrderPayment(
@@ -17,7 +86,7 @@ export async function processOrderPayment(
     const status = payment.status  // 'approved' | 'pending' | 'rejected'
     console.log('📊 Estado del pago:', status)
 
-    const paymentStatusMap: Record<string, string> = {
+    const paymentStatusMap: Record<string, 'paid' | 'pending' | 'failed'> = {
         approved: 'paid',
         pending: 'pending',
         rejected: 'failed',
@@ -28,14 +97,24 @@ export async function processOrderPayment(
     try {
         // 1️⃣ Actualizar orden en Supabase
         console.log('🔄 Actualizando orden en Supabase...')
-        await supabase
+        const updates: Record<string, any> = {
+            payment_status: orderStatus,
+            external_payment_id: String(payment.id),
+            updated_at: new Date().toISOString(),
+        }
+
+        if (orderStatus === 'paid') {
+            updates.status = 'paid'
+        }
+
+        const { error: updateError } = await supabase
             .from('orders')
-            .update({
-                payment_status: orderStatus,
-                external_payment_id: String(payment.id),
-                updated_at: new Date().toISOString(),
-            })
+            .update(updates)
             .eq('id', orderId)
+
+        if (updateError) {
+            throw new Error(`Error actualizando orden: ${updateError.message}`)
+        }
         console.log('✅ Orden actualizada')
 
         // 2️⃣ Obtener datos completos de la orden
@@ -52,22 +131,56 @@ export async function processOrderPayment(
         }
         console.log('✅ Datos de orden obtenidos')
 
-        // 3️⃣ Enviar correos según el estado
-        console.log(`📨 Enviando correos (estado: ${orderStatus})...`)
-        if (orderStatus === 'paid') {
-            await sendOrderConfirmedEmail(config, order, payment)
-            console.log('✅ Email de confirmación enviado')
-        } else if (orderStatus === 'failed') {
-            await sendOrderFailedEmail(config, order, payment)
-            console.log('✅ Email de fallo enviado')
-        } else if (orderStatus === 'pending') {
-            console.log('⏳ Pago pendiente, sin correo enviado aún')
-        }
+        // Datos del cliente (correo y nombre)
+        const customer = await resolveCustomer(supabase, order)
+        order.customer_email = customer.email
+        order.customer_name = customer.name
 
-        // 4️⃣ Enviar notificación al admin
-        console.log('📨 Enviando notificación al admin...')
-        await sendAdminNotification(config, order, payment, orderStatus)
-        console.log('✅ Notificación al admin enviada')
+        // 3️⃣ Reservar el envío de correos para este estado.
+        //    El update condicional es atómico: si la verificación y el webhook
+        //    llegan al mismo tiempo, solo uno obtiene la reserva.
+        const { data: claimed, error: claimError } = await supabase
+            .from('orders')
+            .update({ notified_status: orderStatus })
+            .eq('id', orderId)
+            .or(`notified_status.is.null,notified_status.neq.${orderStatus}`)
+            .select('id')
+
+        if (claimError) {
+            console.error('❌ No se pudo reservar el envío de correos (¿existe la columna notified_status?):', claimError.message)
+        } else if (!claimed?.length) {
+            console.log(`⏭️ Ya se enviaron los correos para el estado "${orderStatus}", se omiten duplicados`)
+        } else {
+            // Productos y dirección para el detalle de los correos
+            const details = await loadOrderDetails(supabase, order)
+            order.items = details.items
+            order.address = details.address
+
+            console.log(`📨 Enviando correos (estado: ${orderStatus})...`)
+
+            // 3a. Correo al cliente (un fallo aquí no debe bloquear el aviso al admin)
+            try {
+                if (!order.customer_email) {
+                    console.warn('⚠️ Orden sin correo de cliente, se omite correo al cliente')
+                } else if (orderStatus === 'paid') {
+                    await sendOrderConfirmedEmail(config, order)
+                } else if (orderStatus === 'failed') {
+                    await sendOrderFailedEmail(config, order, payment)
+                } else if (orderStatus === 'pending') {
+                    console.log('⏳ Pago pendiente, sin correo al cliente aún')
+                }
+            } catch (emailError: any) {
+                console.error('❌ Falló el correo al cliente:', emailError.message)
+            }
+
+            // 3b. Notificación al admin (ferretería)
+            try {
+                console.log('📨 Enviando notificación al admin...')
+                await sendAdminNotification(config, order, payment, orderStatus)
+            } catch (emailError: any) {
+                console.error('❌ Falló la notificación al admin:', emailError.message)
+            }
+        }
 
         console.log('═══════════════════════════════════════')
         console.log('✅ ORDEN PROCESADA CORRECTAMENTE')
@@ -84,291 +197,68 @@ export async function processOrderPayment(
 }
 
 /**
- * Envía email de confirmación al cliente cuando el pago es aprobado
+ * Envío genérico con Resend.
+ * El SDK devuelve los errores en result.error y no lanza excepción.
  */
-async function sendOrderConfirmedEmail(config: any, order: any, payment: any) {
-    const resend = new Resend(config.resendApiKey)
-
+async function sendEmail(
+    config: any,
+    label: string,
+    payload: { to: string; subject: string; html: string; text: string; replyTo?: string }
+) {
     if (!config.resendApiKey) {
         console.error('❌ RESEND_API_KEY NO CONFIGURADA')
         throw new Error('Email service not configured')
     }
 
+    const resend = new Resend(config.resendApiKey)
+
     const result = await resend.emails.send({
         from: config.mailFrom,
-        to: order.customer_email,
-        subject: `¡Tu orden #${order.id} ha sido confirmada! - APCO TOOLS`,
-        html: emailClienteOrdenConfirmadaTemplate({
-            nombreCliente: order.customer_name,
-            numeroOrden: order.id,
-            total: order.total_amount,
-            fecha: order.created_at,
-        }),
+        ...payload,
     })
 
     if (result.error) {
-        console.error('❌ Error enviando email confirmado:', result.error)
+        console.error(`❌ Error enviando ${label}:`, result.error)
         throw new Error(result.error.message)
     }
 
-    console.log('✅ Email confirmado enviado:', result.data?.id)
+    console.log(`✅ ${label} enviado:`, result.data?.id)
 }
 
-/**
- * Envía email de fallo al cliente cuando el pago es rechazado
- */
+/** Confirmación al cliente cuando el pago es aprobado */
+async function sendOrderConfirmedEmail(config: any, order: any) {
+    const email = buildCustomerConfirmedEmail(order)
+
+    await sendEmail(config, 'email de confirmación', {
+        to: order.customer_email,
+        replyTo: config.mailToContact,
+        ...email,
+    })
+}
+
+/** Aviso al cliente cuando el pago es rechazado */
 async function sendOrderFailedEmail(config: any, order: any, payment: any) {
-    const resend = new Resend(config.resendApiKey)
+    const email = buildCustomerFailedEmail(order, payment.status_detail)
 
-    if (!config.resendApiKey) {
-        console.error('❌ RESEND_API_KEY NO CONFIGURADA')
-        throw new Error('Email service not configured')
-    }
-
-    const result = await resend.emails.send({
-        from: config.mailFrom,
+    await sendEmail(config, 'email de pago fallido', {
         to: order.customer_email,
-        subject: `Tu pago no pudo ser procesado - APCO TOOLS`,
-        html: emailClienteOrdenFallidaTemplate({
-            nombreCliente: order.customer_name,
-            numeroOrden: order.id,
-            razonFallo: payment.status_detail || 'Pago rechazado',
-        }),
+        replyTo: config.mailToContact,
+        ...email,
     })
-
-    if (result.error) {
-        console.error('❌ Error enviando email fallido:', result.error)
-        throw new Error(result.error.message)
-    }
-
-    console.log('✅ Email fallido enviado:', result.data?.id)
 }
 
-/**
- * Envía notificación al admin sobre el pago
- */
-async function sendAdminNotification(config: any, order: any, payment: any, orderStatus: string) {
-    const resend = new Resend(config.resendApiKey)
+/** Notificación interna a la ferretería */
+async function sendAdminNotification(
+    config: any,
+    order: any,
+    payment: any,
+    orderStatus: 'paid' | 'failed' | 'pending'
+) {
+    const email = buildAdminEmail(order, payment, orderStatus)
 
-    if (!config.resendApiKey) {
-        console.error('❌ RESEND_API_KEY NO CONFIGURADA')
-        throw new Error('Email service not configured')
-    }
-
-    const statusLabel = {
-        paid: '✅ PAGADA',
-        failed: '❌ RECHAZADA',
-        pending: '⏳ PENDIENTE',
-    }[orderStatus] || '❓ DESCONOCIDO'
-
-    const result = await resend.emails.send({
-        from: config.mailFrom,
+    await sendEmail(config, 'notificación admin', {
         to: config.mailToContact,
-        subject: `Nueva orden ${statusLabel}: ${order.customer_name}`,
-        html: emailAdminNotificationTemplate({
-            numeroOrden: order.id,
-            nombreCliente: order.customer_name,
-            emailCliente: order.customer_email,
-            total: order.total_amount,
-            estado: statusLabel,
-            paymentId: payment.id,
-            fecha: order.created_at,
-        }),
+        replyTo: order.customer_email ?? undefined,
+        ...email,
     })
-
-    if (result.error) {
-        console.error('❌ Error enviando notificación admin:', result.error)
-        throw new Error(result.error.message)
-    }
-
-    console.log('✅ Notificación admin enviada:', result.data?.id)
-}
-
-/**
- * Template: Email cliente - Orden Confirmada
- */
-function emailClienteOrdenConfirmadaTemplate({
-    nombreCliente,
-    numeroOrden,
-    total,
-    fecha,
-}: any) {
-    return `
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9fafb; }
-                .header { background: #16a34a; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
-                .content { background: white; padding: 30px; }
-                .order-info { background: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #16a34a; }
-                .footer { background: #f3f4f6; padding: 15px; text-align: center; font-size: 12px; color: #666; }
-                .btn { display: inline-block; background: #dc2626; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 15px; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>✅ ¡Tu orden ha sido confirmada!</h1>
-                </div>
-                <div class="content">
-                    <p>Hola <strong>${nombreCliente}</strong>,</p>
-                    
-                    <p>Gracias por tu compra. Tu pago ha sido procesado exitosamente y tu orden está confirmada.</p>
-                    
-                    <div class="order-info">
-                        <p><strong>📋 Número de orden:</strong> #${numeroOrden}</p>
-                        <p><strong>💰 Total pagado:</strong> $${parseFloat(total).toFixed(2)}</p>
-                        <p><strong>📅 Fecha:</strong> ${new Date(fecha).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                    </div>
-                    
-                    <p>Pronto recibirás información sobre el envío de tu pedido. Si tienes alguna pregunta, no dudes en contactarnos:</p>
-                    
-                    <p>📞 Teléfono: (33) 2486 0054</p>
-                    <p>📧 Email: HerramientasAltaCalidad@hotmail.com</p>
-                    
-                    <p>Saludos cordiales,<br><strong>APCO Tools</strong></p>
-                </div>
-                <div class="footer">
-                    <p>&copy; 2024 APCO Tools. Todos los derechos reservados.</p>
-                </div>
-            </div>
-        </body>
-    </html>
-    `
-}
-
-/**
- * Template: Email cliente - Orden Fallida
- */
-function emailClienteOrdenFallidaTemplate({
-    nombreCliente,
-    numeroOrden,
-    razonFallo,
-}: any) {
-    return `
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9fafb; }
-                .header { background: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
-                .content { background: white; padding: 30px; }
-                .alert-box { background: #fee2e2; border-left: 4px solid #dc2626; padding: 15px; border-radius: 5px; margin: 20px 0; }
-                .footer { background: #f3f4f6; padding: 15px; text-align: center; font-size: 12px; color: #666; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>❌ No pudimos procesar tu pago</h1>
-                </div>
-                <div class="content">
-                    <p>Hola <strong>${nombreCliente}</strong>,</p>
-                    
-                    <div class="alert-box">
-                        <p><strong>⚠️ Tu pago fue rechazado</strong></p>
-                        <p>Razón: ${razonFallo}</p>
-                        <p>Número de orden: #${numeroOrden}</p>
-                    </div>
-                    
-                    <p>Por favor, intenta nuevamente con otro método de pago o contáctanos para más información.</p>
-                    
-                    <p><strong>¿Necesitas ayuda?</strong></p>
-                    <p>📞 Teléfono: (33) 2486 0054</p>
-                    <p>📧 Email: HerramientasAltaCalidad@hotmail.com</p>
-                    
-                    <p>Saludos cordiales,<br><strong>APCO Tools</strong></p>
-                </div>
-                <div class="footer">
-                    <p>&copy; 2024 APCO Tools. Todos los derechos reservados.</p>
-                </div>
-            </div>
-        </body>
-    </html>
-    `
-}
-
-/**
- * Template: Notificación Admin
- */
-function emailAdminNotificationTemplate({
-    numeroOrden,
-    nombreCliente,
-    emailCliente,
-    total,
-    estado,
-    paymentId,
-    fecha,
-}: any) {
-    return `
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #1f2937; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
-                .content { background: white; padding: 30px; border: 1px solid #e5e7eb; }
-                .field { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e5e7eb; }
-                .field-label { font-weight: bold; color: #dc2626; }
-                .status-badge { display: inline-block; padding: 8px 12px; border-radius: 5px; font-weight: bold; }
-                .status-paid { background: #dcfce7; color: #15803d; }
-                .status-failed { background: #fee2e2; color: #991b1b; }
-                .status-pending { background: #fef3c7; color: #92400e; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h2>🛒 Nueva orden recibida</h2>
-                </div>
-                <div class="content">
-                    <div class="field">
-                        <span class="field-label">Estado:</span>
-                        <p>
-                            <span class="status-badge ${estado.includes('PAGADA') ? 'status-paid' : estado.includes('RECHAZADA') ? 'status-failed' : 'status-pending'}">
-                                ${estado}
-                            </span>
-                        </p>
-                    </div>
-
-                    <div class="field">
-                        <span class="field-label">Orden ID:</span>
-                        <p>#${numeroOrden}</p>
-                    </div>
-                    
-                    <div class="field">
-                        <span class="field-label">Cliente:</span>
-                        <p>${nombreCliente}</p>
-                    </div>
-
-                    <div class="field">
-                        <span class="field-label">Email:</span>
-                        <p><a href="mailto:${emailCliente}">${emailCliente}</a></p>
-                    </div>
-                    
-                    <div class="field">
-                        <span class="field-label">Total:</span>
-                        <p><strong>$${parseFloat(total).toFixed(2)}</strong></p>
-                    </div>
-
-                    <div class="field">
-                        <span class="field-label">Payment ID (MP):</span>
-                        <p>${paymentId}</p>
-                    </div>
-                    
-                    <p style="margin-top: 30px; color: #666; font-size: 12px;">
-                        ⏰ ${new Date(fecha).toLocaleString('es-MX')}
-                    </p>
-                </div>
-            </div>
-        </body>
-    </html>
-    `
 }
