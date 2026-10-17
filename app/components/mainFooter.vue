@@ -16,7 +16,7 @@
 				        <a href="https://wa.me/3324860054" target="_blank" rel="noopener noreferrer" class="opacity-60 hover:opacity-100 transition-opacity">
 				            <img src="/img/whatsapp.webp" alt="WhatsApp" class="w-8 h-8 object-contain" />
 				        </a>
-				        <a href="https://www.facebook.com/profile.php?id=100082649351265" target="_blank" class="opacity-60 hover:opacity-100 transition-opacity">
+				        <a href="https://www.facebook.com/profile.php?id=61591373657120" target="_blank" class="opacity-60 hover:opacity-100 transition-opacity">
 				            <img src="/img/facebook.webp" alt="Facebook" class="w-8 h-8 object-contain" />
 				        </a>
 				    </div>
