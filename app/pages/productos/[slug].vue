@@ -185,6 +185,7 @@
 
                         <div>
                             <ProductMercadopagoButton v-if="producto.mercadopago_link" :link="producto.mercadopago_link" />
+                             <ProductAmazonButton v-if="producto.amazon_link" :link="producto.amazon_link" />
                         </div>
 
                         <!-- Cotización -->

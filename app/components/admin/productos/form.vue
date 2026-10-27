@@ -227,16 +227,27 @@
                             </div>
                         </UFormField>
 
+                        <div class="block">
+                            <UFormField label="Link de mercadopago (opcional)" class="col-span-1">
+                                <UInput
+                                    v-model="form.mercadopago_link"
+                                    type="text"
+                                    placeholder="Link de mercadopago"
+                                    size="lg"
+                                    icon="i-heroicons-link"
+                                />
+                            </UFormField>
 
-                        <UFormField label="Link de mercadopago (opcional)" class="col-span-1">
-                            <UInput
-                                v-model="form.mercadopago_link"
-                                type="text"
-                                placeholder="Link de mercadopago"
-                                size="lg"
-                                icon="i-heroicons-link"
-                            />
-                        </UFormField>
+                            <UFormField label="Link de Amazon (opcional)" class="col-span-1">
+                                <UInput
+                                    v-model="form.amazon_link"
+                                    type="text"
+                                    placeholder="Link de Amazon"
+                                    size="lg"
+                                    icon="i-heroicons-link"
+                                />
+                            </UFormField>
+                        </div>
                     </div>
                 </div>
 
@@ -304,6 +315,7 @@
         stock: props.initialData?.stock || 50,
         is_active: props.initialData?.is_active ?? true,
         mercadopago_link: props.initialData?.mercadopago_link ?? '',
+        amazon_link: props.initialData?.amazon_link ?? '',
         model: props.initialData?.model ?? '',
         specifications: props.initialData?.specifications ?? '',
         order: props.initialData?.order || 999
